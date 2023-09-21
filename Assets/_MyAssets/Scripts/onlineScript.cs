@@ -10,8 +10,8 @@ public class onlineScript : MonoBehaviourPunCallbacks
 {
     private PhotonView _view;
     private menuScript _MS;
-
     private int _selectedLobby;
+
 
 
     void Start()
@@ -24,7 +24,7 @@ public class onlineScript : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster() { PhotonNetwork.JoinLobby(); }
 
-    public override void OnJoinedLobby() { switchWifi(); }
+    public override void OnJoinedLobby() { changeWifiState(); }
 
     public void AccessRoom(int lobbyNum)
     {
@@ -54,21 +54,22 @@ public class onlineScript : MonoBehaviourPunCallbacks
         }
     }
 
-    private void switchWifi()
+    public override void OnDisconnected(DisconnectCause cause) { changeWifiState(); }
+
+    private void changeWifiState()
     {
         Image wifiImage = GameObject.Find("wifi").GetComponent<Image>();
         TextMeshProUGUI wifiText = GameObject.Find("wifi_Text").GetComponent<TextMeshProUGUI>();
 
-        if (wifiText.text == "Online")
-        {
-            wifiImage.color = new Color(255, 0, 31, 255);
-            wifiText.text = "Trying";
-
-        }
-        else
+        if(PhotonNetwork.IsConnected)
         {
             wifiImage.color = new Color(0, 255, 0, 255);
             wifiText.text = "Online";
+        }
+        else
+        {
+            wifiImage.color = new Color(255, 0, 31, 255);
+            wifiText.text = "Trying";
         }
     }
 

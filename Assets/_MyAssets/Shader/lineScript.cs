@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// UnityEngine.InputSystem;
+using UnityEngine.InputSystem;
 
 public class lineScript : MonoBehaviour
 {
@@ -62,10 +62,11 @@ public class lineScript : MonoBehaviour
 
     private void Update()
     {
-        /*if(Input.GetKeyDown(KeyCode.Mouse0) && lr.enabled)
+        if(Input.GetKeyDown(KeyCode.Mouse0) /*&& lr.enabled*/)
         {
-            enable(false, new Vector2(0, 0));
-        }*/
+            Debug.Log("Enabled");
+            enable(true, new Vector2(0, 0));
+        }
 
         if (lr.enabled == false)
             return;
@@ -85,8 +86,9 @@ public class lineScript : MonoBehaviour
             return;
         }
 
-        Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-        reticle.transform.position = mouseScreenPosition;
+        //Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+        //Vector2 mouseScreenPosition = new Vector2(109, 169);
+        //reticle.transform.localPosition = mouseScreenPosition;
     }
 
 }
