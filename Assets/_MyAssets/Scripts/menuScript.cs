@@ -9,20 +9,55 @@ using System.Linq;
 
 public class menuScript : MonoBehaviour, IDataPersistence
 {
+    notifScript NotificationScript;
+
+    //Firebase Data
+    FirebaseScript fireBaseScript;
+
+    //Online
+    onlineScript OnlineScript;
+
     [Header("Sprites")]
     [SerializeField] private Sprite[] _background_Sprites;
     [SerializeField] private Sprite[] _button_Sprites;
 
     [Header("Variables")]
-
-    public string PlayerName;
+    public TMP_InputField UsernameField;
+    public TMP_InputField KillsField;
 
     private string _fieldString;
     private int _fieldInt;
+    private bool _bInt;
+
+    [Header("Menus Lerp")]
+    [SerializeField] float friendSpeed = 6;
+    private bool _bFriends;
+    private Transform _friends;
+    private Transform _friendsIcon;
+
+    private void Awake()
+    {
+        _friends = transform.Find("main").transform.Find("friendsMenu").GetComponent<Transform>();
+        _friendsIcon = transform.Find("main").transform.Find("friendsMenu").transform.Find("icon").GetComponent<Transform>();
+
+        fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
+        OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
+
+        NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
+    }
 
     private void Start()
     {
         menuStyle(Random.Range(0, _background_Sprites.Length)); // picks a random style at game start
+    }
+
+    private void Update()
+    {
+        float friendsLerp = (_bFriends) ? 436 : 850;
+        _friends.localPosition = Vector2.Lerp(_friends.localPosition, new Vector2(friendsLerp, 0), friendSpeed * Time.deltaTime);
+
+        float friendsIconLerp = (_bFriends) ? -187 : -360;
+        _friendsIcon.localPosition = Vector2.Lerp(_friendsIcon.localPosition, new Vector2(friendsIconLerp, 234), friendSpeed * Time.deltaTime);
     }
 
     private void menuStyle(int change)
@@ -36,34 +71,50 @@ public class menuScript : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void LoadData(GameData data)
+    public void FriendsMenu()
     {
-        //PlayerName = data.PlayerName;
-        //transform.Find("nameField").GetComponent<TMP_InputField>().text = PlayerName;
-    }
-
-    public GameData SaveData(GameData data)
-    {
-        //data.PlayerName = PlayerName;
-
-        return data;
+        _bFriends = !_bFriends;
     }
 
     public void ReadStringInput(string s)
     {
         _fieldString = s;
+        _bInt = false;
 
         if (!int.TryParse(s, out int example)) return;
         _fieldInt = System.Convert.ToInt32(s);
+        _bInt = true;
     }
 
-    public void updateField(string field)
+    public void CloudSave(string key)
     {
-        switch(field)
+        if (key == "username")
         {
-            case "PlayerName":
-                PlayerName = _fieldString;
-                break;
+            OnlineScript.updateFriendsName(_fieldString);
+            OnlineScript.setNickName(_fieldString);
+            StartCoroutine(fireBaseScript.UpdateUsernameAuth(_fieldString));
         }
+
+        if(_bInt)
+        {
+            StartCoroutine(fireBaseScript.UpdateObject(key, _fieldInt));
+        }
+        else
+        {
+            StartCoroutine(fireBaseScript.UpdateObject(key, _fieldString));
+        }
+    }
+
+    public void LoadData(Dictionary<string, object> dataDictionary)
+    {
+        KillsField.text = dataDictionary["Kills"].ToString();
+
+        UsernameField.text = dataDictionary["username"].ToString();
+        OnlineScript.setNickName(dataDictionary["username"].ToString());
+    }
+
+    public void LoadOtherPlayersData(string key, object data)
+    {
+        
     }
 }

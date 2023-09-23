@@ -7,10 +7,15 @@ using Firebase.Extensions;
 using TMPro;
 using System;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class AuthManager : MonoBehaviour
 {
     notifScript NotificationScript;
+    loadingScript loading;
+
+    [Header("Firebase Data")]
+    public FirebaseScript fireBaseScript;
 
     //PlayerPref
     private string _savedEmail;
@@ -37,12 +42,16 @@ public class AuthManager : MonoBehaviour
 
     private void Awake()
     {
+        loading = GameObject.Find("LoadingScreen").GetComponent<loadingScript>();
+        loading.show();
+
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             _dependentStatus = task.Result;
             if(_dependentStatus == DependencyStatus.Available)
             {
                 _auth = FirebaseAuth.DefaultInstance;
+                fireBaseScript.InitializeDatabase();
                 Debug.Log("setting up Auth");
             }
             else
@@ -56,7 +65,7 @@ public class AuthManager : MonoBehaviour
     {
         getDependencies();
         getPlayerPrefs();
-        if (_bSaveAutomatically == 1 && _savedEmail != "" && _savedPassword != "") StartCoroutine(signInAuto());
+        StartCoroutine(signInDelay());
     }
 
     private void getDependencies()
@@ -78,10 +87,18 @@ public class AuthManager : MonoBehaviour
         _checkmark.color = (_bSaveAutomatically == 1) ? new Color(255, 255, 255, 255) : new Color(0, 0, 0, 0);
     }
 
-    private IEnumerator signInAuto()
+    private IEnumerator signInDelay()
     {
         yield return new WaitForSeconds(1);
-        StartCoroutine(Login(_savedEmail, _savedPassword));
+ 
+        if (_bSaveAutomatically == 1 && _savedEmail != "" && _savedPassword != "")
+        {
+            StartCoroutine(Login(_savedEmail, _savedPassword));
+        }
+        else
+        {
+            loading.hide();
+        }
     }
 
     public void loginAutoToggle()
@@ -99,6 +116,9 @@ public class AuthManager : MonoBehaviour
     private IEnumerator Login(string email, string password)
     {
         var loginTask = _auth.SignInWithEmailAndPasswordAsync(email, password);
+
+        loading.show();
+
         yield return new WaitUntil(predicate: () => loginTask.IsCompleted);
 
         if (loginTask.Exception != null) // error message
@@ -118,14 +138,20 @@ public class AuthManager : MonoBehaviour
                 case AuthError.NetworkRequestFailed: message = "There's no internet"; break;
             }
             NotificationScript.createNotif($"Failed to login: {message}", Color.red);
+
+            loading.hide();
         }
         else
         {
             _user = loginTask.Result.User;
+            if(_user != null) fireBaseScript.GetUser(_user);
+
             NotificationScript.createNotif($"User {_user.DisplayName} Signed in", Color.green);
 
             PlayerPrefs.SetString("email", email);
             PlayerPrefs.SetString("password", password);
+
+            fireBaseScript.LoadCloudData();
 
             //Load scene here when the login
         }
@@ -147,6 +173,9 @@ public class AuthManager : MonoBehaviour
         else
         {
             var registerTask = _auth.CreateUserWithEmailAndPasswordAsync(email, password);
+
+            loading.show();
+
             yield return new WaitUntil(predicate: () => registerTask.IsCompleted);
 
             if(registerTask.Exception != null)
@@ -165,12 +194,15 @@ public class AuthManager : MonoBehaviour
                     case AuthError.NetworkRequestFailed: message = "There's no internet"; break;
                 }
                 NotificationScript.createNotif($"Failed register: {message}", Color.red);
+                loading.hide();
             }
             else
             {
                 _user = registerTask.Result.User;
                 if(_user != null)
                 {
+                    fireBaseScript.GetUser(_user);
+
                     UserProfile profile = new UserProfile();
                     profile.DisplayName = username;
 
@@ -188,11 +220,20 @@ public class AuthManager : MonoBehaviour
                     else
                     {
                         NotificationScript.createNotif($"You Registered!", Color.green);
-                        //Login using the data
-                        //username set, return to login screen...
+                        GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>().setNickName(username);
+                        GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>().UsernameField.text = username;
+                        StartCoroutine(Login(email, password));
                     }
                 }
             }
         }
+    }
+
+    public void SignOut()
+    {
+        _auth.SignOut();
+        _usernameField.text = "";
+        _emailField.text = "";
+        _passwordField.text = "";
     }
 }
