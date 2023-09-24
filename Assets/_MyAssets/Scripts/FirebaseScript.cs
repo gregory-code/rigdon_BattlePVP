@@ -110,6 +110,15 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("friends", "");
             StartCoroutine(UpdateObject("friends", ""));
 
+            dataDictionary.Add("startSongs", "");
+            StartCoroutine(UpdateObject("startSongs", ""));
+            dataDictionary.Add("middleSongs", "");
+            StartCoroutine(UpdateObject("middleSongs", ""));
+            dataDictionary.Add("finalSongs", "");
+            StartCoroutine(UpdateObject("finalSongs", ""));
+            dataDictionary.Add("randomSongs", "");
+            StartCoroutine(UpdateObject("randomSongs", ""));
+
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
                 dataPersistenceObj.LoadData(dataDictionary);
@@ -125,6 +134,10 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("Kills" ,snapShot.Child("Kills").Value); // This is for ints, "Kills" is the name and snapShot.Chlid("Kills") gets the value from that directoary
             dataDictionary.Add("username", snapShot.Child("username").Value);
             dataDictionary.Add("friends", snapShot.Child("friends").Value);
+            dataDictionary.Add("startSongs", snapShot.Child("startSongs").Value);
+            dataDictionary.Add("middleSongs", snapShot.Child("middleSongs").Value);
+            dataDictionary.Add("finalSongs", snapShot.Child("finalSongs").Value);
+            dataDictionary.Add("randomSongs", snapShot.Child("randomSongs").Value);
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
