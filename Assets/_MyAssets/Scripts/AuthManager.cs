@@ -232,6 +232,7 @@ public class AuthManager : MonoBehaviour
     public void SignOut()
     {
         _auth.SignOut();
+        gameObject.SetActive(true);
         _usernameField.text = "";
         _emailField.text = "";
         _passwordField.text = "";

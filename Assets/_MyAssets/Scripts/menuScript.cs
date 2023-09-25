@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using UnityEngine.Audio;
 using System.Linq;
+using static Photon.Pun.UtilityScripts.PunTeams;
 
 public class menuScript : MonoBehaviour, IDataPersistence
 {
@@ -46,6 +47,19 @@ public class menuScript : MonoBehaviour, IDataPersistence
     private Transform _friends;
     private Transform _friendsIcon;
 
+    [Header("Builder")]
+    [SerializeField] Sprite[] critterSprites;
+    private int selectedTeam;
+    
+    [SerializeField] TMP_Text[] teamName; // for all 3 teams
+    [SerializeField] TMP_Text[] createNewText;
+    [SerializeField] int[] teamCritterIDs;
+
+    [SerializeField] Image[] team1CritterImages; //each team
+    [SerializeField] Image[] team2CritterImages;
+    [SerializeField] Image[] team3CritterImages;
+
+    #region audio fields
     [Header("Audio")]
 
     [SerializeField] private Image[] roundButtns;
@@ -86,9 +100,16 @@ public class menuScript : MonoBehaviour, IDataPersistence
     [SerializeField] AudioSource testEffect;
     [SerializeField] AudioMixerSnapshot Regular;
     [SerializeField] AudioMixerSnapshot Muted;
+    #endregion
 
     private void Awake()
     {
+        for (int i = 0; i < teamCritterIDs.Length; ++i)
+        {
+            teamCritterIDs[i] = -1;
+            selectedTeam = -1;
+        }
+
         _friends = transform.Find("main").transform.Find("friendsMenu").GetComponent<Transform>();
         _friendsIcon = transform.Find("main").transform.Find("friendsMenu").transform.Find("icon").GetComponent<Transform>();
 
@@ -151,8 +172,17 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     public void returnMenu()
     {
-        menuAnimations.ResetTrigger("scatter");
-        menuAnimations.SetTrigger("leave" + currentMenu);
+        if (selectedTeam != -1)
+        {
+            menuAnimations.ResetTrigger("openTeam" + (selectedTeam + 1));
+            menuAnimations.SetTrigger("closeTeam" + (selectedTeam + 1));
+            selectedTeam = -1;
+        }
+        else
+        {
+            menuAnimations.ResetTrigger("scatter");
+            menuAnimations.SetTrigger("leave" + currentMenu);
+        }
     }
 
     public void setTextToName()
@@ -307,6 +337,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
         if (currentSong != null) currentSong.Stop();
         currentSong = GameObject.Find(songName).GetComponent<AudioSource>();
         currentSong.Play();
+        NotificationScript.createNotif($"Now Playing: {songName}", Color.magenta);
     }
 
     private void addSong(string songName)
@@ -449,6 +480,48 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     #endregion
 
+    #region Buidler Menu
+
+    private void InitalizeBuilder()
+    {
+
+        for(int i = 0; i < teamCritterIDs.Length; ++i)
+        {
+            createNewText[i].text = "";
+            if(teamCritterIDs[i] == -1)
+            {
+                //team does not exist, set everything to invisible
+                Image[] critterGroup = new Image[3];
+                switch(i)
+                {
+                    case 0: critterGroup = team1CritterImages; break;
+                    case 1: critterGroup = team2CritterImages; break;
+                    case 2: critterGroup = team3CritterImages; break;
+                }
+
+                critterGroup[0].color = new Color(1, 1, 1, 0);
+                critterGroup[1].color = new Color(1, 1, 1, 0);
+                critterGroup[2].color = new Color(1, 1, 1, 0);
+
+                createNewText[i].text = "Create New";
+                teamName[i].text = "";
+            }
+        }
+    }
+
+    public void selecteTeam(int team)
+    {
+        if (selectedTeam != -1) return;
+
+        selectedTeam = team;
+        menuAnimations.SetTrigger("openTeam" + (team + 1));
+        menuAnimations.ResetTrigger("closeTeam" + 1);
+        menuAnimations.ResetTrigger("closeTeam" + 2);
+        menuAnimations.ResetTrigger("closeTeam" + 3);
+    }
+
+    #endregion
+
     public void ReadStringInput(string s)
     {
         _fieldString = s;
@@ -490,6 +563,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
         deserializeSongList(dataDictionary["finalSongs"].ToString().Split('_').ToList(), finalSongs);
         deserializeSongList(dataDictionary["randomSongs"].ToString().Split('_').ToList(), randomSongs);
         InitalizeMusic();
+        InitalizeBuilder();
     }
 
     public void LoadOtherPlayersData(string key, object data)
