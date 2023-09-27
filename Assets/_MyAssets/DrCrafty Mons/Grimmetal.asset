@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 3
   critterName: Grimmetal
   nickName: 
+  circleOutline: {fileID: 21300000, guid: 8cff3f71ba6242f4eacb44dac6e2e07b, type: 3}
   bFlipSprite: 010100
   stages:
   - {fileID: 21300000, guid: 2a22671c398ad754ca6834c18652f444, type: 3}

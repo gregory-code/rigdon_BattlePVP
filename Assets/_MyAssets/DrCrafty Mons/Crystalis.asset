@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 0
   critterName: Crystalis
   nickName: 
+  circleOutline: {fileID: 21300000, guid: ea9137d418f967d4c8238226d2784059, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 90cc5ccf1549c4248950eb8dd94dd0f9, type: 3}

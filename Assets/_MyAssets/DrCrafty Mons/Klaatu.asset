@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 6
   critterName: Klaatu
   nickName: 
+  circleOutline: {fileID: 21300000, guid: ff812dcee14ef064f90d89e45ab1ee99, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: b30ec521c9e5a724da7d1caf0150a27e, type: 3}

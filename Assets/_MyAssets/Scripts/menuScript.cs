@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using UnityEngine.Audio;
 using System.Linq;
+using static Photon.Pun.UtilityScripts.PunTeams;
 
 public class menuScript : MonoBehaviour, IDataPersistence
 {
@@ -51,10 +52,17 @@ public class menuScript : MonoBehaviour, IDataPersistence
     #region build fields
 
     [Header("Builder")]
+    private bool bCritterList;
+    [SerializeField] Transform critterList;
     [SerializeField] critter[] critterCollection;
+    private List<GameObject> critterGameObjectList = new List<GameObject>();
+    [SerializeField] Transform critterParent;
+    [SerializeField] GameObject critterPrefab;
 
     [SerializeField] Sprite[] critterSprites;
     [SerializeField] Sprite addCritterSprite;
+
+    private int selectedCritter;
     private int selectedTeam;
     private bool bSelectedTeam;
     
@@ -65,6 +73,10 @@ public class menuScript : MonoBehaviour, IDataPersistence
     [SerializeField] Image[] team1CritterImages; //each team
     [SerializeField] Image[] team2CritterImages;
     [SerializeField] Image[] team3CritterImages;
+
+    [SerializeField] Transform[] team1CritterTransforms; //each team
+    [SerializeField] Transform[] team2CritterTransforms;
+    [SerializeField] Transform[] team3CritterTransforms;
 
     #endregion
 
@@ -118,6 +130,8 @@ public class menuScript : MonoBehaviour, IDataPersistence
             teamCritterIDs[i] = -1;
         }
 
+        selectedCritter = -1;
+
         _friends = transform.Find("friendsMenu").GetComponent<Transform>();
         _friendsIcon = transform.Find("friendsMenu").transform.Find("icon").GetComponent<Transform>();
 
@@ -144,12 +158,33 @@ public class menuScript : MonoBehaviour, IDataPersistence
         float friendsIconLerp = (_bFriends) ? -187 : -360;
         _friendsIcon.localPosition = Vector2.Lerp(_friendsIcon.localPosition, new Vector2(friendsIconLerp, 234), friendSpeed * Time.deltaTime);
 
-        if(menuSongs.Count > 0)
+        float critterLerp = (bCritterList) ? -64 : -569;
+        critterList.localPosition = Vector2.Lerp(critterList.localPosition, new Vector2(-26, critterLerp), 6 * Time.deltaTime);
+
+        if (menuSongs.Count > 0)
         {
             if(currentSong != null && currentSong.isPlaying == false)
             {
                 playRandomSong();
             }
+        }
+        
+        if (bSelectedTeam == false) return;
+        float critterIconLerp = 0;
+        Transform[] critterTransforms = new Transform[team1CritterTransforms.Length];
+        switch(selectedTeam)
+        {
+            case 0: critterTransforms = team1CritterTransforms; break;
+            case 1: critterTransforms = team2CritterTransforms; break;
+            case 2: critterTransforms = team3CritterTransforms; break;
+        }
+        for(int i = 0; i < team1CritterTransforms.Length; ++i)
+        {
+            critterIconLerp = (selectedCritter == i) ? 30 : 0;
+            Image critterOutline = critterTransforms[i].transform.Find("outline").GetComponent<Image>();
+            int critterOutlineLerp = (selectedCritter == i) ? 1 : 0;
+            critterOutline.fillAmount = Mathf.Lerp(critterOutline.fillAmount, critterOutlineLerp, 12 * Time.deltaTime);
+            critterTransforms[i].localPosition = Vector2.Lerp(critterTransforms[i].localPosition, new Vector2(critterTransforms[i].localPosition.x, critterIconLerp), 12 * Time.deltaTime);
         }
     }
 
@@ -192,8 +227,10 @@ public class menuScript : MonoBehaviour, IDataPersistence
         {
             menuAnimations.ResetTrigger("openTeam" + (selectedTeam + 1));
             menuAnimations.SetTrigger("closeTeam" + (selectedTeam + 1));
-            bSelectedTeam = false;
-            selectedTeam = -1;
+            //bSelectedTeam = false;
+            //bCritterList = false;
+            selectedCritter = -1;
+            //selectedTeam = -1;
         }
         else if(edittingPlaylist == true)
         {
@@ -562,16 +599,14 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     public void inBuilderMenuSprites(int team)
     {
+        bSelectedTeam = false;
+        bCritterList = false;
+        selectedCritter = -1;
+        selectedTeam = -1;
+
         if (teamCritterIDs[team] == -1) // it's empty
         {
-            //team does not exist, set everything to invisible
-            Image[] critterGroup = new Image[teamCritterIDs.Length];
-            switch (team)
-            {
-                case 0: critterGroup = team1CritterImages; break;
-                case 1: critterGroup = team2CritterImages; break;
-                case 2: critterGroup = team3CritterImages; break;
-            }
+            Image[] critterGroup = getCritterGroup(team);
 
             critterGroup[0].sprite = transparentSprite;
             critterGroup[1].sprite = transparentSprite;
@@ -580,6 +615,20 @@ public class menuScript : MonoBehaviour, IDataPersistence
             createNewText[team].text = "Create New";
             teamName[team].text = "";
         }
+    }
+
+    private Image[] getCritterGroup(int which)
+    {
+        //team does not exist, set everything to invisible
+        Image[] critterGroup = new Image[teamCritterIDs.Length];
+        switch (which)
+        {
+            case 0: critterGroup = team1CritterImages; break;
+            case 1: critterGroup = team2CritterImages; break;
+            case 2: critterGroup = team3CritterImages; break;
+        }
+
+        return critterGroup;
     }
 
     public void selectCritter(int team)
@@ -593,10 +642,55 @@ public class menuScript : MonoBehaviour, IDataPersistence
             menuAnimations.ResetTrigger("closeTeam" + 2);
             menuAnimations.ResetTrigger("closeTeam" + 3);
         }
-        else if(bSelectedTeam == true)
+    }
+
+    public void getSelectedCritter(int which)
+    {
+        if (bSelectedTeam == true)
         {
-            
+            selectedCritter = which;
+            bCritterList = true;
+            createCritterSelect();
         }
+    }
+
+    private void createCritterSelect()
+    {
+        foreach (GameObject critter in critterGameObjectList)
+        {
+            Destroy(critter);
+        }
+        critterGameObjectList.Clear();
+
+        foreach(critter Critter in critterCollection)
+        {
+            GameObject newCritter = Instantiate(critterPrefab);
+
+            newCritter.transform.SetParent(critterParent.transform);
+            newCritter.transform.localScale = new Vector3(1, 1, 1);
+
+            newCritter.transform.Find("critterName").GetComponent<TMP_Text>().text = Critter.GetCritterName();
+            newCritter.transform.Find("graphic").GetComponent<Image>().sprite = Critter.stages[0];
+            newCritter.transform.Find("border").GetComponent<Image>().sprite = Critter.circleOutline;
+            newCritter.transform.Find("hpText").GetComponent<TMP_Text>().text = Critter.GetInitialHP() + "";
+            newCritter.transform.Find("strText").GetComponent<TMP_Text>().text = Critter.GetInitialStrength() + "";
+            newCritter.transform.Find("magicText").GetComponent<TMP_Text>().text = Critter.GetInitialMagic() + "";
+            newCritter.transform.Find("speedText").GetComponent<TMP_Text>().text = Critter.GetInitialSpeed() + "";
+
+            newCritter.GetComponent<Button>().onClick.AddListener(() => chooseCritter(Critter.GetCritterID()));
+
+            critterGameObjectList.Add(newCritter);
+        }
+
+    }
+
+    private void chooseCritter(int ID)
+    {
+        Image[] critterGroup = getCritterGroup(selectedTeam);
+
+        critterGroup[selectedCritter].sprite = critterCollection[ID].stages[0];
+        critterGroup[selectedCritter].transform.Find("outline").GetComponent<Image>().sprite = critterCollection[ID].circleOutline;
+        bCritterList = false;
     }
 
     #endregion

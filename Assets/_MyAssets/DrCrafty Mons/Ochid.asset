@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 10
   critterName: Ochid
   nickName: 
+  circleOutline: {fileID: 21300000, guid: 089281f93a342a8488b45a7e7164ef8c, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 0a3f4f3d39f1aa943a041249c431ab6b, type: 3}

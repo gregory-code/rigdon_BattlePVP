@@ -7,35 +7,43 @@ public class critter : ScriptableObject
 {
     [Header("ID")]
     [SerializeField] private int critterID;
+    public int GetCritterID() { return critterID; }
     [Space(35)]
 
     [Header("Info")]
 
     [SerializeField] private string critterName;
+    public string GetCritterName() { return critterName; }
     [SerializeField] private string nickName;
 
+    public Sprite circleOutline;
+
     [SerializeField] bool[] bFlipSprite = new bool[3];
-    [SerializeField] Sprite[] stages = new Sprite[3];
+    public Sprite[] stages = new Sprite[3];
 
 
     [Header("Stats")]
 
     [SerializeField] private int initial_HP;
+    public int GetInitialHP() { return initial_HP; }
     private int maxHP;
     private int currentHP;
     private int growthHP;
 
     [SerializeField] private int initial_Strength;
+    public int GetInitialStrength() { return initial_Strength; }
     private int baseStrength;
     private int currentStrength;
     private int growthStrength;
 
     [SerializeField] private int initial_Magic;
+    public int GetInitialMagic() { return initial_Magic; }
     private int baseMagic;
     private int currentMagic;
     private int growthMagic;
 
     [SerializeField] private int initial_Speed;
+    public int GetInitialSpeed() { return initial_Speed; }
     private int baseSpeed;
     private int currentSpeed;
     private int growthSpeed;
@@ -44,6 +52,7 @@ public class critter : ScriptableObject
     public int AttackID;
     public int AbilityID;
     public int PassiveID;
+
 
     private void Set_Initial_Stats()
     {

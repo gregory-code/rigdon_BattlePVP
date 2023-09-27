@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 4
   critterName: Hummrance
   nickName: 
+  circleOutline: {fileID: 21300000, guid: 249277ef5535fbc4598ecd66a0227e8a, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 82ba3ce8b29fbf44f96ca1821e65eb98, type: 3}

@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 11
   critterName: Platisaur
   nickName: 
+  circleOutline: {fileID: 21300000, guid: a40d9a13692d86e4dbab812ac80e8de3, type: 3}
   bFlipSprite: 000001
   stages:
   - {fileID: 21300000, guid: a451a4e36b0ffea4f9a6aa3aaed03bf2, type: 3}

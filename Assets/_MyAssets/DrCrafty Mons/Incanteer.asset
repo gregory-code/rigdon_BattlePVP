@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 5
   critterName: Incanteer
   nickName: 
+  circleOutline: {fileID: 21300000, guid: 49d7e5a39360f5b4ca421631228003b6, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: c6b69ee9911b00444bcf8107d3324280, type: 3}

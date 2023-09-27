@@ -15,6 +15,7 @@ MonoBehaviour:
   critterID: 7
   critterName: Lusselia
   nickName: 
+  circleOutline: {fileID: 21300000, guid: 7b21a12e9d1b67641ac12d1c4ef207ae, type: 3}
   bFlipSprite: 000000
   stages:
   - {fileID: 21300000, guid: 08a074ad6cd8a034e9fef008b795f2d6, type: 3}
