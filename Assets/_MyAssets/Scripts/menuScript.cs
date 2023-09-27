@@ -7,10 +7,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using UnityEngine.Audio;
 using System.Linq;
-using static Photon.Pun.UtilityScripts.PunTeams;
 
 public class menuScript : MonoBehaviour, IDataPersistence
 {
+    [SerializeField] private Sprite transparentSprite;
+
     notifScript NotificationScript;
 
     //PlayerPref
@@ -47,9 +48,15 @@ public class menuScript : MonoBehaviour, IDataPersistence
     private Transform _friends;
     private Transform _friendsIcon;
 
+    #region build fields
+
     [Header("Builder")]
+    [SerializeField] critter[] critterCollection;
+
     [SerializeField] Sprite[] critterSprites;
+    [SerializeField] Sprite addCritterSprite;
     private int selectedTeam;
+    private bool bSelectedTeam;
     
     [SerializeField] TMP_Text[] teamName; // for all 3 teams
     [SerializeField] TMP_Text[] createNewText;
@@ -59,8 +66,12 @@ public class menuScript : MonoBehaviour, IDataPersistence
     [SerializeField] Image[] team2CritterImages;
     [SerializeField] Image[] team3CritterImages;
 
+    #endregion
+
     #region audio fields
     [Header("Audio")]
+
+    private bool edittingPlaylist;
 
     [SerializeField] private Image[] roundButtns;
 
@@ -72,6 +83,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
     public List<string> middleSongs = new List<string>();
     public List<string> finalSongs = new List<string>();
     public List<string> randomSongs = new List<string>();
+    public List<string> menuSongs = new List<string>();
 
     private List<GameObject> playListObjects = new List<GameObject>();
     [SerializeField] Transform playListParent;
@@ -85,12 +97,9 @@ public class menuScript : MonoBehaviour, IDataPersistence
     [SerializeField] GameObject songPrefab;
 
     [SerializeField] song[] songLibrary;
+    private bool bBattlePlayListPreference;
     [SerializeField] Image randomImage;
     [SerializeField] Image perBattleImage;
-    [SerializeField] TMP_Text preferenceText;
-    [SerializeField] Image preferenceIcon;
-    [SerializeField] Sprite perBattlePreference;
-    [SerializeField] Sprite randomPreference;
     [SerializeField] Image muteIcon;
     [SerializeField] Sprite mutedSprite;
     [SerializeField] Sprite unmutedSprite;
@@ -107,11 +116,10 @@ public class menuScript : MonoBehaviour, IDataPersistence
         for (int i = 0; i < teamCritterIDs.Length; ++i)
         {
             teamCritterIDs[i] = -1;
-            selectedTeam = -1;
         }
 
-        _friends = transform.Find("main").transform.Find("friendsMenu").GetComponent<Transform>();
-        _friendsIcon = transform.Find("main").transform.Find("friendsMenu").transform.Find("icon").GetComponent<Transform>();
+        _friends = transform.Find("friendsMenu").GetComponent<Transform>();
+        _friendsIcon = transform.Find("friendsMenu").transform.Find("icon").GetComponent<Transform>();
 
         fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
         OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
@@ -135,6 +143,14 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
         float friendsIconLerp = (_bFriends) ? -187 : -360;
         _friendsIcon.localPosition = Vector2.Lerp(_friendsIcon.localPosition, new Vector2(friendsIconLerp, 234), friendSpeed * Time.deltaTime);
+
+        if(menuSongs.Count > 0)
+        {
+            if(currentSong != null && currentSong.isPlaying == false)
+            {
+                playRandomSong();
+            }
+        }
     }
 
     #region menuing
@@ -176,25 +192,21 @@ public class menuScript : MonoBehaviour, IDataPersistence
         {
             menuAnimations.ResetTrigger("openTeam" + (selectedTeam + 1));
             menuAnimations.SetTrigger("closeTeam" + (selectedTeam + 1));
+            bSelectedTeam = false;
             selectedTeam = -1;
+        }
+        else if(edittingPlaylist == true)
+        {
+            edittingPlaylist = false;
+            menuAnimations.ResetTrigger("editPlaylist");
+            menuAnimations.SetTrigger("exitPlaylist");
         }
         else
         {
             menuAnimations.ResetTrigger("scatter");
             menuAnimations.SetTrigger("leave" + currentMenu);
-        }
-    }
-
-    public void setTextToName()
-    {
-        titleText.text = currentMenu;
-    }
-
-    public void setTextToMain()
-    {
-        titleText.text = "Main Menu";
-        menuAnimations.ResetTrigger("leave" + currentMenu);
-        currentMenu = "";
+            currentMenu = "";
+        }    
     }
 
     #endregion
@@ -225,6 +237,38 @@ public class menuScript : MonoBehaviour, IDataPersistence
         // ========
     }
 
+    private void playRandomSong()
+    {
+        int randomSong = Random.Range(0, menuSongs.Count);
+
+        listenToSong(menuSongs[randomSong]);
+    }
+
+
+    public void editPlayList()
+    {
+        edittingPlaylist = true;
+        menuAnimations.SetTrigger("editPlaylist");
+        menuAnimations.ResetTrigger("exitPlaylist");
+        if (bBattlePlayListPreference == false)
+        {
+            switchPlayList(3);
+        }
+        else
+        {
+            switchPlayList(0);
+        }
+    }
+
+    public void editMenuList()
+    {
+        edittingPlaylist = true;
+        switchPlayList(4);
+        menuAnimations.SetTrigger("editPlaylist");
+        menuAnimations.ResetTrigger("exitPlaylist");
+    }
+
+
     public void setMusicLevel(float sliderValue)
     {
         PlayerPrefs.SetFloat("musicLevel", sliderValue);
@@ -254,23 +298,19 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     public void switchSongPrefernce()
     {
-        if(preferenceIcon.sprite == perBattlePreference) // per battle
+        if(bBattlePlayListPreference == true) // per battle
         {
-            preferenceIcon.sprite = randomPreference;
-            preferenceText.text = "Song Prefernce: Random";
+            bBattlePlayListPreference = false;
             perBattleImage.color = new Color(0, 0, 0, 0.5f);
             randomImage.color = new Color(1, 1, 1, 1);
             PlayerPrefs.SetInt("songPreference", 0);
-            switchPlayList(3);
         }
         else // it's random
         {
-            preferenceIcon.sprite = perBattlePreference;
-            preferenceText.text = "Song Prefernce: Per Battle";
+            bBattlePlayListPreference = true;
             randomImage.color = new Color(0, 0, 0, 0.5f);
             perBattleImage.color = new Color(1, 1, 1, 1);
             PlayerPrefs.SetInt("songPreference", 1);
-            switchPlayList(0);
         }
     }
 
@@ -349,6 +389,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
             case 1: desiredPlayList = middleSongs; break;
             case 2: desiredPlayList = finalSongs; break;
             case 3: desiredPlayList = randomSongs; break;
+            case 4: desiredPlayList = menuSongs; break;
         }
 
         if (desiredPlayList.Contains(songName)) return;
@@ -377,7 +418,11 @@ public class menuScript : MonoBehaviour, IDataPersistence
                 break;
             case 3: 
                 desiredPlayList = randomSongs;
-                roundNameText.text = "Song Play List";
+                roundNameText.text = "Random Play List";
+                break;
+            case 4:
+                desiredPlayList = menuSongs;
+                roundNameText.text = "Menu Song List";
                 break;
         }
 
@@ -387,7 +432,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
         }
         playListObjects.Clear();
 
-        if(playList == 3)
+        if(playList == 3 || playList == 4)
         {
             for (int i = 0; i < roundButtns.Length; i++)
             {
@@ -447,11 +492,16 @@ public class menuScript : MonoBehaviour, IDataPersistence
             case 1: desiredPlayList = middleSongs; break;
             case 2: desiredPlayList = finalSongs; break;
             case 3: desiredPlayList = randomSongs; break;
+            case 4: desiredPlayList = menuSongs; break;
         }
 
         desiredPlayList.Remove(name);
         Destroy(songObj);
         playListObjects.Remove(songObj);
+
+        RectTransform rectSongList = playListParent.GetComponent<RectTransform>();
+        float difference = (playListObjects.Count == 0) ? 40 : playListObjects.Count * 40;
+        rectSongList.sizeDelta = new Vector2(rectSongList.sizeDelta.x, difference);
 
         CloudUpdateSongList(whichPlaylist);
     }
@@ -464,6 +514,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
             case 1: StartCoroutine(fireBaseScript.UpdateObject("middleSongs", string.Join("_", middleSongs))); break;
             case 2: StartCoroutine(fireBaseScript.UpdateObject("finalSongs", string.Join("_", finalSongs))); break;
             case 3: StartCoroutine(fireBaseScript.UpdateObject("randomSongs", string.Join("_", randomSongs))); break;
+            case 4: StartCoroutine(fireBaseScript.UpdateObject("menuSongs", string.Join("_", menuSongs))); break;
         }
     }
 
@@ -487,37 +538,65 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
         for(int i = 0; i < teamCritterIDs.Length; ++i)
         {
-            createNewText[i].text = "";
-            if(teamCritterIDs[i] == -1)
+            selectedTeam = i;
+            inBuilderMenuSprites(i);
+        }
+
+        selectedTeam = -1;
+    }
+
+    public void inBuilderSprites(int team)
+    {
+        Image[] critterGroup = new Image[teamCritterIDs.Length];
+        switch (team)
+        {
+            case 0: critterGroup = team1CritterImages; break;
+            case 1: critterGroup = team2CritterImages; break;
+            case 2: critterGroup = team3CritterImages; break;
+        }
+
+        if (critterGroup[0].sprite == transparentSprite) critterGroup[0].sprite = addCritterSprite;
+        if (critterGroup[1].sprite == transparentSprite) critterGroup[1].sprite = addCritterSprite;
+        if (critterGroup[2].sprite == transparentSprite) critterGroup[2].sprite = addCritterSprite;
+    }
+
+    public void inBuilderMenuSprites(int team)
+    {
+        if (teamCritterIDs[team] == -1) // it's empty
+        {
+            //team does not exist, set everything to invisible
+            Image[] critterGroup = new Image[teamCritterIDs.Length];
+            switch (team)
             {
-                //team does not exist, set everything to invisible
-                Image[] critterGroup = new Image[3];
-                switch(i)
-                {
-                    case 0: critterGroup = team1CritterImages; break;
-                    case 1: critterGroup = team2CritterImages; break;
-                    case 2: critterGroup = team3CritterImages; break;
-                }
-
-                critterGroup[0].color = new Color(1, 1, 1, 0);
-                critterGroup[1].color = new Color(1, 1, 1, 0);
-                critterGroup[2].color = new Color(1, 1, 1, 0);
-
-                createNewText[i].text = "Create New";
-                teamName[i].text = "";
+                case 0: critterGroup = team1CritterImages; break;
+                case 1: critterGroup = team2CritterImages; break;
+                case 2: critterGroup = team3CritterImages; break;
             }
+
+            critterGroup[0].sprite = transparentSprite;
+            critterGroup[1].sprite = transparentSprite;
+            critterGroup[2].sprite = transparentSprite;
+
+            createNewText[team].text = "Create New";
+            teamName[team].text = "";
         }
     }
 
-    public void selecteTeam(int team)
+    public void selectCritter(int team)
     {
-        if (selectedTeam != -1) return;
-
-        selectedTeam = team;
-        menuAnimations.SetTrigger("openTeam" + (team + 1));
-        menuAnimations.ResetTrigger("closeTeam" + 1);
-        menuAnimations.ResetTrigger("closeTeam" + 2);
-        menuAnimations.ResetTrigger("closeTeam" + 3);
+        if (selectedTeam == -1 && bSelectedTeam == false)
+        {
+            selectedTeam = team;
+            bSelectedTeam = true;
+            menuAnimations.SetTrigger("openTeam" + (team + 1));
+            menuAnimations.ResetTrigger("closeTeam" + 1);
+            menuAnimations.ResetTrigger("closeTeam" + 2);
+            menuAnimations.ResetTrigger("closeTeam" + 3);
+        }
+        else if(bSelectedTeam == true)
+        {
+            
+        }
     }
 
     #endregion
@@ -562,8 +641,11 @@ public class menuScript : MonoBehaviour, IDataPersistence
         deserializeSongList(dataDictionary["middleSongs"].ToString().Split('_').ToList(), middleSongs);
         deserializeSongList(dataDictionary["finalSongs"].ToString().Split('_').ToList(), finalSongs);
         deserializeSongList(dataDictionary["randomSongs"].ToString().Split('_').ToList(), randomSongs);
+        deserializeSongList(dataDictionary["menuSongs"].ToString().Split('_').ToList(), menuSongs);
         InitalizeMusic();
         InitalizeBuilder();
+
+        playRandomSong();
     }
 
     public void LoadOtherPlayersData(string key, object data)

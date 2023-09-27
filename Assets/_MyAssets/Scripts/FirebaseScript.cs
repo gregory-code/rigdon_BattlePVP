@@ -9,7 +9,6 @@ using System;
 using UnityEngine.UI;
 using Firebase.Auth;
 using System.Linq;
-using static UnityEngine.Rendering.DebugUI;
 
 public class FirebaseScript : MonoBehaviour
 {
@@ -118,6 +117,8 @@ public class FirebaseScript : MonoBehaviour
             StartCoroutine(UpdateObject("finalSongs", ""));
             dataDictionary.Add("randomSongs", "");
             StartCoroutine(UpdateObject("randomSongs", ""));
+            dataDictionary.Add("menuSongs", "");
+            StartCoroutine(UpdateObject("menuSongs", ""));
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
@@ -138,6 +139,7 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("middleSongs", snapShot.Child("middleSongs").Value);
             dataDictionary.Add("finalSongs", snapShot.Child("finalSongs").Value);
             dataDictionary.Add("randomSongs", snapShot.Child("randomSongs").Value);
+            dataDictionary.Add("menuSongs", snapShot.Child("menuSongs").Value);
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
