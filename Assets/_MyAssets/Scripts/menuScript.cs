@@ -66,9 +66,12 @@ public class menuScript : MonoBehaviour, IDataPersistence
     private int selectedTeam;
     private bool bSelectedTeam;
     
-    [SerializeField] TMP_Text[] teamName; // for all 3 teams
+    [SerializeField] TMP_InputField[] teamName; // for all 3 teams
     [SerializeField] TMP_Text[] createNewText;
-    [SerializeField] int[] teamCritterIDs;
+
+    [SerializeField] critterBuild[] team1CritterBuilds = new critterBuild[3];
+    [SerializeField] critterBuild[] team2CritterBuilds = new critterBuild[3];
+    [SerializeField] critterBuild[] team3CritterBuilds = new critterBuild[3];
 
     [SerializeField] Image[] team1CritterImages; //each team
     [SerializeField] Image[] team2CritterImages;
@@ -77,6 +80,25 @@ public class menuScript : MonoBehaviour, IDataPersistence
     [SerializeField] Transform[] team1CritterTransforms; //each team
     [SerializeField] Transform[] team2CritterTransforms;
     [SerializeField] Transform[] team3CritterTransforms;
+
+    [Header("Stats Growth Page")]
+    [SerializeField] Transform editCritterTransform;
+    bool bGrowthEditor;
+    [SerializeField] Transform growthPageTransform;
+    [SerializeField] Transform growthPointsTransform;
+    [SerializeField] TMP_Text growthPointsText;
+    bool bEditCritter;
+
+    [SerializeField] TMP_Text[] statValueTexts;
+    [SerializeField] Image[] statGrowths;
+    
+    [SerializeField] Sprite[] growthSprites;
+
+    [SerializeField] TMP_Text[] growthTexts;
+    [SerializeField] Image[] hpGrowthButtons;
+    [SerializeField] Image[] strGrowthButtons;
+    [SerializeField] Image[] magicGrowthButtons;
+    [SerializeField] Image[] speedGrowthButtons;
 
     #endregion
 
@@ -125,11 +147,6 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     private void Awake()
     {
-        for (int i = 0; i < teamCritterIDs.Length; ++i)
-        {
-            teamCritterIDs[i] = -1;
-        }
-
         selectedCritter = -1;
 
         _friends = transform.Find("friendsMenu").GetComponent<Transform>();
@@ -170,6 +187,16 @@ public class menuScript : MonoBehaviour, IDataPersistence
         }
         
         if (bSelectedTeam == false) return;
+
+        float editCritterLerp = (bEditCritter) ? 0 : -500;
+        editCritterTransform.localPosition = Vector2.Lerp(editCritterTransform.localPosition, new Vector2(0, editCritterLerp), 7.5f * Time.deltaTime);
+
+        float editGrowthLerp = (bGrowthEditor) ? -76.4f : 43;
+        growthPageTransform.localPosition = Vector2.Lerp(growthPageTransform.localPosition, new Vector2(-17, editGrowthLerp), 7.5f * Time.deltaTime);
+
+        float editGrowthSize = (bGrowthEditor) ? 1 : 0.6f;
+        growthPageTransform.localScale = Vector2.Lerp(growthPageTransform.localScale, new Vector2(1, editGrowthSize), 7.5f * Time.deltaTime);
+
         float critterIconLerp = 0;
         Transform[] critterTransforms = new Transform[team1CritterTransforms.Length];
         switch(selectedTeam)
@@ -183,8 +210,8 @@ public class menuScript : MonoBehaviour, IDataPersistence
             critterIconLerp = (selectedCritter == i) ? 30 : 0;
             Image critterOutline = critterTransforms[i].transform.Find("outline").GetComponent<Image>();
             int critterOutlineLerp = (selectedCritter == i) ? 1 : 0;
-            critterOutline.fillAmount = Mathf.Lerp(critterOutline.fillAmount, critterOutlineLerp, 12 * Time.deltaTime);
-            critterTransforms[i].localPosition = Vector2.Lerp(critterTransforms[i].localPosition, new Vector2(critterTransforms[i].localPosition.x, critterIconLerp), 12 * Time.deltaTime);
+            critterOutline.fillAmount = Mathf.Lerp(critterOutline.fillAmount, critterOutlineLerp, 30 * Time.deltaTime);
+            critterTransforms[i].localPosition = Vector2.Lerp(critterTransforms[i].localPosition, new Vector2(critterTransforms[i].localPosition.x, critterIconLerp), 10 * Time.deltaTime);
         }
     }
 
@@ -229,6 +256,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
             menuAnimations.SetTrigger("closeTeam" + (selectedTeam + 1));
             //bSelectedTeam = false;
             //bCritterList = false;
+            bEditCritter = false;
             selectedCritter = -1;
             //selectedTeam = -1;
         }
@@ -573,7 +601,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
     private void InitalizeBuilder()
     {
 
-        for(int i = 0; i < teamCritterIDs.Length; ++i)
+        for(int i = 0; i < team1CritterBuilds.Length; ++i)
         {
             selectedTeam = i;
             inBuilderMenuSprites(i);
@@ -582,15 +610,73 @@ public class menuScript : MonoBehaviour, IDataPersistence
         selectedTeam = -1;
     }
 
+    private void deserializeCritterValue(string toDeserialize, int critterValue)
+    {
+        List<string> teams = toDeserialize.Split('*').ToList<string>();
+
+        for(int i = 0; i < teams.Count; ++i)
+        {
+            critterBuild[] critterGroupBuilds = getCritterBuildGroup(i);
+            Image[] critterGroup = getCritterGroup(i);
+
+            List<string> ids = teams[i].Split('_').ToList<string>();
+
+
+            for(int x = 0; x < teams.Count; ++x)
+            {
+                critterGroupBuilds[x].critterValue[critterValue] = int.Parse(ids[x]);
+
+                if (critterGroupBuilds[x].critterValue[critterValue] != -1)
+                {
+                    createNewText[i].text = "";
+                    critterGroup[x].sprite = critterCollection[critterGroupBuilds[x].critterValue[critterValue]].stages[0];
+                    critterGroup[x].transform.Find("outline").GetComponent<Image>().sprite = critterCollection[critterGroupBuilds[x].critterValue[critterValue]].circleOutline;
+                }
+            }    
+        }
+    }
+
+    private void CloudUpdateCritterBuild(int critterValue)
+    {
+        string newValues = "";
+
+        for(int i = 0; i < team1CritterBuilds.Length; ++i)
+        {
+            critterBuild[] critterGroupBuilds = getCritterBuildGroup(i);
+
+            newValues += critterGroupBuilds[0].critterValue[critterValue];
+            newValues += "_";
+            newValues += critterGroupBuilds[1].critterValue[critterValue];
+            newValues += "_";
+            newValues += critterGroupBuilds[2].critterValue[critterValue];
+            if(i != team1CritterBuilds.Length - 1) newValues += "*";
+
+        }
+
+        string nameToSave = "";
+        switch(critterValue)
+        {
+            case 0: nameToSave = "critterIDs"; break;
+            case 1: nameToSave = "attackIDs"; break;
+            case 2: nameToSave = "abilityIDs"; break;
+            case 3: nameToSave = "passiveIDs"; break;
+            case 4: nameToSave = "HPGrowth"; break;
+            case 5: nameToSave = "StrengthGrowth"; break;
+            case 6: nameToSave = "MagicGrowth"; break;
+            case 7: nameToSave = "SpeedGrowth"; break;
+        }
+
+        StartCoroutine(fireBaseScript.UpdateObject(nameToSave, newValues));
+    }
+
+    public void openGrowthEditor()
+    {
+        bGrowthEditor = !bGrowthEditor;
+    }
+
     public void inBuilderSprites(int team)
     {
-        Image[] critterGroup = new Image[teamCritterIDs.Length];
-        switch (team)
-        {
-            case 0: critterGroup = team1CritterImages; break;
-            case 1: critterGroup = team2CritterImages; break;
-            case 2: critterGroup = team3CritterImages; break;
-        }
+        Image[] critterGroup = getCritterGroup(team);
 
         if (critterGroup[0].sprite == transparentSprite) critterGroup[0].sprite = addCritterSprite;
         if (critterGroup[1].sprite == transparentSprite) critterGroup[1].sprite = addCritterSprite;
@@ -604,14 +690,16 @@ public class menuScript : MonoBehaviour, IDataPersistence
         selectedCritter = -1;
         selectedTeam = -1;
 
-        if (teamCritterIDs[team] == -1) // it's empty
+        critterBuild[] critterIDGroup = getCritterBuildGroup(team);
+
+        Image[] critterGroup = getCritterGroup(team);
+
+        if (critterIDGroup[0].critterValue[0] == -1) critterGroup[0].sprite = transparentSprite;
+        if (critterIDGroup[1].critterValue[0] == -1) critterGroup[1].sprite = transparentSprite;
+        if (critterIDGroup[2].critterValue[0] == -1) critterGroup[2].sprite = transparentSprite;
+
+        if (critterGroup[0].sprite == transparentSprite && critterGroup[1].sprite == transparentSprite && critterGroup[2].sprite == transparentSprite)
         {
-            Image[] critterGroup = getCritterGroup(team);
-
-            critterGroup[0].sprite = transparentSprite;
-            critterGroup[1].sprite = transparentSprite;
-            critterGroup[2].sprite = transparentSprite;
-
             createNewText[team].text = "Create New";
             teamName[team].text = "";
         }
@@ -619,8 +707,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     private Image[] getCritterGroup(int which)
     {
-        //team does not exist, set everything to invisible
-        Image[] critterGroup = new Image[teamCritterIDs.Length];
+        Image[] critterGroup = new Image[team1CritterImages.Length];
         switch (which)
         {
             case 0: critterGroup = team1CritterImages; break;
@@ -631,11 +718,25 @@ public class menuScript : MonoBehaviour, IDataPersistence
         return critterGroup;
     }
 
+    private critterBuild[] getCritterBuildGroup(int which)
+    {
+        critterBuild[] critterBuild = new critterBuild[team1CritterBuilds.Length];
+        switch (which)
+        {
+            case 0: critterBuild = team1CritterBuilds; break;
+            case 1: critterBuild = team2CritterBuilds; break;
+            case 2: critterBuild = team3CritterBuilds; break;
+        }
+
+        return critterBuild;
+    }
+
     public void selectCritter(int team)
     {
         if (selectedTeam == -1 && bSelectedTeam == false)
         {
             selectedTeam = team;
+            bEditCritter = false;
             bSelectedTeam = true;
             menuAnimations.SetTrigger("openTeam" + (team + 1));
             menuAnimations.ResetTrigger("closeTeam" + 1);
@@ -649,7 +750,10 @@ public class menuScript : MonoBehaviour, IDataPersistence
         if (bSelectedTeam == true)
         {
             selectedCritter = which;
-            bCritterList = true;
+
+            critterBuild[] critterGroupBuilds = getCritterBuildGroup(selectedTeam);
+            bEditCritter = (critterGroupBuilds[which].critterValue[0] == -1) ? false: true;
+            bCritterList = (critterGroupBuilds[which].critterValue[0] == -1) ? true : false;
             createCritterSelect();
         }
     }
@@ -687,10 +791,19 @@ public class menuScript : MonoBehaviour, IDataPersistence
     private void chooseCritter(int ID)
     {
         Image[] critterGroup = getCritterGroup(selectedTeam);
+        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
+
+        critterIDGroup[selectedCritter].critterValue[0] = ID;
+
+        createNewText[selectedTeam].text = "";
 
         critterGroup[selectedCritter].sprite = critterCollection[ID].stages[0];
         critterGroup[selectedCritter].transform.Find("outline").GetComponent<Image>().sprite = critterCollection[ID].circleOutline;
+
         bCritterList = false;
+        bEditCritter = true;
+
+        CloudUpdateCritterBuild(0);
     }
 
     #endregion
@@ -736,6 +849,25 @@ public class menuScript : MonoBehaviour, IDataPersistence
         deserializeSongList(dataDictionary["finalSongs"].ToString().Split('_').ToList(), finalSongs);
         deserializeSongList(dataDictionary["randomSongs"].ToString().Split('_').ToList(), randomSongs);
         deserializeSongList(dataDictionary["menuSongs"].ToString().Split('_').ToList(), menuSongs);
+
+        deserializeCritterValue(dataDictionary["critterIDs"].ToString(), 0);
+        deserializeCritterValue(dataDictionary["attackIDs"].ToString(), 1);
+        deserializeCritterValue(dataDictionary["abilityIDs"].ToString(), 2);
+        deserializeCritterValue(dataDictionary["passiveIDs"].ToString(), 3);
+        deserializeCritterValue(dataDictionary["HPGrowth"].ToString(), 4);
+        deserializeCritterValue(dataDictionary["StrengthGrowth"].ToString(), 5);
+        deserializeCritterValue(dataDictionary["MagicGrowth"].ToString(), 6);
+        deserializeCritterValue(dataDictionary["SpeedGrowth"].ToString(), 7);
+
+        // 0  is ID
+        // 1 is attack ID
+        // 2 is ability ID
+        // 3 is passive ID
+        // 4 is HP growth
+        // 5 is Strength growth
+        // 6 is Magic growth
+        // 7 is Speed Growth
+
         InitalizeMusic();
         InitalizeBuilder();
 

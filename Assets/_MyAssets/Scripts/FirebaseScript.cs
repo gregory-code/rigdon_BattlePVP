@@ -120,6 +120,31 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("menuSongs", "");
             StartCoroutine(UpdateObject("menuSongs", ""));
 
+            //builder                        | team 1 | team 2 | team 3 |
+            dataDictionary.Add("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("attackIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("attackIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("abilityIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("abilityIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("passiveIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("passiveIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("HPGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("HPGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("StrengthGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("StrengthGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("MagicGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("MagicGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
+            dataDictionary.Add("SpeedGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
+            StartCoroutine(UpdateObject("SpeedGrowth", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
+
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
                 dataPersistenceObj.LoadData(dataDictionary);
@@ -140,6 +165,14 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("finalSongs", snapShot.Child("finalSongs").Value);
             dataDictionary.Add("randomSongs", snapShot.Child("randomSongs").Value);
             dataDictionary.Add("menuSongs", snapShot.Child("menuSongs").Value);
+            dataDictionary.Add("critterIDs", snapShot.Child("critterIDs").Value);
+            dataDictionary.Add("attackIDs", snapShot.Child("attackIDs").Value);
+            dataDictionary.Add("abilityIDs", snapShot.Child("abilityIDs").Value);
+            dataDictionary.Add("passiveIDs", snapShot.Child("passiveIDs").Value);
+            dataDictionary.Add("HPGrowth", snapShot.Child("HPGrowth").Value);
+            dataDictionary.Add("StrengthGrowth", snapShot.Child("StrengthGrowth").Value);
+            dataDictionary.Add("MagicGrowth", snapShot.Child("MagicGrowth").Value);
+            dataDictionary.Add("SpeedGrowth", snapShot.Child("SpeedGrowth").Value);
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {

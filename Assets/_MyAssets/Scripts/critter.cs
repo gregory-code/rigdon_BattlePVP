@@ -14,7 +14,6 @@ public class critter : ScriptableObject
 
     [SerializeField] private string critterName;
     public string GetCritterName() { return critterName; }
-    [SerializeField] private string nickName;
 
     public Sprite circleOutline;
 
