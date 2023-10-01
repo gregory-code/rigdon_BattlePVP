@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 5
   critterName: Incanteer
-  nickName: 
   circleOutline: {fileID: 21300000, guid: 49d7e5a39360f5b4ca421631228003b6, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: c6b69ee9911b00444bcf8107d3324280, type: 3}
   - {fileID: 21300000, guid: 94a0a3a3e75015747b175b47b853e94b, type: 3}
   - {fileID: 21300000, guid: 6e3b44e30ef96254283bfe70587fff31, type: 3}
-  initial_HP: 0
-  initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_HP: 20
+  initial_Strength: 2
+  initial_Magic: 1
+  initial_Speed: 7
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

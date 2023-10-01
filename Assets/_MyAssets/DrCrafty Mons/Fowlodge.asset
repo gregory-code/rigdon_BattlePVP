@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 2
   critterName: Fowlodge
-  nickName: 
   circleOutline: {fileID: 21300000, guid: bf0630aa3f9c7f3429b234b8b360899f, type: 3}
   bFlipSprite: 000000
   stages:
   - {fileID: 21300000, guid: ccde2804ebf6e5d45b59029cbaaace98, type: 3}
   - {fileID: 21300000, guid: b2c04ce847324d5448fdf7144d9affa9, type: 3}
   - {fileID: 21300000, guid: 1472f4888b0ab5f4baf1b26cc6142d0f, type: 3}
-  initial_HP: 0
-  initial_Strength: 0
+  initial_HP: 22
+  initial_Strength: 4
   initial_Magic: 0
-  initial_Speed: 0
+  initial_Speed: 5
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

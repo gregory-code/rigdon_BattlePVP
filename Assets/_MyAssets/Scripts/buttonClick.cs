@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,7 +13,13 @@ public class buttonClick : Button
     {
         base.OnPointerDown(eventData);
 
+        if(name.Contains("critter"))
+        {
+            StartCoroutine(deleteCritter());
+        }
+
         isClicked = true;
+
         if(name.Contains("Switch"))
         {
             GameObject.Find("switch-").GetComponent<AudioSource>().Play();
@@ -28,6 +35,23 @@ public class buttonClick : Button
         base.OnPointerUp(eventData);
 
         isClicked = false;
+    }
+
+    private IEnumerator deleteCritter()
+    {
+        yield return new WaitForSeconds(1f);
+
+        if(isClicked == true)
+        {
+            isClicked = false;
+            GameObject.Find("builder").GetComponent<builderMenu>().bDeleteCritter = true;
+            var pointer = new PointerEventData(EventSystem.current);
+            ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+            ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.submitHandler);
+            yield return new WaitForSeconds(0.25f);
+            ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerExitHandler);
+            // call builderDelete menu
+        }
     }
 
     private void Update()

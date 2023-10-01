@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 7
   critterName: Lusselia
-  nickName: 
   circleOutline: {fileID: 21300000, guid: 7b21a12e9d1b67641ac12d1c4ef207ae, type: 3}
   bFlipSprite: 000000
   stages:
   - {fileID: 21300000, guid: 08a074ad6cd8a034e9fef008b795f2d6, type: 3}
   - {fileID: 21300000, guid: 0f789971862e2d84b969b09b0cd935c3, type: 3}
   - {fileID: 21300000, guid: 55559903adbd290409c8ef97534f4ea9, type: 3}
-  initial_HP: 0
-  initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_HP: 25
+  initial_Strength: 3
+  initial_Magic: 4
+  initial_Speed: 2
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

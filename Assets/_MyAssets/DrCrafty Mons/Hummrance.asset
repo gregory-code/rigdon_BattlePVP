@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 4
   critterName: Hummrance
-  nickName: 
   circleOutline: {fileID: 21300000, guid: 249277ef5535fbc4598ecd66a0227e8a, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 82ba3ce8b29fbf44f96ca1821e65eb98, type: 3}
   - {fileID: 21300000, guid: 97a48224020b1af4fa902bcdc7fbef83, type: 3}
   - {fileID: 21300000, guid: d10ef4dcb499cb74dad98bcae29967bf, type: 3}
-  initial_HP: 0
-  initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_HP: 15
+  initial_Strength: 1
+  initial_Magic: 3
+  initial_Speed: 8
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

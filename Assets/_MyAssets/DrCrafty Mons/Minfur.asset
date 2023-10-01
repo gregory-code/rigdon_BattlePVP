@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 8
   critterName: Minfur
-  nickName: 
   circleOutline: {fileID: 21300000, guid: 41b027c93ce75eb4fb1e2bfadf49d257, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 9c17bb283b85c194c8802e6870aad6f6, type: 3}
   - {fileID: 21300000, guid: 38311931505e5ae499166da24b5dd7f6, type: 3}
   - {fileID: 0}
-  initial_HP: 0
+  initial_HP: 16
   initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_Magic: 1
+  initial_Speed: 7
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

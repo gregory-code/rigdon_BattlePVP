@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 0
   critterName: Crystalis
-  nickName: 
   circleOutline: {fileID: 21300000, guid: ea9137d418f967d4c8238226d2784059, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 90cc5ccf1549c4248950eb8dd94dd0f9, type: 3}
   - {fileID: 21300000, guid: cdf4cd551f8fc934c92d3cdaf86c6e02, type: 3}
   - {fileID: 21300000, guid: 1bab71d7a15792a4d8936505f83a1a03, type: 3}
-  initial_HP: 0
-  initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_HP: 18
+  initial_Strength: 1
+  initial_Magic: 5
+  initial_Speed: 1
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

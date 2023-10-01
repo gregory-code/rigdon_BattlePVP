@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 6
   critterName: Klaatu
-  nickName: 
   circleOutline: {fileID: 21300000, guid: ff812dcee14ef064f90d89e45ab1ee99, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: b30ec521c9e5a724da7d1caf0150a27e, type: 3}
   - {fileID: 21300000, guid: f9afa7fd04e5b1e44914921e632c4661, type: 3}
   - {fileID: 21300000, guid: 08fdff914778a2d4ea9d064ba1949603, type: 3}
-  initial_HP: 0
+  initial_HP: 17
   initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_Magic: 6
+  initial_Speed: 6
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 1
   critterName: Dratic
-  nickName: 
   circleOutline: {fileID: 21300000, guid: f754ced6497d34e4c92d82a1a6c22cb0, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: e762342ae3d5d094e9228d5917131a6d, type: 3}
   - {fileID: 21300000, guid: 9d2829bb1a27a8a4a898145efd2368f8, type: 3}
   - {fileID: 21300000, guid: 0c85850ac2f273b498fa24a622cb8db3, type: 3}
-  initial_HP: 0
-  initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_HP: 24
+  initial_Strength: 3
+  initial_Magic: 2
+  initial_Speed: 3
   AttackID: 0
   AbilityID: 0
   PassiveID: 0

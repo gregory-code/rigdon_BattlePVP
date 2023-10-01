@@ -14,17 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 12
   critterName: Rejuvestor_Decaysease
-  nickName: 
   circleOutline: {fileID: 21300000, guid: ff812dcee14ef064f90d89e45ab1ee99, type: 3}
   bFlipSprite: 000001
   stages:
   - {fileID: 21300000, guid: f22b6d5f34e997b41a9b332f25680b6d, type: 3}
   - {fileID: 0}
   - {fileID: 21300000, guid: 5f39152157a15dc4abdc5b6c9ed8e37f, type: 3}
-  initial_HP: 0
+  initial_HP: 20
   initial_Strength: 0
-  initial_Magic: 0
-  initial_Speed: 0
+  initial_Magic: 4
+  initial_Speed: 3
   AttackID: 0
   AbilityID: 0
   PassiveID: 0
