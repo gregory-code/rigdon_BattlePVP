@@ -121,6 +121,11 @@ public class FirebaseScript : MonoBehaviour
             StartCoroutine(UpdateObject("menuSongs", ""));
 
             //builder                        | team 1 | team 2 | team 3 |
+
+            dataDictionary.Add("teamNames", "___");
+            StartCoroutine(UpdateObject("teamNames", "___"));
+
+
             dataDictionary.Add("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
             StartCoroutine(UpdateObject("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
 
@@ -173,6 +178,7 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("StrengthGrowth", snapShot.Child("StrengthGrowth").Value);
             dataDictionary.Add("MagicGrowth", snapShot.Child("MagicGrowth").Value);
             dataDictionary.Add("SpeedGrowth", snapShot.Child("SpeedGrowth").Value);
+            dataDictionary.Add("teamNames", snapShot.Child("teamNames").Value);
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
