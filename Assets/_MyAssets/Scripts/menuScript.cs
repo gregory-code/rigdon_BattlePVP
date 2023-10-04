@@ -116,11 +116,8 @@ public class menuScript : MonoBehaviour, IDataPersistence
         {
             menuAnimations.ResetTrigger("openTeam" + (builderMenuScript.selectedTeam + 1));
             menuAnimations.SetTrigger("closeTeam" + (builderMenuScript.selectedTeam + 1));
-            //bSelectedTeam = false;
-            //bCritterList = false;
             builderMenuScript.bEditCritter = false;
             builderMenuScript.selectedCritter = -1;
-            //selectedTeam = -1;
         }
         else if(musicMenuScript.edittingPlaylist == true)
         {

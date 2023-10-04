@@ -68,6 +68,17 @@ public class critter : ScriptableObject
         currentSpeed = initial_Speed;
     }
 
+    public float[] getStatBlock()
+    {
+        float[] statBlock = new float[4];
+        statBlock[0] = GetInitialHP();
+        statBlock[1] = GetInitialStrength();
+        statBlock[2] = GetInitialMagic();
+        statBlock[3] = GetInitialSpeed();
+
+        return statBlock;
+    }
+
     public void levelUp()
     {
         maxHP += growthHP;

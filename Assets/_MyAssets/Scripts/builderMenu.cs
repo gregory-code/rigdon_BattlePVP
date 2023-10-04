@@ -21,85 +21,117 @@ public class builderMenu : MonoBehaviour, IDataPersistence
     //statPopup
     statNotif statNotification;
 
-    public bool bDeleteCritter;
-    [SerializeField] GameObject deletePrefab;
-
     //Aniamtor
     private Animator menuAnimations;
 
-    [SerializeField] private Sprite transparentSprite;
-
-    [Header("Builder")]
-    private bool bCritterList;
-    [SerializeField] Transform critterList;
-    [SerializeField] critter[] critterCollection;
-    private List<GameObject> critterGameObjectList = new List<GameObject>();
-    [SerializeField] Transform critterParent;
-    [SerializeField] GameObject critterPrefab;
-
-    [SerializeField] Sprite[] critterSprites;
-    [SerializeField] Sprite addCritterSprite;
-
+    //Varibles for menu
     public int selectedCritter;
-    public int selectedTeam;
-    public bool bSelectedTeam;
+    public bool bDeleteCritter;
+    public int selectedTeam { get; private set; }
+    public bool bSelectedTeam { get; private set; }
 
-    [SerializeField] TMP_InputField[] teamName; // for all 3 teams
-    [SerializeField] TMP_Text[] createNewText;
+    private bool bCritterList;
+
+    [Header("Sprites")]
+    [SerializeField] private Sprite transparentSprite;
+    [SerializeField] Sprite addCritterSprite;
+    [SerializeField] Sprite[] critterSprites;
+    [SerializeField] Sprite[] growthSprites;
+    
+    [Header("Prefabs")]
+    [SerializeField] GameObject deletePrefab;
+    [SerializeField] GameObject critterPrefab;
+    [SerializeField] Transform critterParent;
+
+
+    [Header("Teams")]
+    [SerializeField] critter[] critterCollection;
+    private Transform critterList;
+    private List<GameObject> critterGameObjectList = new List<GameObject>();
+    private TMP_InputField[] teamName = new TMP_InputField[3];
+    private TMP_Text[] createNewText = new TMP_Text[3];
+    bool bShaderDissolve;
+
+    [SerializeField] SpriteRenderer[] team1CritterImages; //each team
+    [SerializeField] SpriteRenderer[] team2CritterImages;
+    [SerializeField] SpriteRenderer[] team3CritterImages;
 
     [SerializeField] critterBuild[] team1CritterBuilds = new critterBuild[3];
     [SerializeField] critterBuild[] team2CritterBuilds = new critterBuild[3];
     [SerializeField] critterBuild[] team3CritterBuilds = new critterBuild[3];
+    
+    private Transform[] team1CritterTransforms = new Transform[3];
+    private Transform[] team2CritterTransforms = new Transform[3];
+    private Transform[] team3CritterTransforms = new Transform[3];
 
-    [SerializeField] Image[] team1CritterImages; //each team
-    [SerializeField] Image[] team2CritterImages;
-    [SerializeField] Image[] team3CritterImages;
-
-    bool bShaderDissolve;
     [SerializeField] Material[] critterShaders;
 
-    [SerializeField] Transform[] team1CritterTransforms; //each team
-    [SerializeField] Transform[] team2CritterTransforms;
-    [SerializeField] Transform[] team3CritterTransforms;
-
     [Header("Stats Growth Page")]
-    float level;
-    [SerializeField] Transform editCritterTransform;
-    bool bGrowthEditor;
-    [SerializeField] Transform growthPageTransform;
-    [SerializeField] Transform growthPointsTransform;
-    [SerializeField] TMP_Text growthPointsText;
-    public bool bEditCritter;
-
     [SerializeField] TMP_Text levelText;
-
     [SerializeField] TMP_Text[] statValueTexts;
+    [SerializeField] TMP_Text[] growthTexts;
     [SerializeField] Image[] statGrowths;
 
-    [SerializeField] Sprite[] growthSprites;
+    private Transform editCritterTransform;
+    private Transform growthPageTransform;
+    private Transform growthPointsTransform;
+    private TMP_Text growthPointsText;
+    private bool bGrowthEditor;
+    float level;
+    
+    public bool bEditCritter;
 
-    [SerializeField] TMP_Text[] growthTexts;
-    [SerializeField] Image[] hpGrowthButtons;
-    [SerializeField] Image[] strGrowthButtons;
-    [SerializeField] Image[] magicGrowthButtons;
-    [SerializeField] Image[] speedGrowthButtons;
+    private Image[] hpGrowthButtons = new Image[4];
+    private Image[] strGrowthButtons = new Image[4];
+    private Image[] magicGrowthButtons = new Image[4];
+    private Image[] speedGrowthButtons = new Image[4];
+
+    private void InitializeVariables()
+    {
+        statNotification = GetComponent<statNotif>();
+        fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
+        OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
+        NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
+        menuAnimations = GameObject.Find("menu").GetComponent<Animator>();
+
+        critterList = transform.Find("critterList").GetComponent<Transform>();
+        editCritterTransform = transform.Find("editCritter").GetComponent<Transform>();
+        growthPageTransform = editCritterTransform.Find("growthPage").GetComponent<Transform>();
+        growthPointsTransform = editCritterTransform.Find("growthPoints").GetComponent<Transform>();
+        growthPointsText = growthPointsTransform.Find("points1").GetComponent<TMP_Text>();
+
+        for(int i = 0; i < hpGrowthButtons.Length; ++i)
+        {
+            int find = i - 1;
+            hpGrowthButtons[i] = growthPageTransform.Find(find + "HP").GetComponent<Image>();
+            strGrowthButtons[i] = growthPageTransform.Find(find + "Str").GetComponent<Image>();
+            magicGrowthButtons[i] = growthPageTransform.Find(find + "Magic").GetComponent<Image>();
+            speedGrowthButtons[i] = growthPageTransform.Find(find + "Speed").GetComponent<Image>();
+        }
+
+        for (int i = 0; i < team1CritterBuilds.Length; ++i)
+        {
+            int team = i + 1;
+            teamName[i] = transform.Find("team" + team).transform.Find("nameScreen").GetComponent<TMP_InputField>();
+            createNewText[i] = transform.Find("team" + team).transform.Find("chooseText").GetComponent<TMP_Text>();
+
+            team1CritterTransforms[i] = team1CritterImages[i].GetComponent<Transform>();
+            team2CritterTransforms[i] = team2CritterImages[i].GetComponent<Transform>();
+            team3CritterTransforms[i] = team3CritterImages[i].GetComponent<Transform>();
+        }
+    }
 
     private void Awake()
     {
+        InitializeVariables();
+
+        bShaderDissolve = true;
+
         selectedCritter = -1;
         level = 1;
-        critterShaders[0].SetFloat("Vector1_E974001A", 0);
-        critterShaders[1].SetFloat("Vector1_E974001A", 0);
-        critterShaders[2].SetFloat("Vector1_E974001A", 0);
-
-        statNotification = GetComponent<statNotif>();
-
-        fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
-        OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
-
-        NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
-
-        menuAnimations = GameObject.Find("menu").GetComponent<Animator>();
+        critterShaders[0].SetFloat("Vector1_E974001A", 2);
+        critterShaders[1].SetFloat("Vector1_E974001A", 2);
+        critterShaders[2].SetFloat("Vector1_E974001A", 2);
     }
 
     void Update()
@@ -121,7 +153,11 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         float editGrowthSize = (bGrowthEditor) ? 1 : 0.6f;
         growthPageTransform.localScale = Vector2.Lerp(growthPageTransform.localScale, new Vector2(1, editGrowthSize), 7.5f * Time.deltaTime);
 
-        float critterIconLerp = 0;
+        this.critterLerp();
+    }
+
+    private void critterLerp()
+    {
         Transform[] critterTransforms = new Transform[team1CritterTransforms.Length];
         switch (selectedTeam)
         {
@@ -129,30 +165,20 @@ public class builderMenu : MonoBehaviour, IDataPersistence
             case 1: critterTransforms = team2CritterTransforms; break;
             case 2: critterTransforms = team3CritterTransforms; break;
         }
+
         for (int i = 0; i < team1CritterTransforms.Length; ++i)
         {
-            critterIconLerp = (selectedCritter == i) ? 30 : 0;
+            float critterIconLerp = (selectedCritter == i) ? 30 : 0;
+            int critterOutlineLerp = (selectedCritter == i) ? 1 : 0;
+            
             Image critterOutline = critterTransforms[i].transform.Find("outline").GetComponent<Image>();
-            SpriteRenderer critterRenderer = critterTransforms[i].GetComponent<SpriteRenderer>();
-            int dissolve = (bShaderDissolve) ? 1 : 0 ;
-            critterShaders[i].SetFloat("Vector1_E974001A", Mathf.Lerp(critterShaders[i].GetFloat("Vector1_E974001A"), dissolve, 5 * Time.deltaTime));
-            int critterOutlineLerp = (selectedCritter == i) ? 2 : 0;
             critterOutline.fillAmount = Mathf.Lerp(critterOutline.fillAmount, critterOutlineLerp, 30 * Time.deltaTime);
+            
             critterTransforms[i].localPosition = Vector2.Lerp(critterTransforms[i].localPosition, new Vector2(critterTransforms[i].localPosition.x, critterIconLerp), 10 * Time.deltaTime);
+
+            int dissolve = (bShaderDissolve) ? 2 : 0;
+            critterShaders[i].SetFloat("Vector1_E974001A", Mathf.Lerp(critterShaders[i].GetFloat("Vector1_E974001A"), dissolve, 6 * Time.deltaTime));
         }
-    }
-
-
-    private void InitalizeBuilder()
-    {
-
-        for (int i = 0; i < team1CritterBuilds.Length; ++i)
-        {
-            selectedTeam = i;
-            inBuilderMenuSprites(i);
-        }
-
-        selectedTeam = -1;
     }
 
     private void deserializeCritterValue(string toDeserialize, int critterValue)
@@ -162,7 +188,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         for (int i = 0; i < teams.Count; ++i)
         {
             critterBuild[] critterGroupBuilds = getCritterBuildGroup(i);
-            Image[] critterGroup = getCritterGroup(i);
+            SpriteRenderer[] critterGroup = getCritterGroup(i);
 
             List<string> ids = teams[i].Split('_').ToList<string>();
 
@@ -177,45 +203,11 @@ public class builderMenu : MonoBehaviour, IDataPersistence
                     {
                         createNewText[i].text = "";
                         critterGroup[x].sprite = critterCollection[critterGroupBuilds[x].critterValue[critterValue]].stages[0];
-                        critterGroup[x].GetComponent<SpriteRenderer>().sprite = critterCollection[critterGroupBuilds[x].critterValue[critterValue]].stages[0];
                         critterGroup[x].transform.Find("outline").GetComponent<Image>().sprite = critterCollection[critterGroupBuilds[x].critterValue[critterValue]].circleOutline;
                     }
                 }
             }
         }
-    }
-
-    private void CloudUpdateCritterBuild(int critterValue)
-    {
-        string newValues = "";
-
-        for (int i = 0; i < team1CritterBuilds.Length; ++i)
-        {
-            critterBuild[] critterGroupBuilds = getCritterBuildGroup(i);
-
-            newValues += critterGroupBuilds[0].critterValue[critterValue];
-            newValues += "_";
-            newValues += critterGroupBuilds[1].critterValue[critterValue];
-            newValues += "_";
-            newValues += critterGroupBuilds[2].critterValue[critterValue];
-            if (i != team1CritterBuilds.Length - 1) newValues += "*";
-
-        }
-
-        string nameToSave = "";
-        switch (critterValue)
-        {
-            case 0: nameToSave = "critterIDs"; break;
-            case 1: nameToSave = "attackIDs"; break;
-            case 2: nameToSave = "abilityIDs"; break;
-            case 3: nameToSave = "passiveIDs"; break;
-            case 4: nameToSave = "HPGrowth"; break;
-            case 5: nameToSave = "StrengthGrowth"; break;
-            case 6: nameToSave = "MagicGrowth"; break;
-            case 7: nameToSave = "SpeedGrowth"; break;
-        }
-
-        StartCoroutine(fireBaseScript.UpdateObject(nameToSave, newValues));
     }
 
     public void openGrowthEditor()
@@ -225,22 +217,14 @@ public class builderMenu : MonoBehaviour, IDataPersistence
 
     public void inBuilderSprites(int team)
     {
-        Image[] critterGroup = getCritterGroup(team);
+        SpriteRenderer[] critterGroup = getCritterGroup(team);
 
-        if (critterGroup[0].sprite == transparentSprite)
+        for(int i = 0; i < critterGroup.Length; ++i)
         {
-            critterGroup[0].sprite = addCritterSprite;
-            critterGroup[0].GetComponent<SpriteRenderer>().sprite = transparentSprite;
-        }
-        if (critterGroup[1].sprite == transparentSprite)
-        {
-            critterGroup[1].sprite = addCritterSprite;
-            critterGroup[1].GetComponent<SpriteRenderer>().sprite = transparentSprite;
-        }
-        if (critterGroup[2].sprite == transparentSprite)
-        {
-            critterGroup[2].sprite = addCritterSprite;
-            critterGroup[2].GetComponent<SpriteRenderer>().sprite = transparentSprite;
+            if (critterGroup[i].sprite == transparentSprite)
+            {
+                critterGroup[i].sprite = addCritterSprite;
+            }
         }
     }
 
@@ -252,23 +236,14 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         selectedTeam = -1;
 
         critterBuild[] critterBuild = getCritterBuildGroup(team);
+        SpriteRenderer[] critterGroup = getCritterGroup(team);
 
-        Image[] critterGroup = getCritterGroup(team);
-
-        if (critterBuild[0].critterValue[0] == -1)
+        for(int i = 0; i < critterGroup.Length; ++i)
         {
-            critterGroup[0].sprite = transparentSprite;
-            critterGroup[0].GetComponent<SpriteRenderer>().sprite = transparentSprite;
-        }
-        if (critterBuild[1].critterValue[0] == -1)
-        {
-            critterGroup[1].sprite = transparentSprite;
-            critterGroup[1].GetComponent<SpriteRenderer>().sprite = transparentSprite;
-        }
-        if (critterBuild[2].critterValue[0] == -1)
-        {
-            critterGroup[2].sprite = transparentSprite;
-            critterGroup[2].GetComponent<SpriteRenderer>().sprite = transparentSprite;
+            if (critterBuild[i].critterValue[0] == -1)
+            {
+                critterGroup[i].sprite = transparentSprite;
+            }
         }
 
         if (critterGroup[0].sprite == transparentSprite && critterGroup[1].sprite == transparentSprite && critterGroup[2].sprite == transparentSprite)
@@ -278,75 +253,38 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void changeHPGrowth(int change)
+    private void processStatGrowth(int change, int statID, Image[] growthButtons)
     {
-
-        if (validPointReduction(0, change) == false){
-            return;
-        }
+        if (validPointReduction(0, change) == false) { return; }
         critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
 
-        float previousStat = float.Parse(statValueTexts[0].text);
+        float previousStat = float.Parse(statValueTexts[statID].text);
 
-        changeGrowth(change, hpGrowthButtons, 0);
+        changeGrowth(change, growthButtons, statID);
 
-        float currerntStat = float.Parse(statValueTexts[0].text);
+        float currerntStat = float.Parse(statValueTexts[statID].text);
 
-        statNotification.spawnStatPopup(statValueTexts[0].transform, currerntStat - previousStat);
+        statNotification.spawnStatPopup(statValueTexts[statID].transform, currerntStat - previousStat);
+    }
+
+    public void changeHPGrowth(int change)
+    {
+        processStatGrowth(change, 0, hpGrowthButtons);
     }
 
     public void changeStrGrowth(int change)
     {
-
-        if (validPointReduction(1, change) == false)
-        {
-            return;
-        }
-        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
-
-        float previousStat = float.Parse(statValueTexts[1].text);
-
-        changeGrowth(change, strGrowthButtons, 1);
-
-        float currerntStat = float.Parse(statValueTexts[1].text);
-
-        statNotification.spawnStatPopup(statValueTexts[1].transform, currerntStat - previousStat);
+        processStatGrowth(change, 1, strGrowthButtons);
     }
 
     public void changeMagicGrowth(int change)
     {
-
-        if (validPointReduction(2, change) == false)
-        {
-            return;
-        }
-        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
-
-        float previousStat = float.Parse(statValueTexts[2].text);
-
-        changeGrowth(change, magicGrowthButtons, 2);
-
-        float currerntStat = float.Parse(statValueTexts[2].text);
-
-        statNotification.spawnStatPopup(statValueTexts[2].transform, currerntStat - previousStat);
+        processStatGrowth(change, 2, magicGrowthButtons);
     }
 
     public void changeSpeedGrowth(int change)
     {
-
-        if (validPointReduction(3, change) == false)
-        {
-            return;
-        }
-        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
-
-        float previousStat = float.Parse(statValueTexts[3].text);
-
-        changeGrowth(change, speedGrowthButtons, 3);
-
-        float currerntStat = float.Parse(statValueTexts[3].text);
-
-        statNotification.spawnStatPopup(statValueTexts[3].transform, currerntStat - previousStat);
+        processStatGrowth(change, 3, speedGrowthButtons);
     }
 
     private bool validPointReduction(int statToExclude, int newGrowth)
@@ -399,7 +337,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         growthPointsText.transform.GetChild(0).GetComponent<TMP_Text>().text = newPoints + "";
 
         int statToUpdate = statID + 4;
-        setStats();
+        setStats(level);
         CloudUpdateCritterBuild(statToUpdate);
     }
 
@@ -416,9 +354,9 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         return growthColor;
     }
 
-    private Image[] getCritterGroup(int which)
+    private SpriteRenderer[] getCritterGroup(int which)
     {
-        Image[] critterGroup = new Image[team1CritterImages.Length];
+        SpriteRenderer[] critterGroup = new SpriteRenderer[team1CritterImages.Length];
         switch (which)
         {
             case 0: critterGroup = team1CritterImages; break;
@@ -464,7 +402,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         {
             selectedCritter = which;
             critterBuild[] critterGroupBuilds = getCritterBuildGroup(selectedTeam);
-            Image[] critterImages = getCritterGroup(selectedTeam);
+            SpriteRenderer[] critterImages = getCritterGroup(selectedTeam);
 
 
             if (bDeleteCritter == true && critterGroupBuilds[which].critterValue[0] != -1)
@@ -491,7 +429,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         selectedCritter = -1;
 
         critterBuild[] critterGroupBuilds = getCritterBuildGroup(selectTeam);
-        Image[] critterImages = getCritterGroup(selectTeam);
+        SpriteRenderer[] critterImages = getCritterGroup(selectTeam);
 
         for(int i = 0; i < 7; ++i)
         {
@@ -499,7 +437,6 @@ public class builderMenu : MonoBehaviour, IDataPersistence
             CloudUpdateCritterBuild(i);
 
             critterImages[selectCritter].transform.Find("outline").GetComponent<Image>().sprite = transparentSprite;
-            critterImages[selectCritter].GetComponent<SpriteRenderer>().sprite = transparentSprite;
             critterImages[selectCritter].sprite = addCritterSprite;
         }
     }
@@ -553,7 +490,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
 
     private void chooseCritter(int ID)
     {
-        Image[] critterGroup = getCritterGroup(selectedTeam);
+        SpriteRenderer[] critterGroup = getCritterGroup(selectedTeam);
         critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
 
         critterIDGroup[selectedCritter].critterValue[0] = ID;
@@ -561,7 +498,6 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         createNewText[selectedTeam].text = "";
 
         critterGroup[selectedCritter].sprite = critterCollection[ID].stages[0];
-        critterGroup[selectedCritter].GetComponent<SpriteRenderer>().sprite = critterCollection[ID].stages[0];
         critterGroup[selectedCritter].transform.Find("outline").GetComponent<Image>().sprite = critterCollection[ID].circleOutline;
 
         bCritterList = false;
@@ -583,108 +519,81 @@ public class builderMenu : MonoBehaviour, IDataPersistence
             changeGrowth(critterIDGroup[selectedCritter].critterValue[6], magicGrowthButtons, 2);
             changeGrowth(critterIDGroup[selectedCritter].critterValue[7], speedGrowthButtons, 3);
 
-            setStats();
+            setStats(level);
         }
     }
 
-    private void setStats()
+    private void setStats(float level)
     {
         critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
+        float[] stats = critterCollection[critterIDGroup[selectedCritter].critterValue[0]].getStatBlock();
+        float lvl = level - 1f;
 
-        float hp = critterCollection[critterIDGroup[selectedCritter].critterValue[0]].GetInitialHP();
-        float str = critterCollection[critterIDGroup[selectedCritter].critterValue[0]].GetInitialStrength();
-        float magic = critterCollection[critterIDGroup[selectedCritter].critterValue[0]].GetInitialMagic();
-        float speed = critterCollection[critterIDGroup[selectedCritter].critterValue[0]].GetInitialSpeed();
-
-        float addedHpValue = (level - 1) * (4 + critterIDGroup[selectedCritter].critterValue[4]);
-        hp += addedHpValue;
-        hp = Mathf.FloorToInt(hp);
-
-        float addedStrValue = (level - 1) * (1f + (critterIDGroup[selectedCritter].critterValue[5] / 2f));
-        str += addedStrValue;
-        str = Mathf.FloorToInt(str);
-
-        float addedMagicValue = (level - 1) * (1f + (critterIDGroup[selectedCritter].critterValue[6] / 2f));
-        magic += addedMagicValue;
-        magic = Mathf.FloorToInt(magic);
-
-        float addedSpeedValue = (level - 1) * (1f + (critterIDGroup[selectedCritter].critterValue[7] / 2f));
-        speed += addedSpeedValue;
-        speed = Mathf.FloorToInt(speed);
-
-        statValueTexts[0].text = hp + "";
-        statValueTexts[1].text = str + "";
-        statValueTexts[2].text = magic + "";
-        statValueTexts[3].text = speed + "";
+        for(int i = 0; i < 4; ++i)
+        {
+            float addedValue = (i == 0) ? lvl * (4 + critterIDGroup[selectedCritter].critterValue[4]) : lvl * (1f + (critterIDGroup[selectedCritter].critterValue[i + 4] / 2f));
+            stats[i] += addedValue;
+            stats[i] = Mathf.FloorToInt(stats[i]);
+            statValueTexts[i].text = stats[i] + "";
+        }
     }
 
-    private IEnumerator handleDissolve(int i, int stage)
-    {
-        Image[] critterImages = getCritterGroup(selectedTeam);
-        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
-
-        bShaderDissolve = true;
-
-        critterImages[i].GetComponent<SpriteRenderer>().sprite = critterImages[i].sprite;
-        critterImages[i].sprite = transparentSprite;
-        critterShaders[i].SetFloat("Vector1_E974001A", 2);
-
-        yield return new WaitForSeconds(1f);
-
-        bShaderDissolve = false;
-
-        critterImages[i].GetComponent<SpriteRenderer>().sprite = critterCollection[critterIDGroup[i].critterValue[0]].stages[stage];
-
-        yield return new WaitForSeconds(1f);
-
-        critterImages[i].sprite = critterCollection[critterIDGroup[i].critterValue[0]].stages[stage];
-    }
-
-    public void setStatsFromLevel(float sliderValue)
+    public void setStatsFromLevel(float sliderValue) // From Slider
     {
         float previousLevel = level;
 
         this.level = sliderValue;
         levelText.text = "Level " + sliderValue;
-        setStats();
+
+        setStats(level);
+        checkStageSprite();
 
         critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
-        Image[] critterImages = getCritterGroup(selectedTeam);
+
+        for(int i = 0; i < 4; ++i)
+        {
+            float statChange = (i == 0) ? (4 + critterIDGroup[selectedCritter].critterValue[4]) : (1f + (critterIDGroup[selectedCritter].critterValue[i + 4] / 2f));
+            if (level < previousLevel) statChange *= -1f;
+            statNotification.spawnStatPopup(statValueTexts[i].transform, statChange);
+        }
+    }
+
+    private void checkStageSprite()
+    {
+        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
+        SpriteRenderer[] critterImages = getCritterGroup(selectedTeam);
 
         for (int i = 0; i < team1CritterBuilds.Length; ++i)
         {
             if (critterIDGroup[i].critterValue[0] == 12) break;
 
-            if (sliderValue <= 2 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[0])
+            if (level <= 2 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[0])
             {
                 StartCoroutine(handleDissolve(i, 0));
             }
-            else if (sliderValue >= 3 && sliderValue <= 5 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[1])
+            else if (level >= 3 && level <= 5 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[1])
             {
                 StartCoroutine(handleDissolve(i, 1));
             }
-            else if(sliderValue >= 6 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[2])
+            else if (level >= 6 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[2])
             {
                 StartCoroutine(handleDissolve(i, 2));
             }
         }
+    }
 
+    private IEnumerator handleDissolve(int i, int stage)
+    {
+        SpriteRenderer[] critterImages = getCritterGroup(selectedTeam);
+        critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
 
-        float hpChange = (4 + critterIDGroup[selectedCritter].critterValue[4]);
-        if (level < previousLevel) hpChange *= -1f;
-        statNotification.spawnStatPopup(statValueTexts[0].transform, hpChange);
+        bShaderDissolve = false;
+        critterShaders[i].SetFloat("Vector1_E974001A", 2);
 
-        float strChange = (1f + (critterIDGroup[selectedCritter].critterValue[5] / 2f));
-        if (level < previousLevel) strChange *= -1f;
-        statNotification.spawnStatPopup(statValueTexts[1].transform, strChange);
+        yield return new WaitForSeconds(0.6f);
 
-        float magicChange = (1f + (critterIDGroup[selectedCritter].critterValue[6] / 2f));
-        if (level < previousLevel) magicChange *= -1f;
-        statNotification.spawnStatPopup(statValueTexts[2].transform, magicChange);
-
-        float speedChange = (1f + (critterIDGroup[selectedCritter].critterValue[7] / 2f));
-        if (level < previousLevel) speedChange *= -1f;
-        statNotification.spawnStatPopup(statValueTexts[3].transform, speedChange);
+        bShaderDissolve = true;
+        critterImages[i].sprite = critterCollection[critterIDGroup[i].critterValue[0]].stages[stage];
     }
 
     public void updateTeamName()
@@ -703,6 +612,51 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         teamName[0].text = list[0];
         teamName[1].text = list[1];
         teamName[2].text = list[2];
+    }
+
+    private void CloudUpdateCritterBuild(int critterValue)
+    {
+        string newValues = "";
+
+        for (int i = 0; i < team1CritterBuilds.Length; ++i)
+        {
+            critterBuild[] critterGroupBuilds = getCritterBuildGroup(i);
+
+            newValues += critterGroupBuilds[0].critterValue[critterValue];
+            newValues += "_";
+            newValues += critterGroupBuilds[1].critterValue[critterValue];
+            newValues += "_";
+            newValues += critterGroupBuilds[2].critterValue[critterValue];
+            if (i != team1CritterBuilds.Length - 1) newValues += "*";
+
+        }
+
+        string nameToSave = "";
+        switch (critterValue)
+        {
+            case 0: nameToSave = "critterIDs"; break;
+            case 1: nameToSave = "attackIDs"; break;
+            case 2: nameToSave = "abilityIDs"; break;
+            case 3: nameToSave = "passiveIDs"; break;
+            case 4: nameToSave = "HPGrowth"; break;
+            case 5: nameToSave = "StrengthGrowth"; break;
+            case 6: nameToSave = "MagicGrowth"; break;
+            case 7: nameToSave = "SpeedGrowth"; break;
+        }
+
+        StartCoroutine(fireBaseScript.UpdateObject(nameToSave, newValues));
+    }
+
+    private void InitalizeBuilder()
+    {
+
+        for (int i = 0; i < team1CritterBuilds.Length; ++i)
+        {
+            selectedTeam = i;
+            inBuilderMenuSprites(i);
+        }
+
+        selectedTeam = -1;
     }
 
     public void LoadData(Dictionary<string, object> dataDictionary)
