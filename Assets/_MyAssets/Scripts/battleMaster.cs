@@ -8,6 +8,7 @@ using TMPro;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System;
+using Photon.Pun.Demo.PunBasics;
 
 public class battleMaster : MonoBehaviourPunCallbacks
 {
@@ -43,19 +44,24 @@ public class battleMaster : MonoBehaviourPunCallbacks
         NotificationScript.createNotif($"Loaded as player {playerNum}", Color.green);
 
         BuilderMenu.setActiveTeam(0); // you can change this when selecting teams, it's set to 0
+        sendMyTeam();
 
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i) // gets my team
         {
-            int[] critterValues = BuilderMenu.activeCritterTeam[i].critterValue;
-            string critterNickname = BuilderMenu.activeCritterTeam[i].critterNickname;
-            this.photonView.RPC("recieveEnemyCritterRPC", RpcTarget.OthersBuffered, i, critterValues, critterNickname); // whoever starts searching first will recieve the other persons team, but not the person who searched second.
-
             player1Team[i] = critterCollection[BuilderMenu.activeCritterTeam[i].critterValue[0]];
             player1Team[i].SetFromCritterBuild(BuilderMenu.activeCritterTeam[i]);
         }
     }
-     
-    // still doesn't work. Get to it
+
+    private void sendMyTeam()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            int[] critterValues = BuilderMenu.activeCritterTeam[i].critterValue;
+            string critterNickname = BuilderMenu.activeCritterTeam[i].critterNickname;
+            this.photonView.RPC("recieveEnemyCritterRPC", RpcTarget.OthersBuffered, i, critterValues, critterNickname); // First person to search is player 2
+        }
+    }
 
     [PunRPC]
     void recieveEnemyCritterRPC(int whichMember, int[] enemyValues, string enemyNickname)

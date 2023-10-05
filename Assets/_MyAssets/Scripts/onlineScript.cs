@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
 using System.Linq;
+using Photon.Pun.Demo.PunBasics;
 
 public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 {
@@ -96,7 +97,19 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 
     public override void OnPlayerEnteredRoom(Player newPlayer) { whosInLobby(); }
     public override void OnPlayerLeftRoom(Player newPlayer) { whosInLobby(); }
-    public override void OnJoinedRoom() { whosInLobby(); }
+    public override void OnJoinedRoom() 
+    {
+        whosInLobby(); 
+        
+        if(bJoiningFightRoom == true)
+        {
+            bJoiningFightRoom = false;
+
+            List<string> names = fightRoomID.ToString().Split('õ').ToList();
+            GameObject.FindGameObjectWithTag("BattleField").GetComponent<battleMaster>().setPlayerData(names[0], names[1]);
+            StartCoroutine(battleMenuManager.setUpFight());
+        }
+    }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
@@ -249,9 +262,7 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
         if (PhotonNetwork.NickName != player1ID && PhotonNetwork.NickName != player2ID) return;
 
         bJoiningFightRoom = true;
-        fightRoomID = player1ID + player2ID;
-        GameObject.FindGameObjectWithTag("BattleField").GetComponent<battleMaster>().setPlayerData(player1ID, player2ID);
-        StartCoroutine(battleMenuManager.setUpFight());
+        fightRoomID = player1ID + "õ" + player2ID;
         PhotonNetwork.LeaveRoom();
     }
 
