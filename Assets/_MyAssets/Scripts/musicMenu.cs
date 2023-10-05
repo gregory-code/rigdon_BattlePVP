@@ -15,7 +15,10 @@ public class musicMenu : MonoBehaviour, IDataPersistence
     private int _songPreference;
 
     notifScript NotificationScript;
-    
+
+    //battleMenuManager
+    BattleMenuManager battleMenuManager;
+
     //Firebase Data
     FirebaseScript fireBaseScript;
 
@@ -67,6 +70,7 @@ public class musicMenu : MonoBehaviour, IDataPersistence
 
     private void Awake()
     {
+        battleMenuManager = GameObject.FindGameObjectWithTag("BattleMenuManager").GetComponent<BattleMenuManager>();
         fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
         OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
 
@@ -82,6 +86,8 @@ public class musicMenu : MonoBehaviour, IDataPersistence
 
     private void Update()
     {
+        if (battleMenuManager.state != BattleMenuManager.battleMenuState.Menu && battleMenuManager.state != BattleMenuManager.battleMenuState.Searching) return;
+
         if (menuSongs.Count > 0)
         {
             if (currentSong != null && currentSong.isPlaying == false)

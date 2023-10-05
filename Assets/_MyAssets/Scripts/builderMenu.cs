@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -11,6 +10,9 @@ using UnityEngine.UI;
 public class builderMenu : MonoBehaviour, IDataPersistence
 {
     notifScript NotificationScript;
+
+    //battleMenuManager
+    BattleMenuManager battleMenuManager;
 
     //Firebase Data
     FirebaseScript fireBaseScript;
@@ -59,6 +61,8 @@ public class builderMenu : MonoBehaviour, IDataPersistence
     [SerializeField] critterBuild[] team1CritterBuilds = new critterBuild[3];
     [SerializeField] critterBuild[] team2CritterBuilds = new critterBuild[3];
     [SerializeField] critterBuild[] team3CritterBuilds = new critterBuild[3];
+
+    public critterBuild[] activeCritterTeam = new critterBuild[3];
     
     private Transform[] team1CritterTransforms = new Transform[3];
     private Transform[] team2CritterTransforms = new Transform[3];
@@ -88,6 +92,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
 
     private void InitializeVariables()
     {
+        battleMenuManager = GameObject.FindGameObjectWithTag("BattleMenuManager").GetComponent<BattleMenuManager>();
         statNotification = GetComponent<statNotif>();
         fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
         OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
@@ -136,6 +141,8 @@ public class builderMenu : MonoBehaviour, IDataPersistence
 
     void Update()
     {
+        if (battleMenuManager.state != BattleMenuManager.battleMenuState.Menu && battleMenuManager.state != BattleMenuManager.battleMenuState.Searching) return;
+
         float critterLerp = (bCritterList) ? -64 : -569;
         critterList.localPosition = Vector2.Lerp(critterList.localPosition, new Vector2(-26, critterLerp), 6 * Time.deltaTime);
 
@@ -431,7 +438,9 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         critterBuild[] critterGroupBuilds = getCritterBuildGroup(selectTeam);
         SpriteRenderer[] critterImages = getCritterGroup(selectTeam);
 
-        for(int i = 0; i < 7; ++i)
+        critterShaders[selectCritter].SetColor("Color_2ED9CBC6", Color.white);
+
+        for (int i = 0; i < 7; ++i)
         {
             critterGroupBuilds[selectCritter].critterValue[i] = -1;
             CloudUpdateCritterBuild(i);
@@ -505,6 +514,8 @@ public class builderMenu : MonoBehaviour, IDataPersistence
 
         setGrowthandStats();
 
+        checkStageSprite(selectedCritter);
+
         CloudUpdateCritterBuild(0);
     }
 
@@ -546,7 +557,9 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         levelText.text = "Level " + sliderValue;
 
         setStats(level);
-        checkStageSprite();
+        checkStageSprite(0);
+        checkStageSprite(1);
+        checkStageSprite(2);
 
         critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
 
@@ -558,27 +571,28 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         }
     }
 
-    private void checkStageSprite()
+    private void checkStageSprite(int which)
     {
         critterBuild[] critterIDGroup = getCritterBuildGroup(selectedTeam);
+
+        if (critterIDGroup[which].critterValue[0] == -1) return;
+        if (critterIDGroup[which].critterValue[0] == 12) return;
+
         SpriteRenderer[] critterImages = getCritterGroup(selectedTeam);
 
-        for (int i = 0; i < team1CritterBuilds.Length; ++i)
-        {
-            if (critterIDGroup[i].critterValue[0] == 12) break;
+        critterShaders[which].SetColor("Color_2ED9CBC6", critterCollection[which].matchingColor);
 
-            if (level <= 2 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[0])
-            {
-                StartCoroutine(handleDissolve(i, 0));
-            }
-            else if (level >= 3 && level <= 5 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[1])
-            {
-                StartCoroutine(handleDissolve(i, 1));
-            }
-            else if (level >= 6 && critterImages[i].sprite != critterCollection[critterIDGroup[i].critterValue[0]].stages[2])
-            {
-                StartCoroutine(handleDissolve(i, 2));
-            }
+        if (level <= 2 && critterImages[which].sprite != critterCollection[critterIDGroup[which].critterValue[0]].stages[0])
+        {
+            StartCoroutine(handleDissolve(which, 0));
+        }
+        else if (level >= 3 && level <= 5 && critterImages[which].sprite != critterCollection[critterIDGroup[which].critterValue[0]].stages[1])
+        {
+            StartCoroutine(handleDissolve(which, 1));
+        }
+        else if (level >= 6 && critterImages[which].sprite != critterCollection[critterIDGroup[which].critterValue[0]].stages[2])
+        {
+            StartCoroutine(handleDissolve(which, 2));
         }
     }
 
@@ -594,6 +608,11 @@ public class builderMenu : MonoBehaviour, IDataPersistence
 
         bShaderDissolve = true;
         critterImages[i].sprite = critterCollection[critterIDGroup[i].critterValue[0]].stages[stage];
+    }
+
+    public void setActiveTeam(int which)
+    {
+        activeCritterTeam = getCritterBuildGroup(which);
     }
 
     public void updateTeamName()

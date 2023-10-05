@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
 using System.Linq;
-using Unity.VisualScripting;
 
 public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 {
@@ -15,9 +14,23 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
     //Firebase Data
     FirebaseScript fireBaseScript;
 
+    loadingScript loading;
+
+    //battleMenuManager
+    BattleMenuManager battleMenuManager;
+
     menuScript MenuScript;
 
+    bool bJoiningFightRoom;
+    string fightRoomID = "";
+
     [SerializeField] TMP_Text playersInLobby;
+
+    [SerializeField] Image wifiImage;
+    [SerializeField] TMP_Text wifiText;
+
+    [Header("Battle Searches")]
+    [SerializeField] private List<string> waitingRoomIDs = new List<string>();
 
     [Header("Friends List")]
     [SerializeField] private TMP_InputField friendInput;
@@ -36,6 +49,11 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 
     void Start()
     {
+        bJoiningFightRoom = false;
+
+        loading = GameObject.Find("LoadingScreen").GetComponent<loadingScript>();
+
+        battleMenuManager = GameObject.FindGameObjectWithTag("BattleMenuManager").GetComponent<BattleMenuManager>();
         NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
         fireBaseScript = GameObject.FindGameObjectWithTag("Data").GetComponent<FirebaseScript>();
         MenuScript = GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>();
@@ -46,26 +64,44 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
         PhotonNetwork.ConnectUsingSettings();
     }
 
-    public override void OnConnectedToMaster() { PhotonNetwork.JoinLobby(); }
-
-    public override void OnJoinedLobby() 
+    public override void OnConnectedToMaster() 
     { 
-        changeWifiState();
+        PhotonNetwork.JoinLobby();
     }
 
-    public void joinLobbyRoom()
+    public override void OnJoinedLobby() 
     {
         RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 20;
         roomOptions.IsOpen = true;
         roomOptions.IsVisible = true;
 
-        PhotonNetwork.JoinOrCreateRoom("LobbyRoom", roomOptions, TypedLobby.Default);
+        if (bJoiningFightRoom == true)
+        {
+            roomOptions.MaxPlayers = 4;
+            PhotonNetwork.JoinOrCreateRoom(fightRoomID, roomOptions, TypedLobby.Default);
+        }
+        else
+        {
+            PhotonNetwork.JoinOrCreateRoom("LobbyRoom", roomOptions, TypedLobby.Default);
+            roomOptions.MaxPlayers = 20;
+        }
+        changeWifiState();
+    }
+
+    public override void OnLeftRoom()
+    {
+        base.OnLeftRoom();
+        PhotonNetwork.JoinLobby();
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer) { whosInLobby(); }
     public override void OnPlayerLeftRoom(Player newPlayer) { whosInLobby(); }
     public override void OnJoinedRoom() { whosInLobby(); }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        NotificationScript.createNotif($"{message}", Color.red);
+    }
 
     public void whosInLobby()
     {
@@ -88,20 +124,38 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
         }
     }
 
+    public void quickPlaySearch()
+    {
+        if (PhotonNetwork.InRoom == false) return;
+
+        foreach(string waitingID in waitingRoomIDs)
+        {
+            if(waitingID == PhotonNetwork.NickName)
+            {
+                return;
+            }
+            else if(waitingID != PhotonNetwork.NickName) // do some MMR matchmaking here
+            {
+                this.photonView.RPC("updateSearchWaitingRPC", RpcTarget.AllBufferedViaServer, waitingID, false, 0);
+                this.photonView.RPC("matchFoundRPC", RpcTarget.All, PhotonNetwork.NickName, waitingID);
+                return;
+            }
+        }
+
+        this.photonView.RPC("updateSearchWaitingRPC", RpcTarget.AllBufferedViaServer, PhotonNetwork.NickName, true, 0);
+    }
+
     public void setNickName(string nickname)
     {
         PhotonNetwork.NickName = nickname;
-    }
-
-    public override void OnJoinRoomFailed(short returnCode, string message)
-    {
-        NotificationScript.createNotif($"{message}", Color.red);
     }
 
     public override void OnDisconnected(DisconnectCause cause) { changeWifiState(); }
 
     public void sendFriendInvite()
     {
+        if (PhotonNetwork.InRoom == false) return;
+
         if (friendInput.text == "")
         {
             NotificationScript.createNotif($"Input field is empty", Color.red);
@@ -150,9 +204,6 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 
     private void changeWifiState()
     {
-        Image wifiImage = GameObject.Find("wifi").GetComponent<Image>();
-        TextMeshProUGUI wifiText = GameObject.Find("wifi_Text").GetComponent<TextMeshProUGUI>();
-
         if(PhotonNetwork.IsConnected)
         {
             wifiImage.color = new Color(0, 255, 0, 255);
@@ -187,7 +238,31 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 
     public void updateFriendsName(string newName)
     {
+        if (PhotonNetwork.InRoom == false) return;
+
         this.photonView.RPC("updateFriendsNameRPC", RpcTarget.Others, PhotonNetwork.NickName, newName);
+    }
+
+    [PunRPC]
+    void matchFoundRPC(string player1ID, string player2ID)
+    {
+        bJoiningFightRoom = true;
+        fightRoomID = player1ID + player2ID;
+        GameObject.FindGameObjectWithTag("BattleField").GetComponent<battleMaster>().setPlayerData(player1ID, player2ID);
+        StartCoroutine(battleMenuManager.setUpFight());
+        PhotonNetwork.LeaveRoom();
+    }
+
+    [PunRPC]
+    void updateSearchWaitingRPC(string roomID, bool bAdd, int whichMode)
+    {
+        switch(whichMode)
+        {
+            case 0:
+                if (bAdd) waitingRoomIDs.Add(roomID);
+                else waitingRoomIDs.Remove(roomID);
+                break;
+        }
     }
 
     [PunRPC]

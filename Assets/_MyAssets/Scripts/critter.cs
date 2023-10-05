@@ -20,6 +20,7 @@ public class critter : ScriptableObject
     [SerializeField] bool[] bFlipSprite = new bool[3];
     public Sprite[] stages = new Sprite[3];
 
+    public Color matchingColor;
 
     [Header("Stats")]
 

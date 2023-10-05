@@ -88,7 +88,6 @@ public class FirebaseScript : MonoBehaviour
 
         loading.hide();
         loginMenu.SetActive(false);
-        GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>().joinLobbyRoom();
 
         if (dataBaseTask.Exception != null)
         {

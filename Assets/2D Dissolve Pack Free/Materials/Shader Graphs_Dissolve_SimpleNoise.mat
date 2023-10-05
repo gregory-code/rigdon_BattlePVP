@@ -46,7 +46,7 @@ Material:
     - Vector1_450D3E32: 50
     - Vector1_E974001A: 2
     m_Colors:
-    - Color_2ED9CBC6: {r: 8.47419, g: 1.2067165, b: 0, a: 0}
+    - Color_2ED9CBC6: {r: 0.9716981, g: 0.8538602, b: 0.13444869, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &857484590861611502
 MonoBehaviour:

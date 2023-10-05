@@ -26,6 +26,9 @@ public class menuScript : MonoBehaviour, IDataPersistence
     //Builder Menu
     builderMenu builderMenuScript;
 
+    //battleMenuManager
+    BattleMenuManager battleMenuManager;
+
     [Header("Sprites")]
     [SerializeField] private Sprite[] _background_Sprites;
     [SerializeField] private Sprite[] _button_Sprites;
@@ -51,6 +54,8 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     private void Awake()
     {
+        battleMenuManager = GameObject.FindGameObjectWithTag("BattleMenuManager").GetComponent<BattleMenuManager>();
+
         _friends = transform.Find("friendsMenu").GetComponent<Transform>();
         _friendsIcon = transform.Find("friendsMenu").transform.Find("icon").GetComponent<Transform>();
 
@@ -77,6 +82,12 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
         float friendsIconLerp = (_bFriends) ? -187 : -360;
         _friendsIcon.localPosition = Vector2.Lerp(_friendsIcon.localPosition, new Vector2(friendsIconLerp, 234), friendSpeed * Time.deltaTime);
+    }
+
+    public void findBattle()
+    {
+        battleMenuManager.setState(BattleMenuManager.battleMenuState.Searching);
+        OnlineScript.quickPlaySearch();
     }
 
     private void menuStyle(int change)

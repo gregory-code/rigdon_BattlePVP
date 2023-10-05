@@ -20,6 +20,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c6b69ee9911b00444bcf8107d3324280, type: 3}
   - {fileID: 21300000, guid: 94a0a3a3e75015747b175b47b853e94b, type: 3}
   - {fileID: 21300000, guid: 6e3b44e30ef96254283bfe70587fff31, type: 3}
+  matchingColor: {r: 0.764151, g: 0.34855312, b: 0.040850785, a: 0}
   initial_HP: 20
   initial_Strength: 2
   initial_Magic: 1
