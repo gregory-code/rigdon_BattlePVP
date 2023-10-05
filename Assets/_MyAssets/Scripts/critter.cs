@@ -5,54 +5,68 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Critter")]
 public class critter : ScriptableObject
 {
+
     [Header("ID")]
     [SerializeField] private int critterID;
-    public int GetCritterID() { return critterID; }
     [Space(35)]
 
+    [Header("Components")]
+    critterController critterClickController;
+    Animator critterAnimator;
+
     [Header("Info")]
-
-    [SerializeField] private string critterName;
-    public string GetCritterName() { return critterName; }
-
-    public Sprite circleOutline;
-
     [SerializeField] bool[] bFlipSprite = new bool[3];
+    [SerializeField] private string critterName;
+    private string critterNickname;
     public Sprite[] stages = new Sprite[3];
-
+    public Sprite circleOutline;
     public Color matchingColor;
 
     [Header("Stats")]
-
     [SerializeField] private int initial_HP;
-    public int GetInitialHP() { return initial_HP; }
     private int maxHP;
     private int currentHP;
-    private int growthHP;
+    [SerializeField] private int growthHP; // growths are serialized for testing
 
     [SerializeField] private int initial_Strength;
-    public int GetInitialStrength() { return initial_Strength; }
     private int baseStrength;
     private int currentStrength;
-    private int growthStrength;
+    [SerializeField] private int growthStrength;
 
     [SerializeField] private int initial_Magic;
-    public int GetInitialMagic() { return initial_Magic; }
     private int baseMagic;
     private int currentMagic;
-    private int growthMagic;
+    [SerializeField] private int growthMagic;
 
     [SerializeField] private int initial_Speed;
-    public int GetInitialSpeed() { return initial_Speed; }
     private int baseSpeed;
     private int currentSpeed;
-    private int growthSpeed;
+    [SerializeField] private int growthSpeed;
 
     [Header("MoveSet")]
-    public int AttackID;
-    public int AbilityID;
-    public int PassiveID;
+    private int AttackID;
+    private int AbilityID;
+    private int PassiveID;
+    
+    public string GetCritterName() { return critterName; }
+    public int GetCritterID() { return critterID; }
+    public int GetInitialHP() { return initial_HP; }
+    public int GetInitialStrength() { return initial_Strength; }
+    public int GetInitialMagic() { return initial_Magic; }
+    public int GetInitialSpeed() { return initial_Speed; }
 
+    public void SetFromCritterBuild(critterBuild build)
+    {
+        AttackID = build.critterValue[1];
+        AbilityID = build.critterValue[2];
+        PassiveID = build.critterValue[3];
+        growthHP = build.critterValue[4];
+        growthStrength = build.critterValue[5];
+        growthMagic = build.critterValue[6];
+        growthSpeed = build.critterValue[7];
+
+        critterNickname = build.critterNickname;
+    }
 
     private void Set_Initial_Stats()
     {

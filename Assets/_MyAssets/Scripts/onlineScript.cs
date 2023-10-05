@@ -246,6 +246,8 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
     [PunRPC]
     void matchFoundRPC(string player1ID, string player2ID)
     {
+        if (PhotonNetwork.NickName != player1ID && PhotonNetwork.NickName != player2ID) return;
+
         bJoiningFightRoom = true;
         fightRoomID = player1ID + player2ID;
         GameObject.FindGameObjectWithTag("BattleField").GetComponent<battleMaster>().setPlayerData(player1ID, player2ID);

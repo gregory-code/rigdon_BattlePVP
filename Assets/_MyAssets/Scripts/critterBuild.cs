@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "critterBuild")]
-[System.Serializable]
 public class critterBuild : ScriptableObject
 {
     public int[] critterValue = new int[8];

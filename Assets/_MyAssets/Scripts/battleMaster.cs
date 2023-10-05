@@ -13,71 +13,61 @@ public class battleMaster : MonoBehaviourPunCallbacks
 {
     builderMenu BuilderMenu;
 
+    notifScript NotificationScript;
+
     [Header("Critters")]
     [SerializeField] critter[] critterCollection;
 
-    [SerializeField] private critterBuild[] player1Team;
-    [SerializeField] private critterBuild[] player2Team;
+    [SerializeField] private critter[] player1Team = new critter[3];
+    [SerializeField] private critter[] player2Team = new critter[3];
 
+    [SerializeField] private critterBuild proxyBuild; // for storing info to put into a function
+
+    private bool bIsPlayer1;
     [SerializeField] private string player1;
     [SerializeField] private string player2;
 
     private void Awake()
     {
         BuilderMenu = GameObject.Find("builder").GetComponent<builderMenu>();
+
+        NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
     }
 
-    public void setPlayerData(string player_1, string player_2) // MAKE SURE IT HAS THE PHOTONVIEW ASSET
+    public void setPlayerData(string player_1, string player_2)
     {
         player1 = player_1;
         player2 = player_2;
+        bIsPlayer1 = (PhotonNetwork.NickName == player_1) ? true : false ;
+        int playerNum = (bIsPlayer1) ? 1 : 2 ;
+        NotificationScript.createNotif($"Loaded as player {playerNum}", Color.green);
 
-        BuilderMenu.setActiveTeam(0);
-        player1Team = BuilderMenu.activeCritterTeam;
+        BuilderMenu.setActiveTeam(0); // you can change this when selecting teams, it's set to 0
 
-        sendMyTeamData();
+        for (int i = 0; i < 3; ++i)
+        {
+            int[] critterValues = BuilderMenu.activeCritterTeam[i].critterValue;
+            string critterNickname = BuilderMenu.activeCritterTeam[i].critterNickname;
+            this.photonView.RPC("recieveEnemyCritterRPC", RpcTarget.OthersBuffered, i, critterValues, critterNickname); // whoever starts searching first will recieve the other persons team, but not the person who searched second.
+
+            player1Team[i] = critterCollection[BuilderMenu.activeCritterTeam[i].critterValue[0]];
+            player1Team[i].SetFromCritterBuild(BuilderMenu.activeCritterTeam[i]);
+        }
     }
-
-    private byte[] SerializeTeam(critterBuild obj)
-    {
-        BinaryFormatter bf = new BinaryFormatter();
-        MemoryStream ms = new MemoryStream();
-        bf.Serialize(ms, obj);
-        return ms.ToArray();
-    }
-
-    private critterBuild DeserializeTeam(byte[] byteArray)
-    {
-        BinaryFormatter bf = new BinaryFormatter();
-        MemoryStream ms = new MemoryStream(byteArray);
-        object obj = bf.Deserialize(ms);
-        return (critterBuild)obj;
-    }
-
-    private void sendMyTeamData()
-    {
-        byte[] byteArray = SerializeTeam(player1Team[0]);
-        string seralizedCritter1 = Convert.ToBase64String(byteArray);
-
-        byte[] byte2Array = SerializeTeam(player1Team[1]);
-        string seralizedCritter2 = Convert.ToBase64String(byte2Array);
-
-        byte[] byte3Array = SerializeTeam(player1Team[2]);
-        string seralizedCritter3 = Convert.ToBase64String(byte3Array);
-
-        this.photonView.RPC("recieveEnemyCritterTeamRPC", RpcTarget.Others, seralizedCritter1, seralizedCritter2, seralizedCritter3);
-    }
+     
+    // still doesn't work. Get to it
 
     [PunRPC]
-    void recieveEnemyCritterTeamRPC(string enemyCritter1, string enemyCritter2, string enemyCritter3)
+    void recieveEnemyCritterRPC(int whichMember, int[] enemyValues, string enemyNickname)
     {
-        byte[] dataArray = Convert.FromBase64String(enemyCritter1);
-        player2Team[0] = DeserializeTeam(dataArray);
+        player2Team[whichMember] = critterCollection[enemyValues[0]]; // careful if you both have the same critter it might reference the same scriptable object
 
-        byte[] data2Array = Convert.FromBase64String(enemyCritter2);
-        player2Team[1] = DeserializeTeam(data2Array);
+        proxyBuild.critterNickname = enemyNickname;
+        for (int i = 0; i < proxyBuild.critterValue.Length; ++i)
+        {
+            proxyBuild.critterValue[i] = enemyValues[i];
+        }
 
-        byte[] data3Array = Convert.FromBase64String(enemyCritter3);
-        player2Team[2] = DeserializeTeam(data3Array);
+        player2Team[whichMember].SetFromCritterBuild(proxyBuild);
     }
 }

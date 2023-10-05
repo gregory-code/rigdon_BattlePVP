@@ -7012,9 +7012,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89204d8fc87134142855718b6158e6e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  critterCollection: []
-  player1Team: []
-  player2Team: []
+  critterCollection:
+  - {fileID: 11400000, guid: b98e37eeed3be934b819e11fd6eafc67, type: 2}
+  - {fileID: 11400000, guid: 09d8aa029eafa9d4c9e71028b75c138d, type: 2}
+  - {fileID: 11400000, guid: 7c56562593a751b4199f471a261a0a25, type: 2}
+  - {fileID: 11400000, guid: e687a3043e5e5a442a1c02dc0511adcf, type: 2}
+  - {fileID: 11400000, guid: 0c90b352adae9964c967a0f1888c59e8, type: 2}
+  - {fileID: 11400000, guid: 103136f1c6426f945a2068694bdc7920, type: 2}
+  - {fileID: 11400000, guid: f1c7e7682a35c1a4aae16ecf251e3df3, type: 2}
+  - {fileID: 11400000, guid: 0223b7c77518ed74c8b2a294b8360738, type: 2}
+  - {fileID: 11400000, guid: 03e3238d9a993d449a85eb8498782210, type: 2}
+  - {fileID: 11400000, guid: d811396a9550586468ea3b92ad89b21a, type: 2}
+  - {fileID: 11400000, guid: 4b416f3a0247f83448136f4bb91be8b7, type: 2}
+  - {fileID: 11400000, guid: aa632fbb6206df142bc13c6cbe4cbd07, type: 2}
+  - {fileID: 11400000, guid: b261e348d3277a647aaed510842e0519, type: 2}
+  player1Team:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  player2Team:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  proxyBuild: {fileID: 11400000, guid: 2b10daeabe9dec745a2a46fcbd9041ed, type: 2}
   player1: 
   player2: 
 --- !u!212 &413420225
