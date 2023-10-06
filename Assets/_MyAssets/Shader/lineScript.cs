@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,8 +15,8 @@ public class lineScript : MonoBehaviour
 
     private Vector3 previousScale;
 
-    private bool bFocusEnemy;
-    private Transform enemyTransform;
+    private bool bFocusTarget;
+    private Transform targetTransform;
 
     private void Awake()
     {
@@ -44,14 +45,29 @@ public class lineScript : MonoBehaviour
             StartCoroutine(showLineRender());
             startPoint = start;
             lr.SetPosition(0, startPoint);
-            lr.SetPosition(1, reticle.transform.position);
         }
     }
 
-    public void focusEnemy(bool state, Transform enemy)
+    public void resetReticle(Vector2 start)
     {
-        bFocusEnemy = state;
-        enemyTransform = enemy;
+        reticle.transform.position = start;
+    }
+
+    public bool IsHoveringOverTarget()
+    {
+        return bFocusTarget;
+    }
+
+    public void updateReticleLocation(Vector3 position)
+    {
+        Vector3 lerp = Vector3.Lerp(reticle.transform.position, position, 15 * Time.deltaTime);
+        reticle.transform.position = lerp;
+    }
+
+    public void focusTarget(bool state, Transform target)
+    {
+        bFocusTarget = state;
+        targetTransform = target;
     }
 
     private IEnumerator showLineRender()
@@ -62,12 +78,6 @@ public class lineScript : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Mouse0) /*&& lr.enabled*/)
-        {
-            Debug.Log("Enabled");
-            enable(true, new Vector2(0, 0));
-        }
-
         if (lr.enabled == false)
             return;
 
@@ -75,20 +85,16 @@ public class lineScript : MonoBehaviour
         lr.SetPosition(1, reticle.transform.position);
 
 
-        Vector3 lerpScale = (bFocusEnemy) ? Vector3.Lerp(reticle.transform.localScale, (enemyTransform.localScale * 2), 6 * Time.deltaTime) 
+        Vector3 lerpScale = (bFocusTarget) ? Vector3.Lerp(reticle.transform.localScale, (targetTransform.localScale * 9), 6 * Time.deltaTime) 
                                           : Vector3.Lerp(reticle.transform.localScale, previousScale, 6 * Time.deltaTime);
         reticle.transform.localScale = lerpScale;
 
-        if (bFocusEnemy == true)
+        if (bFocusTarget == true)
         {
-            Vector2 lerpPos = Vector2.Lerp(reticle.transform.position, enemyTransform.position, 6 * Time.deltaTime);
+            Vector2 lerpPos = Vector2.Lerp(reticle.transform.position, targetTransform.position, 6 * Time.deltaTime);
             reticle.transform.position = lerpPos;
             return;
         }
-
-        //Vector2 mouseScreenPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-        //Vector2 mouseScreenPosition = new Vector2(109, 169);
-        //reticle.transform.localPosition = mouseScreenPosition;
     }
 
 }

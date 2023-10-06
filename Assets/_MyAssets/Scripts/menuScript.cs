@@ -168,6 +168,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
     {
         if (key == "username")
         {
+            if (_fieldString == "") return;
             OnlineScript.updateFriendsName(_fieldString);
             OnlineScript.setNickName(_fieldString);
             StartCoroutine(fireBaseScript.UpdateUsernameAuth(_fieldString));

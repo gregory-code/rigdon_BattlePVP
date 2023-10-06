@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2238692daebc88449b6de31cd50c1862, type: 3}
+  m_Name: Platisaur
+  m_EditorClassIdentifier: 
+  critterID: 11
+  bFlipSprite: 000001
+  critterName: Platisaur
+  stages:
+  - {fileID: 21300000, guid: 0971dd166e3def94e855330f6553f80b, type: 3}
+  - {fileID: 21300000, guid: 9e5d2668cd2bdec45bf793c58ba11e19, type: 3}
+  - {fileID: 21300000, guid: f83a7137c82c7b14b807ff2369653362, type: 3}
+  circleOutline: {fileID: 21300000, guid: a40d9a13692d86e4dbab812ac80e8de3, type: 3}
+  matchingColor: {r: 0.28592613, g: 0.745283, b: 0.6116164, a: 0}
+  initial_HP: 21
+  growthHP: 0
+  initial_Strength: 3
+  growthStrength: 0
+  initial_Magic: 1
+  growthMagic: 0
+  initial_Speed: 5
+  growthSpeed: 0

@@ -231,11 +231,12 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 
     public void LoadData(Dictionary<string, object> dataDictionary)
     {
-        List<string> stringList = dataDictionary["friends"].ToString().Split('õ').ToList();
-        if (stringList[0] == "") return;
-        foreach(string friend in stringList)
+        int friendsInList = 0;
+        while (dataDictionary.ContainsKey("startSongs" + friendsInList))
         {
-            addFriend(friend);
+            if (dataDictionary["startSongs" + friendsInList].ToString() == "") return;
+            addFriend(dataDictionary["startSongs" + friendsInList].ToString());
+            friendsInList++;
         }
     }
 

@@ -17,7 +17,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
     notifScript NotificationScript;
 
     [Header("Critters")]
-    [SerializeField] critter[] critterCollection;
+    [SerializeField] critter[] allyCritterCollection;
 
     [SerializeField] private critter[] player1Team = new critter[3];
     [SerializeField] private critter[] player2Team = new critter[3];
@@ -27,6 +27,9 @@ public class battleMaster : MonoBehaviourPunCallbacks
     private bool bIsPlayer1;
     [SerializeField] private string player1;
     [SerializeField] private string player2;
+
+    public Vector3 touchedPos;
+    public bool bRendering;
 
     private void Awake()
     {
@@ -48,7 +51,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < 3; ++i) // gets my team
         {
-            player1Team[i] = critterCollection[BuilderMenu.activeCritterTeam[i].critterValue[0]];
+            player1Team[i] = allyCritterCollection[BuilderMenu.activeCritterTeam[i].critterValue[0]];
             player1Team[i].SetFromCritterBuild(BuilderMenu.activeCritterTeam[i]);
         }
     }
@@ -66,7 +69,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
     [PunRPC]
     void recieveEnemyCritterRPC(int whichMember, int[] enemyValues, string enemyNickname)
     {
-        player2Team[whichMember] = critterCollection[enemyValues[0]]; // careful if you both have the same critter it might reference the same scriptable object
+        player2Team[whichMember] = allyCritterCollection[enemyValues[0]]; // careful if you both have the same critter it might reference the same scriptable object
 
         proxyBuild.critterNickname = enemyNickname;
         for (int i = 0; i < proxyBuild.critterValue.Length; ++i)

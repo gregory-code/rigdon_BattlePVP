@@ -626,13 +626,6 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         StartCoroutine(fireBaseScript.UpdateObject("teamNames", teamsToSubmit));
     }
 
-    private void deserializeCritterTeams(List<string> list)
-    {
-        teamName[0].text = list[0];
-        teamName[1].text = list[1];
-        teamName[2].text = list[2];
-    }
-
     private void CloudUpdateCritterBuild(int critterValue)
     {
         string newValues = "";
@@ -699,9 +692,12 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         // 6 is Magic growth
         // 7 is Speed Growth
 
-        InitalizeBuilder();
+        for(int i = 0; i < 3; ++i) //(dataDictionary.ContainsKey("startSongs" + teamNamesInList))
+        {
+            teamName[0].text = dataDictionary["teamNames" + i].ToString();
+        }
         
-        deserializeCritterTeams(dataDictionary["teamNames"].ToString().Split('_').ToList());
+        InitalizeBuilder();
     }
 
     public void LoadOtherPlayersData(string key, object data)

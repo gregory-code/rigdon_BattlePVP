@@ -123,7 +123,7 @@ public class musicMenu : MonoBehaviour, IDataPersistence
 
     private void playRandomSong()
     {
-        if (menuSongs.Count == 0) return;
+        if (menuSongs[0] == "" || menuSongs.Count == 0) return;
         int randomSong = Random.Range(0, menuSongs.Count);
 
         listenToSong(menuSongs[randomSong]);
@@ -395,32 +395,50 @@ public class musicMenu : MonoBehaviour, IDataPersistence
     {
         switch (whichPlaylist)
         {
-            case 0: StartCoroutine(fireBaseScript.UpdateObject("startSongs", string.Join("_", startSongs))); break;
-            case 1: StartCoroutine(fireBaseScript.UpdateObject("middleSongs", string.Join("_", middleSongs))); break;
-            case 2: StartCoroutine(fireBaseScript.UpdateObject("finalSongs", string.Join("_", finalSongs))); break;
-            case 3: StartCoroutine(fireBaseScript.UpdateObject("randomSongs", string.Join("_", randomSongs))); break;
-            case 4: StartCoroutine(fireBaseScript.UpdateObject("menuSongs", string.Join("_", menuSongs))); break;
-        }
-    }
-
-    private void deserializeSongList(List<string> list, List<string> desiredPlayList)
-    {
-        if (list[0] != "")
-        {
-            foreach (string song in list)
-            {
-                desiredPlayList.Add(song);
-            }
+            case 0: StartCoroutine(fireBaseScript.UpdateObject("startSongs", startSongs)); break;
+            case 1: StartCoroutine(fireBaseScript.UpdateObject("middleSongs", middleSongs)); break;
+            case 2: StartCoroutine(fireBaseScript.UpdateObject("finalSongs", finalSongs)); break;
+            case 3: StartCoroutine(fireBaseScript.UpdateObject("randomSongs", randomSongs)); break;
+            case 4: StartCoroutine(fireBaseScript.UpdateObject("menuSongs", menuSongs)); break;
         }
     }
 
     public void LoadData(Dictionary<string, object> dataDictionary)
     {
-        deserializeSongList(dataDictionary["startSongs"].ToString().Split('_').ToList(), startSongs);
-        deserializeSongList(dataDictionary["middleSongs"].ToString().Split('_').ToList(), middleSongs);
-        deserializeSongList(dataDictionary["finalSongs"].ToString().Split('_').ToList(), finalSongs);
-        deserializeSongList(dataDictionary["randomSongs"].ToString().Split('_').ToList(), randomSongs);
-        deserializeSongList(dataDictionary["menuSongs"].ToString().Split('_').ToList(), menuSongs);
+        int songsInList = 0;
+        while (dataDictionary.ContainsKey("startSongs" + songsInList))
+        {
+            startSongs.Add(dataDictionary["startSongs" + songsInList].ToString());
+            songsInList++;
+        }
+
+        songsInList = 0;
+        while (dataDictionary.ContainsKey("middleSongs" + songsInList))
+        {
+            middleSongs.Add(dataDictionary["middleSongs" + songsInList].ToString());
+            songsInList++;
+        }
+
+        songsInList = 0;
+        while (dataDictionary.ContainsKey("finalSongs" + songsInList))
+        {
+            finalSongs.Add(dataDictionary["finalSongs" + songsInList].ToString());
+            songsInList++;
+        }
+
+        songsInList = 0;
+        while (dataDictionary.ContainsKey("randomSongs" + songsInList))
+        {
+            randomSongs.Add(dataDictionary["randomSongs" + songsInList].ToString());
+            songsInList++;
+        }
+
+        songsInList = 0;
+        while (dataDictionary.ContainsKey("menuSongs" + songsInList))
+        {
+            menuSongs.Add(dataDictionary["menuSongs" + songsInList].ToString());
+            songsInList++;
+        }
 
         InitalizeMusic();
         playRandomSong();

@@ -80,6 +80,8 @@ public class FirebaseScript : MonoBehaviour
         else { } // Data saved
     }
 
+
+
     private IEnumerator LoadData()
     {
         var dataBaseTask = dataBaseReference.Child("users").Child(_user.UserId).GetValueAsync();
@@ -98,6 +100,7 @@ public class FirebaseScript : MonoBehaviour
             // No data exists yet, set all data to default
             Dictionary<string, object> dataDictionary = new Dictionary<string, object>();
 
+
             dataDictionary.Add("Kills", "0"); 
             StartCoroutine(UpdateObject("Kills", "0"));
 
@@ -105,25 +108,35 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("username", name);
             StartCoroutine(UpdateObject("username", name));
 
-            dataDictionary.Add("friends", "");
-            StartCoroutine(UpdateObject("friends", ""));
+            List<string> emptyFriends = new List<string> { "" };
+            dataDictionary.Add("friends", emptyFriends);
+            StartCoroutine(UpdateObject("friends", emptyFriends));
 
-            dataDictionary.Add("startSongs", "");
-            StartCoroutine(UpdateObject("startSongs", ""));
-            dataDictionary.Add("middleSongs", "");
-            StartCoroutine(UpdateObject("middleSongs", ""));
-            dataDictionary.Add("finalSongs", "");
-            StartCoroutine(UpdateObject("finalSongs", ""));
-            dataDictionary.Add("randomSongs", "");
-            StartCoroutine(UpdateObject("randomSongs", ""));
-            dataDictionary.Add("menuSongs", "");
-            StartCoroutine(UpdateObject("menuSongs", ""));
+            List<string> emptyStart = new List<string> { "" };
+            dataDictionary.Add("startSongs", emptyStart);
+            StartCoroutine(UpdateObject("startSongs", emptyStart));
+
+            List<string> emptyMiddle = new List<string> { "" };
+            dataDictionary.Add("middleSongs", emptyMiddle);
+            StartCoroutine(UpdateObject("middleSongs", emptyMiddle));
+
+            List<string> emptyFinal = new List<string> { "" };
+            dataDictionary.Add("finalSongs", emptyFinal);
+            StartCoroutine(UpdateObject("finalSongs", emptyFinal));
+
+            List<string> emptyRandom = new List<string> { "" };
+            dataDictionary.Add("randomSongs", emptyRandom);
+            StartCoroutine(UpdateObject("randomSongs", emptyRandom));
+
+            List<string> emptyMenu = new List<string> { "" };
+            dataDictionary.Add("menuSongs", emptyMenu);
+            StartCoroutine(UpdateObject("menuSongs", emptyMenu));
 
             //builder                        | team 1 | team 2 | team 3 |
 
-            dataDictionary.Add("teamNames", "___");
-            StartCoroutine(UpdateObject("teamNames", "___"));
-
+            List<string> emptyTeamNames = new List<string> { "", "", "" };
+            dataDictionary.Add("teamNames", emptyTeamNames);
+            StartCoroutine(UpdateObject("teamNames", emptyTeamNames));
 
             dataDictionary.Add("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
             StartCoroutine(UpdateObject("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1"));
@@ -163,12 +176,33 @@ public class FirebaseScript : MonoBehaviour
             Dictionary<string, object> dataDictionary = new Dictionary<string, object>();
             dataDictionary.Add("Kills" ,snapShot.Child("Kills").Value); // This is for ints, "Kills" is the name and snapShot.Chlid("Kills") gets the value from that directoary
             dataDictionary.Add("username", snapShot.Child("username").Value);
-            dataDictionary.Add("friends", snapShot.Child("friends").Value);
-            dataDictionary.Add("startSongs", snapShot.Child("startSongs").Value);
-            dataDictionary.Add("middleSongs", snapShot.Child("middleSongs").Value);
-            dataDictionary.Add("finalSongs", snapShot.Child("finalSongs").Value);
-            dataDictionary.Add("randomSongs", snapShot.Child("randomSongs").Value);
-            dataDictionary.Add("menuSongs", snapShot.Child("menuSongs").Value);
+
+            for (int i = 0; i < snapShot.Child("friends").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("friends" + i), snapShot.Child("friends").Child("" + i).Value);
+            }
+
+            for (int i = 0; i < snapShot.Child("startSongs").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("startSongs" + i), snapShot.Child("startSongs").Child("" + i).Value);
+            }
+            for (int i = 0; i < snapShot.Child("middleSongs").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("middleSongs" + i), snapShot.Child("middleSongs").Child("" + i).Value);
+            }
+            for (int i = 0; i < snapShot.Child("finalSongs").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("finalSongs" + i), snapShot.Child("finalSongs").Child("" + i).Value);
+            }
+            for (int i = 0; i < snapShot.Child("randomSongs").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("randomSongs" + i), snapShot.Child("randomSongs").Child("" + i).Value);
+            }
+            for (int i = 0; i < snapShot.Child("menuSongs").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("menuSongs" + i), snapShot.Child("menuSongs").Child("" + i).Value);
+            }
+
             dataDictionary.Add("critterIDs", snapShot.Child("critterIDs").Value);
             dataDictionary.Add("attackIDs", snapShot.Child("attackIDs").Value);
             dataDictionary.Add("abilityIDs", snapShot.Child("abilityIDs").Value);
@@ -177,7 +211,11 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("StrengthGrowth", snapShot.Child("StrengthGrowth").Value);
             dataDictionary.Add("MagicGrowth", snapShot.Child("MagicGrowth").Value);
             dataDictionary.Add("SpeedGrowth", snapShot.Child("SpeedGrowth").Value);
-            dataDictionary.Add("teamNames", snapShot.Child("teamNames").Value);
+
+            for (int i = 0; i < snapShot.Child("teamNames").ChildrenCount; ++i)
+            {
+                dataDictionary.Add(("teamNames" + i), snapShot.Child("teamNames").Child("" + i).Value);
+            }
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {

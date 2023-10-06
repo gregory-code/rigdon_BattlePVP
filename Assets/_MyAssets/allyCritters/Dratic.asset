@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2238692daebc88449b6de31cd50c1862, type: 3}
+  m_Name: Dratic
+  m_EditorClassIdentifier: 
+  critterID: 1
+  bFlipSprite: 010101
+  critterName: Dratic
+  stages:
+  - {fileID: 21300000, guid: 5b83c20342041594a9ec7dd3eb80f813, type: 3}
+  - {fileID: 21300000, guid: c12a20e543d4e6a41bf1a58a57b501d8, type: 3}
+  - {fileID: 21300000, guid: 364679d2d766f024996fa123caf4a04a, type: 3}
+  circleOutline: {fileID: 21300000, guid: f754ced6497d34e4c92d82a1a6c22cb0, type: 3}
+  matchingColor: {r: 0.9716981, g: 0.8538602, b: 0.13444869, a: 0}
+  initial_HP: 24
+  growthHP: 0
+  initial_Strength: 3
+  growthStrength: 0
+  initial_Magic: 2
+  growthMagic: 0
+  initial_Speed: 3
+  growthSpeed: 0
