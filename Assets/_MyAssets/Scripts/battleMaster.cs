@@ -6,15 +6,20 @@ using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System;
-using Photon.Pun.Demo.PunBasics;
+using Unity.VisualScripting;
 
 public class battleMaster : MonoBehaviourPunCallbacks
 {
     builderMenu BuilderMenu;
 
     notifScript NotificationScript;
+
+    [Header("Camera Shake")]
+    float shakeTime;
+    float shakePower;
+    float shakeFade;
+    float shakeRotation;
+    [SerializeField] Camera mainCamera;
 
     [Header("Critters")]
     [SerializeField] critter[] allyCritterCollection;
@@ -24,22 +29,75 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
     [SerializeField] private critterBuild proxyBuild; // for storing info to put into a function
 
-    private bool bIsPlayer1;
+    public GameObject critterPrefab;
+    public GameObject enemyCritterPrefab;
+
     [SerializeField] private string player1;
     [SerializeField] private string player2;
+    private bool bIsPlayer1;
 
     public Vector3 touchedPos;
     public bool bRendering;
+
+    private bool bGameStart = false;
 
     private void Awake()
     {
         BuilderMenu = GameObject.Find("builder").GetComponent<builderMenu>();
 
         NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
+
+        bGameStart = true;
+    }
+
+    private void LateUpdate()
+    {
+        if (bGameStart == false) return;
+
+        Vector3 cameraLerp = Vector3.Lerp(mainCamera.transform.position, new Vector3(0, 0, -100), 2 * Time.deltaTime);
+        mainCamera.transform.position = cameraLerp;
+
+        cameraShake();
+    }
+
+    private void cameraShake()
+    {
+        if (shakeTime > 0)
+        {
+            float xAmount = Random.Range(-1f, 1f) * shakePower;
+            float yAmount = Random.Range(-1f, 1f) * shakePower;
+
+            mainCamera.transform.position += new Vector3(xAmount, yAmount);
+            mainCamera.transform.rotation = Quaternion.Euler(0f, 0f, shakeRotation * Random.Range(-1f, 1f));
+
+            shakePower = Mathf.MoveTowards(shakePower, 0f, shakeFade * Time.deltaTime);
+            shakeRotation = Mathf.MoveTowards(shakeRotation, 0f, shakeFade * 5 * Time.deltaTime);
+
+            shakeTime -= 1;
+
+            if (shakeTime <= 0)
+            {
+                mainCamera.transform.position =  new Vector3(0,0,-100);
+                mainCamera.transform.rotation = Quaternion.Euler(0,0,0);
+            }
+        }
+    }
+
+    public void setCameraShake(float length, float power)
+    {
+        shakeTime = length;
+
+        shakePower = power;
+
+        shakeFade = power / length;
+
+        shakeRotation = power * 5;
     }
 
     public void setPlayerData(string player_1, string player_2)
     {
+        bGameStart = true;
+
         player1 = player_1;
         player2 = player_2;
         bIsPlayer1 = (PhotonNetwork.NickName == player_1) ? true : false ;
@@ -53,6 +111,28 @@ public class battleMaster : MonoBehaviourPunCallbacks
         {
             player1Team[i] = allyCritterCollection[BuilderMenu.activeCritterTeam[i].critterValue[0]];
             player1Team[i].SetFromCritterBuild(BuilderMenu.activeCritterTeam[i]);
+        }
+
+        InitalizeFight();
+    }
+
+    public void InitalizeFight()
+    {
+        for(int i = 0; i < 3; ++i)
+        {
+            GameObject critter = Instantiate(critterPrefab, transform.position, transform.rotation);
+            critter.transform.SetParent(transform.Find("player" + (i+1) + "Spawn").transform);
+            critter.transform.localPosition = Vector3.zero;
+            critter.transform.localScale = new Vector3(1, 1, 1);
+            critterController critterCon = critter.GetComponent<critterController>();
+            critterCon.setCritter(player1Team[i]);
+
+            GameObject enemyCritter = Instantiate(enemyCritterPrefab, transform.position, transform.rotation);
+            enemyCritter.transform.SetParent(transform.Find("enemy" + (i+1) + "Spawn").transform);
+            enemyCritter.transform.localPosition = Vector3.zero;
+            enemyCritter.transform.localScale = new Vector3(1, 1, 1);
+            enemyCritter enemyCon = enemyCritter.GetComponent<enemyCritter>();
+            enemyCon.setCritter(player2Team[i]);
         }
     }
 

@@ -14,6 +14,8 @@ public class musicMenu : MonoBehaviour, IDataPersistence
     private float _effectsLevel;
     private int _songPreference;
 
+    private bool bGottenList;
+
     notifScript NotificationScript;
 
     //battleMenuManager
@@ -88,7 +90,9 @@ public class musicMenu : MonoBehaviour, IDataPersistence
     {
         if (battleMenuManager.state != BattleMenuManager.battleMenuState.Menu && battleMenuManager.state != BattleMenuManager.battleMenuState.Searching) return;
 
-        if (menuSongs.Count > 0)
+        if (bGottenList == false) return;
+
+        if (menuSongs[0] != "" && menuSongs.Count > 0)
         {
             if (currentSong != null && currentSong.isPlaying == false)
             {
@@ -441,6 +445,7 @@ public class musicMenu : MonoBehaviour, IDataPersistence
         }
 
         InitalizeMusic();
+        bGottenList = true;
         playRandomSong();
     }
 

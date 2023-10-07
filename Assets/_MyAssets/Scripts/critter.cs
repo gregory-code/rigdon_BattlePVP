@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Critter")]
@@ -15,9 +16,9 @@ public class critter : ScriptableObject
     Animator critterAnimator;
 
     [Header("Info")]
-    [SerializeField] bool[] bFlipSprite = new bool[3];
     [SerializeField] private string critterName;
     private string critterNickname;
+    public bool[] bFlipSprite = new bool[3];
     public Sprite[] stages = new Sprite[3];
     public Sprite circleOutline;
     public Color matchingColor;
@@ -55,6 +56,28 @@ public class critter : ScriptableObject
     public int GetInitialMagic() { return initial_Magic; }
     public int GetInitialSpeed() { return initial_Speed; }
 
+    public void changeHealth(int change)
+    {
+        currentHP += change;
+
+        if (currentHP >= maxHP) currentHP = maxHP;
+        if (currentHP <= 0)
+        {
+            currentHP = 0;
+            //die
+        }
+    }
+
+    public float getHealthPercentage()
+    {
+        return (currentHP * 1.0f / maxHP);
+    }
+
+    public int getCurrentHealth()
+    {
+        return currentHP;
+    }
+
     public void SetFromCritterBuild(critterBuild build)
     {
         AttackID = build.critterValue[1];
@@ -68,7 +91,7 @@ public class critter : ScriptableObject
         critterNickname = build.critterNickname;
     }
 
-    private void Set_Initial_Stats()
+    public void Set_Initial_Stats()
     {
         maxHP = initial_HP;
         currentHP = initial_HP;

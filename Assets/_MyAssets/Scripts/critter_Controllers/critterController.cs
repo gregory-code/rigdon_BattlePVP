@@ -3,28 +3,11 @@ using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.iOS;
 using UnityEngine.UI;
 
-public class critterController : MonoBehaviour
+public class critterController : critterBase
 {
-    battleMaster BattleMaster;
-    lineScript redLine;
-    lineScript greenLine;
-
-    Camera renderCamera;
-    bool bMouseOver;
-
-
-    private void Start()
-    {
-        BattleMaster = GameObject.FindGameObjectWithTag("BattleField").GetComponent<battleMaster>();
-        redLine = GameObject.Find("redLineRender").GetComponent<lineScript>();
-        greenLine = GameObject.Find("greenLineRender").GetComponent<lineScript>();
-        renderCamera = GameObject.Find("lineRenderCamera").GetComponent<Camera>();
-    }
-
-    private void Update()
+    private void LateUpdate()
     {
         if (BattleMaster.bRendering == false || redLine.IsHoveringOverTarget() || greenLine.IsHoveringOverTarget()) return;
 
@@ -42,24 +25,6 @@ public class critterController : MonoBehaviour
     public void OnMouseUp()
     {
         lineRenderState(false);
-    }
-
-    public void OnMouseOver()
-    {
-        if (BattleMaster.bRendering == false || bMouseOver == true) return;
-
-        bMouseOver = true;
-        redLine.enable(false, Vector2.zero);
-        greenLine.enable(true, renderCamera.ScreenToWorldPoint(BattleMaster.touchedPos));
-        greenLine.focusTarget(true, gameObject.transform);
-    }
-
-    public void OnMouseExit()
-    {
-        if (bMouseOver == false) return;
-
-        bMouseOver = false;
-        greenLine.focusTarget(false, gameObject.transform);
     }
 
     private void lineRenderState(bool state)
