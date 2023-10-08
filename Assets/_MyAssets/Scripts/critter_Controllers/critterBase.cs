@@ -27,13 +27,21 @@ public class critterBase : MonoBehaviour
     bool bShattered;
 
     [Header("Critter Reference")]
-    [SerializeField] critter myCritter;
+    public critter myCritter;
     [SerializeField] int teamIndex;
     private SpriteRenderer critterGraphic;
 
     public void setCritter(critter reference)
     {
         myCritter = reference;
+        critterGraphic = gameObject.transform.Find("critterGraphic").GetComponent<SpriteRenderer>(); // flips the sprite
+        critterGraphic.sprite = myCritter.stages[0]; // this is incorrect if they have levels
+        for (int i = 0; i < 3; ++i) { if (critterGraphic.sprite == myCritter.stages[i] && myCritter.bFlipSprite[i] == true) critterGraphic.flipX = !critterGraphic.flipX; }
+        if (bFriendly == false) critterGraphic.flipX = !critterGraphic.flipX;
+
+        myCritter.Set_Initial_Stats(); // this is incorrect past the first round
+        healthText.text = myCritter.getCurrentHealth() + "";
+        healthText.color = (myCritter.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
     }
 
     private void Awake()
@@ -44,20 +52,9 @@ public class critterBase : MonoBehaviour
         critterAnimator = GetComponent<Animator>();
         renderCamera = GameObject.Find("lineRenderCamera").GetComponent<Camera>();
 
-        critterGraphic = gameObject.transform.Find("critterGraphic").GetComponent<SpriteRenderer>(); // flips the sprite
-        critterGraphic.sprite = myCritter.stages[0]; // this is incorrect if they have levels
-        for(int i = 0; i < 3; ++i) { if (critterGraphic.sprite == myCritter.stages[i] && myCritter.bFlipSprite[i] == true) critterGraphic.flipX = !critterGraphic.flipX; }
-        if (bFriendly == false) critterGraphic.flipX = !critterGraphic.flipX;
-
         nameText = gameObject.transform.Find("textCanvas").transform.Find("name").GetComponent<TextMeshProUGUI>();
         healthText = gameObject.transform.Find("textCanvas").transform.Find("healthText").GetComponent<TextMeshProUGUI>();
         healthMask = gameObject.transform.Find("healthBar").transform.Find("Sprite Mask").gameObject;
-
-
-
-        myCritter.Set_Initial_Stats(); // this is incorrect past the first round
-        healthText.text = myCritter.getCurrentHealth() + "";
-        healthText.color = (myCritter.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
     }
 
     private void Update()
@@ -70,8 +67,6 @@ public class critterBase : MonoBehaviour
         float value = myCritter.getHealthPercentage();
         value *= 4.53f;
         value += 4.62f;
-
-        Debug.Log($"I am {myCritter.GetCritterName()}  " + healthMask.transform.localPosition);
 
         Vector2 barLerp = Vector2.Lerp(healthMask.transform.localPosition, new Vector2(value, healthMask.transform.localPosition.y), 8 * Time.deltaTime);
 

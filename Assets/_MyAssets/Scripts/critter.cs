@@ -9,6 +9,7 @@ public class critter : ScriptableObject
 
     [Header("ID")]
     [SerializeField] private int critterID;
+    public bool bMine;
     [Space(35)]
 
     [Header("Components")]
@@ -56,6 +57,12 @@ public class critter : ScriptableObject
     public int GetInitialMagic() { return initial_Magic; }
     public int GetInitialSpeed() { return initial_Speed; }
 
+
+    public int getCurrentHealth() { return currentHP; }
+    public int getCurrentSpeed() { return currentSpeed; }
+
+
+
     public void changeHealth(int change)
     {
         currentHP += change;
@@ -73,10 +80,6 @@ public class critter : ScriptableObject
         return (currentHP * 1.0f / maxHP);
     }
 
-    public int getCurrentHealth()
-    {
-        return currentHP;
-    }
 
     public void SetFromCritterBuild(critterBuild build)
     {
