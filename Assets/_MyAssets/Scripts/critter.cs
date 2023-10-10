@@ -10,6 +10,7 @@ public class critter : ScriptableObject
     [Header("ID")]
     [SerializeField] private int critterID;
     public bool bMine;
+    public int teamPlacement;
     [Space(35)]
 
     [Header("Components")]

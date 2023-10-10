@@ -13,18 +13,21 @@ MonoBehaviour:
   m_Name: Hummrance
   m_EditorClassIdentifier: 
   critterID: 4
+  bMine: 0
+  teamPlacement: 0
   critterName: Hummrance
-  circleOutline: {fileID: 21300000, guid: 249277ef5535fbc4598ecd66a0227e8a, type: 3}
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 82ba3ce8b29fbf44f96ca1821e65eb98, type: 3}
   - {fileID: 21300000, guid: 97a48224020b1af4fa902bcdc7fbef83, type: 3}
   - {fileID: 21300000, guid: d10ef4dcb499cb74dad98bcae29967bf, type: 3}
-  matchingColor: {r: 0.18882751, g: 0.2985343, b: 0.6320754, a: 0}
+  circleOutline: {fileID: 21300000, guid: 249277ef5535fbc4598ecd66a0227e8a, type: 3}
+  matchingColor: {r: 0.18882751, g: 0.2985343, b: 0.6320754, a: 0.39215687}
   initial_HP: 15
+  growthHP: 0
   initial_Strength: 1
+  growthStrength: 0
   initial_Magic: 3
+  growthMagic: 0
   initial_Speed: 8
-  AttackID: 0
-  AbilityID: 0
-  PassiveID: 0
+  growthSpeed: 0

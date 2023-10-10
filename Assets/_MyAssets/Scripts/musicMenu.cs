@@ -127,7 +127,8 @@ public class musicMenu : MonoBehaviour, IDataPersistence
 
     private void playRandomSong()
     {
-        if (menuSongs[0] == "" || menuSongs.Count == 0) return;
+        if (menuSongs.Count <= 0) return;
+        if (menuSongs[0] == "") return;
         int randomSong = Random.Range(0, menuSongs.Count);
 
         listenToSong(menuSongs[randomSong]);

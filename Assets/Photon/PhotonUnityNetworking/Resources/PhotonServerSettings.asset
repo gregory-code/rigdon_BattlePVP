@@ -47,6 +47,7 @@ MonoBehaviour:
   - matchFoundRPC
   - recieveEnemyCritterTeamRPC
   - recieveEnemyCritterRPC
+  - nextTurnRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

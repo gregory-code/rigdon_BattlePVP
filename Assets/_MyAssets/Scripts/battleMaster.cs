@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
-using System.IO;
 using Unity.VisualScripting;
 using System.Runtime.CompilerServices;
 using UnityEditor.Rendering;
@@ -53,7 +52,18 @@ public class battleMaster : MonoBehaviourPunCallbacks
     [SerializeField] GameObject turnOrderPrefab;
     [SerializeField] Sprite friendlyTurnSprite;
     [SerializeField] Sprite enemyTurnSprite;
+
+    public List<critter> allCritters = new List<critter>();
+
     [SerializeField] private List<GameObject> turnOrderObjectList = new List<GameObject>();
+
+    [Header("Particles")]
+    [SerializeField] GameObject selectParticles;
+    [SerializeField] GameObject currentSelectParticles;
+
+    [Header("Targeting")]
+    public critter selectedCritter;
+    public critter targetedCritter;
 
     private void Awake()
     {
@@ -167,6 +177,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             critter.transform.localScale = new Vector3(1, 1, 1);
             critterCon.setCritter(player1Team[i]);
             critterCon.myCritter.bMine = true;
+            critterCon.myCritter.teamPlacement = i;
 
             GameObject enemyCritter = Instantiate(enemyCritterPrefab, transform.position, transform.rotation);
             enemyCritter enemyCon = enemyCritter.GetComponent<enemyCritter>();
@@ -175,14 +186,16 @@ public class battleMaster : MonoBehaviourPunCallbacks
             enemyCritter.transform.localScale = new Vector3(1, 1, 1);
             enemyCon.setCritter(player2Team[i]);
             enemyCon.myCritter.bMine = false;
+            enemyCon.myCritter.teamPlacement = i;
         }
 
         SortBySpeed();
+        selectNew();
     }
 
     private void SortBySpeed()
     {
-        List<critter> allCritters = new List<critter>();
+        allCritters.Clear();
         StatComparer comparer = new StatComparer();
         for (int i = 0; i < player1Team.Length; ++i)
         {
@@ -193,15 +206,52 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
         foreach (critter c in allCritters)
         {
-            GameObject newTurnOrder = Instantiate(turnOrderPrefab);
-            newTurnOrder.transform.localScale = new Vector3(1, 1, 1);
-            newTurnOrder.transform.SetParent(turnOrderGameObject.transform);
-            newTurnOrder.transform.localPosition = spawnLocation.localPosition;
-            Debug.Log($"Is Friendly: {c.bMine}  and name is {c.GetCritterName()}");
-            newTurnOrder.GetComponent<Image>().sprite = (c.bMine) ? friendlyTurnSprite : enemyTurnSprite;
-            newTurnOrder.transform.Find("critterGraphic").GetComponent<Image>().sprite = critterIcons[c.GetCritterID()]; // check levels to see if it's a higher evolution
-            turnOrderObjectList.Add(newTurnOrder);
+            addToTurnOrder(c);
         }
+    }
+
+    private void addToTurnOrder(critter c)
+    {
+        GameObject newTurnOrder = Instantiate(turnOrderPrefab);
+        newTurnOrder.transform.localScale = new Vector3(1, 1, 1);
+        newTurnOrder.transform.SetParent(turnOrderGameObject.transform);
+        newTurnOrder.transform.localPosition = spawnLocation.localPosition;
+        newTurnOrder.GetComponent<Image>().sprite = (c.bMine) ? friendlyTurnSprite : enemyTurnSprite;
+        newTurnOrder.transform.Find("critterGraphic").GetComponent<Image>().sprite = critterIcons[c.GetCritterID()]; // check levels to see if it's a higher evolution
+        turnOrderObjectList.Add(newTurnOrder);
+    }
+
+    private void selectNew()
+    {
+        GameObject newSelect = Instantiate(selectParticles);
+        string team = (allCritters[0].bMine) ? "player" : "enemy" ;
+        newSelect.transform.SetParent(GameObject.Find(team + (allCritters[0].teamPlacement + 1) + "Spawn").transform);
+        newSelect.transform.localPosition = selectParticles.transform.localPosition;
+        newSelect.transform.localScale = selectParticles.transform.localScale;
+
+        ParticleSystem system = newSelect.GetComponent<ParticleSystem>();
+        var mainModule = system.main;
+        mainModule.startColor = allCritters[0].matchingColor;
+
+        foreach(Transform t in newSelect.transform)
+        {
+            ParticleSystem newSystem = t.GetComponent<ParticleSystem>();
+            var module = newSystem.main;
+            module.startColor = allCritters[0].matchingColor;
+        }
+
+        currentSelectParticles = newSelect;
+    }
+
+    public void disappearSelectParticles()
+    {
+        currentSelectParticles.GetComponent<Animator>().SetTrigger("disappear");
+        Destroy(currentSelectParticles, 0.5f);
+    }
+
+    public void NextTurn()
+    {
+        this.photonView.RPC("nextTurnRPC", RpcTarget.AllBuffered);
     }
 
     private void sendMyTeam()
@@ -212,6 +262,34 @@ public class battleMaster : MonoBehaviourPunCallbacks
             string critterNickname = BuilderMenu.activeCritterTeam[i].critterNickname;
             this.photonView.RPC("recieveEnemyCritterRPC", RpcTarget.OthersBuffered, i, critterValues, critterNickname); // First person to search is player 2
         }
+    }
+
+    [PunRPC]
+    void nextTurnRPC()
+    {
+        disappearSelectParticles();
+        turnOrderObjectList[0].GetComponent<Animator>().SetTrigger("discard");
+        Destroy(turnOrderObjectList[0], 0.5f);
+        turnOrderObjectList.RemoveAt(0);
+        critter deletedCritter = allCritters[0];
+        allCritters.RemoveAt(0);
+        for (int i = 0; i < player1Team.Length; ++i)
+        {
+            if (player1Team[i] == deletedCritter)
+            {
+                allCritters.Add(player1Team[i]);
+                addToTurnOrder(player1Team[i]);
+                break;
+            }
+
+            if (player2Team[i] == deletedCritter)
+            {
+                allCritters.Add(player2Team[i]);
+                addToTurnOrder(player2Team[i]);
+                break;
+            }
+        }
+        selectNew();
     }
 
     [PunRPC]

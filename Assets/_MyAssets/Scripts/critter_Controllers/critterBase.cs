@@ -143,6 +143,7 @@ public class critterBase : MonoBehaviour
         if (BattleMaster.bRendering == false || bMouseOver == true) return;
 
         bMouseOver = true;
+        BattleMaster.targetedCritter = myCritter;
 
         if(bFriendly)
         {
@@ -166,10 +167,10 @@ public class critterBase : MonoBehaviour
         bMouseOver = false;
 
         //for testing
-        myCritter.changeHealth(-3);
-        healthText.text = myCritter.getCurrentHealth() + "";
-        healthText.color = (myCritter.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
-        healthParticles(-3);
+        //myCritter.changeHealth(-3);
+        //healthText.text = myCritter.getCurrentHealth() + "";
+        //healthText.color = (myCritter.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
+        //healthParticles(-3);
 
         if(bFriendly)
         {

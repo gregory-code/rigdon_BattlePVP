@@ -18,12 +18,21 @@ public class critterController : critterBase
 
     public void OnMouseDown()
     {
-        lineRenderState(true);
-        greenLine.resetReticle(renderCamera.ScreenToWorldPoint(BattleMaster.touchedPos));
+        if (BattleMaster.allCritters[0] == myCritter)
+        {
+            lineRenderState(true);
+            BattleMaster.selectedCritter = myCritter;
+            greenLine.resetReticle(renderCamera.ScreenToWorldPoint(BattleMaster.touchedPos));
+        }
     }
 
     public void OnMouseUp()
     {
+        if (redLine.IsHoveringOverTarget() && BattleMaster.allCritters[0] == myCritter)
+        {
+            BattleMaster.NextTurn();
+            //Put in the attack order
+        }
         lineRenderState(false);
     }
 
