@@ -3327,6 +3327,7 @@ GameObject:
   - component: {fileID: 5950704625707747106}
   - component: {fileID: 5610252897789742520}
   - component: {fileID: 4251719593735952548}
+  - component: {fileID: 8998596353122852576}
   m_Layer: 5
   m_Name: enemyPrefab
   m_TagString: Untagged
@@ -3376,6 +3377,8 @@ MonoBehaviour:
     type: 3}
   myCritter: {fileID: 0}
   teamIndex: 0
+  bAttack: 0
+  targetTransform: {fileID: 0}
 --- !u!61 &4251719593735952548
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3421,6 +3424,27 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 31.666666, y: 37.666668}
   m_EdgeRadius: 0
+--- !u!95 &8998596353122852576
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3731688684820185306}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c23903ee19f9873449ef85a2b7bf15cb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3784143662470627705
 GameObject:
   m_ObjectHideFlags: 0

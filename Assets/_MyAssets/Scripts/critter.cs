@@ -47,6 +47,7 @@ public class critter : ScriptableObject
     [SerializeField] private int growthSpeed;
 
     [Header("MoveSet")]
+    public moveBase[] moves = new moveBase[4];
     private int AttackID;
     private int AbilityID;
     private int PassiveID;
@@ -60,6 +61,7 @@ public class critter : ScriptableObject
 
 
     public int getCurrentHealth() { return currentHP; }
+    public int getCurrentStrength() { return currentStrength; }
     public int getCurrentSpeed() { return currentSpeed; }
 
 

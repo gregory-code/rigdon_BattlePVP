@@ -30,8 +30,7 @@ public class critterController : critterBase
     {
         if (redLine.IsHoveringOverTarget() && BattleMaster.allCritters[0] == myCritter)
         {
-            BattleMaster.NextTurn();
-            //Put in the attack order
+            BattleMaster.prepareMove(0);
         }
         lineRenderState(false);
     }

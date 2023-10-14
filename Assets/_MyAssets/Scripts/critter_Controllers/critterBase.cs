@@ -31,6 +31,9 @@ public class critterBase : MonoBehaviour
     [SerializeField] int teamIndex;
     private SpriteRenderer critterGraphic;
 
+    public bool bAttack;
+    public Transform targetTransform;
+
     public void setCritter(critter reference)
     {
         myCritter = reference;
@@ -60,6 +63,20 @@ public class critterBase : MonoBehaviour
     private void Update()
     {
         healthBarUpdate();
+
+        Vector3 moveLerp = (bAttack) ? targetTransform.localPosition : Vector3.zero;
+
+        if (bAttack)
+        {
+            int space = (bFriendly) ? 80 : -80;
+            Vector3 lerp  = Vector3.Lerp(transform.localPosition, new Vector3(moveLerp.x + space, moveLerp.y + 50, moveLerp.z), 5 * Time.deltaTime);
+            transform.localPosition = lerp;
+        }
+        else
+        {
+            Vector3 resetLerp = Vector3.Lerp(transform.localPosition, moveLerp, 5 * Time.deltaTime);
+            transform.localPosition = resetLerp;
+        }
     }
 
     private void healthBarUpdate()
@@ -138,6 +155,15 @@ public class critterBase : MonoBehaviour
         }
     }
 
+    public void recieveAttack(int change)
+    {
+        //for testing
+        myCritter.changeHealth(change);
+        healthText.text = myCritter.getCurrentHealth() + "";
+        healthText.color = (myCritter.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
+        healthParticles(change);
+    }
+
     public void OnMouseOver()
     {
         if (BattleMaster.bRendering == false || bMouseOver == true) return;
@@ -165,12 +191,6 @@ public class critterBase : MonoBehaviour
         if (bMouseOver == false) return;
 
         bMouseOver = false;
-
-        //for testing
-        //myCritter.changeHealth(-3);
-        //healthText.text = myCritter.getCurrentHealth() + "";
-        //healthText.color = (myCritter.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
-        //healthParticles(-3);
 
         if(bFriendly)
         {

@@ -31,3 +31,8 @@ MonoBehaviour:
   growthMagic: 1
   initial_Speed: 0
   growthSpeed: -1
+  moves:
+  - {fileID: 11400000, guid: ba16ebc708bc2cb4989c4c354c1c5127, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

@@ -5,9 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Realtime;
 using TMPro;
-using Unity.VisualScripting;
-using System.Runtime.CompilerServices;
-using UnityEditor.Rendering;
 
 public class battleMaster : MonoBehaviourPunCallbacks
 {
@@ -22,13 +19,18 @@ public class battleMaster : MonoBehaviourPunCallbacks
     float shakeRotation;
     [SerializeField] Camera mainCamera;
 
+    [SerializeField] bool myTurn;
+
     [Header("Critters")]
     [SerializeField] Sprite[] critterIcons;
     [SerializeField] critter[] allyCritterCollection;
     [SerializeField] critter[] enemyCritterCollection;
 
     [SerializeField] private critter[] player1Team = new critter[3];
+    public Transform[] player1TeamTransforms = new Transform[3];
+
     [SerializeField] private critter[] player2Team = new critter[3];
+    public Transform[] player2TeamTransforms = new Transform[3];
 
     [SerializeField] private critterBuild proxyBuild; // for storing info to put into a function
 
@@ -178,6 +180,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             critterCon.setCritter(player1Team[i]);
             critterCon.myCritter.bMine = true;
             critterCon.myCritter.teamPlacement = i;
+            player1TeamTransforms[i] = critter.transform;
 
             GameObject enemyCritter = Instantiate(enemyCritterPrefab, transform.position, transform.rotation);
             enemyCritter enemyCon = enemyCritter.GetComponent<enemyCritter>();
@@ -187,6 +190,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             enemyCon.setCritter(player2Team[i]);
             enemyCon.myCritter.bMine = false;
             enemyCon.myCritter.teamPlacement = i;
+            player2TeamTransforms[i] = enemyCritter.transform;
         }
 
         SortBySpeed();
@@ -240,6 +244,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             module.startColor = allCritters[0].matchingColor;
         }
 
+        myTurn = allCritters[0].bMine;
         currentSelectParticles = newSelect;
     }
 
@@ -262,6 +267,62 @@ public class battleMaster : MonoBehaviourPunCallbacks
             string critterNickname = BuilderMenu.activeCritterTeam[i].critterNickname;
             this.photonView.RPC("recieveEnemyCritterRPC", RpcTarget.OthersBuffered, i, critterValues, critterNickname); // First person to search is player 2
         }
+    }
+
+    public void prepareMove(int moveID)
+    {
+
+        this.photonView.RPC("executeMoveRPC", RpcTarget.AllBuffered, moveID, selectedCritter.bMine, selectedCritter.teamPlacement, targetedCritter.bMine, targetedCritter.teamPlacement);
+    }
+
+    [PunRPC]
+    void executeMoveRPC(int moveID, bool selectedIsMine, int selectedTeamPlacement, bool targetIsMine, int targetTeamPlaceMent) // current critter using it is in index 0
+    {
+        StartCoroutine(executeMove(moveID, selectedIsMine, selectedTeamPlacement, targetIsMine, targetTeamPlaceMent));
+    }
+
+    private IEnumerator executeMove(int moveID, bool selectedIsMine, int selectedTeamPlacement, bool targetIsMine, int targetTeamPlaceMent)
+    {
+        critterBase movingCritter = new critterBase();
+        critterBase recivingCritter = new critterBase();
+
+        if(myTurn)
+        {
+            movingCritter = player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
+            recivingCritter = (targetIsMine) ? player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>() : player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
+            movingCritter.targetTransform = (targetIsMine) ? player1TeamTransforms[targetTeamPlaceMent].parent.transform : player2TeamTransforms[targetTeamPlaceMent].parent.transform;
+        }
+        else
+        {
+            movingCritter = player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
+            recivingCritter = (targetIsMine) ? player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>() : player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
+            movingCritter.targetTransform = (targetIsMine) ? player2TeamTransforms[targetTeamPlaceMent].parent.transform : player1TeamTransforms[targetTeamPlaceMent].parent.transform;
+        }
+
+        if (moveID == -1) moveID = 0; // to prevent softlocking
+        moveBase move = movingCritter.myCritter.moves[moveID];
+
+        if (move.bMeleeAttack) movingCritter.bAttack = true;
+
+        yield return new WaitForSeconds(move.firstWait);
+
+        movingCritter.GetComponent<Animator>().SetTrigger(move.animType);
+
+        yield return new WaitForSeconds(0.5f);
+
+        recivingCritter.GetComponent<Animator>().SetTrigger("damaged");
+
+        int damageDealt = move.leveledPower[0] + allCritters[0].getCurrentStrength();
+        damageDealt *= -1;
+        recivingCritter.recieveAttack(damageDealt);
+
+        yield return new WaitForSeconds(move.secondWait);
+
+        movingCritter.bAttack = false;
+
+        yield return new WaitForSeconds(move.thirdWait);
+
+        NextTurn();
     }
 
     [PunRPC]
