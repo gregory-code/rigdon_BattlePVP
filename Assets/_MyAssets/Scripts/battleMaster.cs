@@ -10,6 +10,8 @@ public class battleMaster : MonoBehaviourPunCallbacks
 {
     builderMenu BuilderMenu;
 
+    [SerializeField] private GameObject loadingScreen;
+
     notifScript NotificationScript;
 
     [Header("Camera Shake")]
@@ -142,6 +144,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
     public void setPlayerData(string player_1, string player_2)
     {
+
         bGameStart = true;
 
         player1 = player_1;
@@ -166,6 +169,8 @@ public class battleMaster : MonoBehaviourPunCallbacks
     {
         yield return new WaitForSeconds(0.3f);
         InitalizeFight();
+        yield return new WaitForSeconds(1);
+        loadingScreen.SetActive(false); // make sure to set back on when fight is over.
     }
 
     public void InitalizeFight()
@@ -254,6 +259,26 @@ public class battleMaster : MonoBehaviourPunCallbacks
         Destroy(currentSelectParticles, 0.5f);
     }
 
+    public void removeFromCritterBase(critterBase toRemove)
+    {
+        for(int i = 0; i < allCritters.Count; ++i)
+        {
+            if(toRemove.myCritter == allCritters[i])
+            {
+                deleteFromTurnOrder(i);
+                break;
+            }
+        }
+    }
+
+    private void deleteFromTurnOrder(int where)
+    {
+        turnOrderObjectList[where].GetComponent<Animator>().SetTrigger("discard");
+        Destroy(turnOrderObjectList[where], 0.5f);
+        turnOrderObjectList.RemoveAt(where);
+        allCritters.RemoveAt(where);
+    }
+
     public void NextTurn()
     {
         this.photonView.RPC("nextTurnRPC", RpcTarget.AllBuffered);
@@ -286,23 +311,25 @@ public class battleMaster : MonoBehaviourPunCallbacks
         critterBase movingCritter = new critterBase();
         critterBase recivingCritter = new critterBase();
 
-        if(myTurn)
+        if (myTurn)
         {
             movingCritter = player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
-            recivingCritter = (targetIsMine) ? player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>() : player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
-            movingCritter.targetTransform = (targetIsMine) ? player1TeamTransforms[targetTeamPlaceMent].parent.transform : player2TeamTransforms[targetTeamPlaceMent].parent.transform;
+            recivingCritter = player2TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>();
         }
         else
         {
+            selectedIsMine = !selectedIsMine;
+            targetIsMine = !targetIsMine;
+
             movingCritter = player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
-            recivingCritter = (targetIsMine) ? player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>() : player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
-            movingCritter.targetTransform = (targetIsMine) ? player2TeamTransforms[targetTeamPlaceMent].parent.transform : player1TeamTransforms[targetTeamPlaceMent].parent.transform;
+            recivingCritter = player1TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>();
         }
 
         if (moveID == -1) moveID = 0; // to prevent softlocking
         moveBase move = movingCritter.myCritter.moves[moveID];
 
-        if (move.bMeleeAttack) movingCritter.bAttack = true;
+        if (move.bMeleeAttack && myTurn) movingCritter.attackMove(true, player2TeamTransforms[targetTeamPlaceMent].parent.transform);
+        else if (move.bMeleeAttack && !myTurn) movingCritter.attackMove(true, player1TeamTransforms[targetTeamPlaceMent].parent.transform);
 
         yield return new WaitForSeconds(move.firstWait);
 
@@ -318,22 +345,19 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(move.secondWait);
 
-        movingCritter.bAttack = false;
+        movingCritter.attackMove(false, null);
 
         yield return new WaitForSeconds(move.thirdWait);
 
-        NextTurn();
+        if(bIsPlayer1) NextTurn();
     }
 
     [PunRPC]
     void nextTurnRPC()
     {
         disappearSelectParticles();
-        turnOrderObjectList[0].GetComponent<Animator>().SetTrigger("discard");
-        Destroy(turnOrderObjectList[0], 0.5f);
-        turnOrderObjectList.RemoveAt(0);
         critter deletedCritter = allCritters[0];
-        allCritters.RemoveAt(0);
+        deleteFromTurnOrder(0);
         for (int i = 0; i < player1Team.Length; ++i)
         {
             if (player1Team[i] == deletedCritter)

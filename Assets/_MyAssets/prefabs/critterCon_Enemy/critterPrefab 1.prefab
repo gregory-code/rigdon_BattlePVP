@@ -254,7 +254,6 @@ MonoBehaviour:
   hitParticleEffect: {fileID: 6579404667820818749, guid: 2aab0e0891e148247830e087239d9c65,
     type: 3}
   myCritter: {fileID: 0}
-  teamIndex: 0
 --- !u!61 &7789777106687992283
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1711,7 +1710,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &1414867151880443358
 MonoBehaviour:
   m_ObjectHideFlags: 0

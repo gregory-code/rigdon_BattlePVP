@@ -7012,6 +7012,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89204d8fc87134142855718b6158e6e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadingScreen: {fileID: 1260709539}
   mainCamera: {fileID: 1398068279}
   myTurn: 0
   critterIcons:

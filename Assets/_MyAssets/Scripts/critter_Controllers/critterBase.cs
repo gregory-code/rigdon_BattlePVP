@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class critterBase : MonoBehaviour
 {
     [Header("BaseClass")]
-    [SerializeField] bool bFriendly;
+    public bool bFriendly;
     public bool bMouseOver;
 
     //Fields for controller
@@ -28,11 +28,17 @@ public class critterBase : MonoBehaviour
 
     [Header("Critter Reference")]
     public critter myCritter;
-    [SerializeField] int teamIndex;
     private SpriteRenderer critterGraphic;
+    private bool bAttack;
+    private Transform originalParent;
 
-    public bool bAttack;
-    public Transform targetTransform;
+    private Transform healthBar;
+    private Vector3 originalHealthBar;
+    private Vector3 originalHealthBarSize;
+
+    private Transform textCanvas;
+    private Vector3 originalTextCanvas;
+    private Vector3 originalTextCanvasSize;
 
     public void setCritter(critter reference)
     {
@@ -41,6 +47,8 @@ public class critterBase : MonoBehaviour
         critterGraphic.sprite = myCritter.stages[0]; // this is incorrect if they have levels
         for (int i = 0; i < 3; ++i) { if (critterGraphic.sprite == myCritter.stages[i] && myCritter.bFlipSprite[i] == true) critterGraphic.flipX = !critterGraphic.flipX; }
         if (bFriendly == false) critterGraphic.flipX = !critterGraphic.flipX;
+
+        originalParent = transform.parent;
 
         myCritter.Set_Initial_Stats(); // this is incorrect past the first round
         healthText.text = myCritter.getCurrentHealth() + "";
@@ -58,24 +66,54 @@ public class critterBase : MonoBehaviour
         nameText = gameObject.transform.Find("textCanvas").transform.Find("name").GetComponent<TextMeshProUGUI>();
         healthText = gameObject.transform.Find("textCanvas").transform.Find("healthText").GetComponent<TextMeshProUGUI>();
         healthMask = gameObject.transform.Find("healthBar").transform.Find("Sprite Mask").gameObject;
+
+        healthBar = gameObject.transform.Find("healthBar").transform;
+        textCanvas = gameObject.transform.Find("textCanvas").transform;
+
+        originalHealthBar = healthBar.localPosition;
+        originalHealthBarSize = healthBar.localScale;
+
+        originalTextCanvas = textCanvas.localPosition;
+        originalTextCanvasSize = textCanvas.localScale;
     }
 
     private void Update()
     {
         healthBarUpdate();
 
-        Vector3 moveLerp = (bAttack) ? targetTransform.localPosition : Vector3.zero;
+        Vector3 healthLerp = (bAttack) ? new Vector3(-13, 8, 0) : originalHealthBar;
+        Vector3 healthSize = (bAttack) ? new Vector3(3, 4, 0) : originalHealthBarSize;
 
+        healthBar.transform.localPosition = Vector3.Lerp(healthBar.transform.localPosition, healthLerp, 4 * Time.deltaTime);
+        healthBar.transform.localScale = Vector3.Lerp(healthBar.transform.localScale, healthSize, 4 * Time.deltaTime);
+
+        Vector3 textLerp = (bAttack) ? new Vector3(-4.5f, 30f, 0) : originalTextCanvas;
+        Vector3 textSize = (bAttack) ? new Vector3(1, 2, 0) : originalTextCanvasSize;
+
+        textCanvas.transform.localPosition = Vector3.Lerp(textCanvas.transform.localPosition, textLerp, 4 * Time.deltaTime);
+        textCanvas.transform.localScale = Vector3.Lerp(textCanvas.transform.localScale, textSize, 4 * Time.deltaTime);
+
+        float extra = 0;
         if (bAttack)
         {
-            int space = (bFriendly) ? 80 : -80;
-            Vector3 lerp  = Vector3.Lerp(transform.localPosition, new Vector3(moveLerp.x + space, moveLerp.y + 50, moveLerp.z), 5 * Time.deltaTime);
-            transform.localPosition = lerp;
+            extra = (bFriendly) ? -40 : 40;
+        }
+
+        Vector3 lerp = Vector3.Lerp(transform.localPosition, new Vector3(0 + extra, 0, 0), 5 * Time.deltaTime);
+        transform.localPosition = lerp;
+    }
+
+    public void attackMove(bool state, Transform target)
+    {
+        bAttack = state;
+
+        if(state)
+        {
+            transform.parent = target;
         }
         else
         {
-            Vector3 resetLerp = Vector3.Lerp(transform.localPosition, moveLerp, 5 * Time.deltaTime);
-            transform.localPosition = resetLerp;
+            transform.parent = originalParent;
         }
     }
 
@@ -126,6 +164,9 @@ public class critterBase : MonoBehaviour
             float force = (float)Random.Range(-0.05f, 0.05f);
             gameObject.transform.Find("healthBar").transform.GetChild(0).gameObject.SetActive(false);
             explodeHealthBar(force);
+            BattleMaster.removeFromCritterBase(this);
+            GetComponent<Animator>().SetTrigger("die");
+            Destroy(this, 0.6f);
             StartCoroutine(explodeDelay());
         }
 
@@ -135,7 +176,7 @@ public class critterBase : MonoBehaviour
 
     private IEnumerator explodeDelay()
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(.4f);
         nameText.text = "";
         healthText.text = "";
         float force = (float)Random.Range(10f, 15f);
