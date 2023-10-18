@@ -60,6 +60,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
     public List<critter> allCritters = new List<critter>();
 
     [SerializeField] private List<GameObject> turnOrderObjectList = new List<GameObject>();
+    [SerializeField] private List<GameObject> critterObjects = new List<GameObject>();
 
     [Header("Particles")]
     [SerializeField] GameObject selectParticles;
@@ -185,6 +186,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             critterCon.setCritter(player1Team[i]);
             critterCon.myCritter.bMine = true;
             critterCon.myCritter.teamPlacement = i;
+            critterObjects.Add(critter);
             player1TeamTransforms[i] = critter.transform;
 
             GameObject enemyCritter = Instantiate(enemyCritterPrefab, transform.position, transform.rotation);
@@ -195,6 +197,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             enemyCon.setCritter(player2Team[i]);
             enemyCon.myCritter.bMine = false;
             enemyCon.myCritter.teamPlacement = i;
+            critterObjects.Add(enemyCritter);
             player2TeamTransforms[i] = enemyCritter.transform;
         }
 
@@ -250,6 +253,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
         }
 
         myTurn = allCritters[0].bMine;
+        allCritters[0].canAct = true;
         currentSelectParticles = newSelect;
     }
 
@@ -296,37 +300,36 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
     public void prepareMove(int moveID)
     {
-
-        this.photonView.RPC("executeMoveRPC", RpcTarget.AllBuffered, moveID, selectedCritter.bMine, selectedCritter.teamPlacement, targetedCritter.bMine, targetedCritter.teamPlacement);
+        this.photonView.RPC("executeMoveRPC", RpcTarget.AllBuffered, moveID, selectedCritter.teamPlacement, targetedCritter.teamPlacement);
     }
 
     [PunRPC]
-    void executeMoveRPC(int moveID, bool selectedIsMine, int selectedTeamPlacement, bool targetIsMine, int targetTeamPlaceMent) // current critter using it is in index 0
+    void executeMoveRPC(int moveID, int selectedTeamPlacement, int targetTeamPlaceMent) // current critter using it is in index 0
     {
-        StartCoroutine(executeMove(moveID, selectedIsMine, selectedTeamPlacement, targetIsMine, targetTeamPlaceMent));
+        StartCoroutine(executeMove(moveID, selectedTeamPlacement, targetTeamPlaceMent));
     }
 
-    private IEnumerator executeMove(int moveID, bool selectedIsMine, int selectedTeamPlacement, bool targetIsMine, int targetTeamPlaceMent)
+    private IEnumerator executeMove(int moveID, int selectedTeamPlacement, int targetTeamPlaceMent)
     {
         critterBase movingCritter = new critterBase();
         critterBase recivingCritter = new critterBase();
+        moveBase move = new moveBase();
+
 
         if (myTurn)
         {
             movingCritter = player1TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
-            recivingCritter = player2TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>();
+            move = movingCritter.myCritter.moves[moveID];
+            recivingCritter = (move.bMeleeAttack) ? player2TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>() : player1TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>(); // this determines an attack or support
         }
         else
         {
-            selectedIsMine = !selectedIsMine;
-            targetIsMine = !targetIsMine;
+
 
             movingCritter = player2TeamTransforms[selectedTeamPlacement].GetComponent<critterBase>();
-            recivingCritter = player1TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>();
+            move = movingCritter.myCritter.moves[moveID];
+            recivingCritter = (move.bMeleeAttack) ? player1TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>() : player2TeamTransforms[targetTeamPlaceMent].GetComponent<critterBase>(); // this determines an attack or support
         }
-
-        if (moveID == -1) moveID = 0; // to prevent softlocking
-        moveBase move = movingCritter.myCritter.moves[moveID];
 
         if (move.bMeleeAttack && myTurn) movingCritter.attackMove(true, player2TeamTransforms[targetTeamPlaceMent].parent.transform);
         else if (move.bMeleeAttack && !myTurn) movingCritter.attackMove(true, player1TeamTransforms[targetTeamPlaceMent].parent.transform);
@@ -337,11 +340,8 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(0.5f);
 
-        recivingCritter.GetComponent<Animator>().SetTrigger("damaged");
-
-        int damageDealt = move.leveledPower[0] + allCritters[0].getCurrentStrength();
-        damageDealt *= -1;
-        recivingCritter.recieveAttack(damageDealt);
+        if (moveID == 0) dishAttack(recivingCritter, move);
+        else if (moveID == 1) dishHeal(recivingCritter, move);
 
         yield return new WaitForSeconds(move.secondWait);
 
@@ -352,9 +352,60 @@ public class battleMaster : MonoBehaviourPunCallbacks
         if(bIsPlayer1) NextTurn();
     }
 
+    private void dishAttack(critterBase recivingCritter, moveBase move)
+    {
+        recivingCritter.GetComponent<Animator>().SetTrigger("damaged");
+
+        int damageDealt = move.leveledPower[0] + allCritters[0].getCurrentStrength();
+        damageDealt *= -1;
+        recivingCritter.recieveAttack(damageDealt);
+    }
+
+    private void dishHeal(critterBase recivingCritter, moveBase move)
+    {
+        recivingCritter.GetComponent<Animator>().SetTrigger("cast");
+
+        int healthHeal = move.leveledPower[0] + allCritters[0].getCurrentMagic();
+        recivingCritter.recieveAttack(healthHeal);
+    }
+
+    private void clearField()
+    {
+        foreach (GameObject game in turnOrderObjectList)
+        {
+            Destroy(game);
+        }
+        foreach (GameObject game in critterObjects)
+        {
+            Destroy(game);
+        }
+        Destroy(selectParticles);
+        turnOrderObjectList.Clear();
+        critterObjects.Clear();
+        allCritters.Clear();
+    }
+
     [PunRPC]
     void nextTurnRPC()
     {
+        // Check to see if there are 0 of a team left.
+        bool team1Alive = false;
+        bool team2Alive = false;
+        foreach(critter c in allCritters)
+        {
+            if (c.bMine == true) team1Alive = true;
+            if (c.bMine == false) team2Alive = true;
+        }
+
+        if(team1Alive == false || team2Alive == false)
+        {
+            // game over
+            clearField();
+            loadingScreen.SetActive(true);
+            GameObject.FindGameObjectWithTag("BattleMenuManager").GetComponent<BattleMenuManager>().wrapUpFight();
+            return;
+        }
+
         disappearSelectParticles();
         critter deletedCritter = allCritters[0];
         deleteFromTurnOrder(0);

@@ -44,4 +44,23 @@ public class BattleMenuManager : MonoBehaviourPunCallbacks
         loading.hide();
     }
 
+    public void wrapUpFight()
+    {
+        StartCoroutine(backToMenu());
+    }
+
+    public IEnumerator backToMenu()
+    {
+        loading.show();
+
+        yield return new WaitForSeconds(0.5f);
+
+        menuGameObject.SetActive(true);
+        OnlineScript.rejoinLobby();
+
+        yield return new WaitForSeconds(0.5f);
+
+        loading.hide();
+    }
+
 }

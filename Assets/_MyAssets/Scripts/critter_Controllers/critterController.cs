@@ -28,9 +28,15 @@ public class critterController : critterBase
 
     public void OnMouseUp()
     {
-        if (redLine.IsHoveringOverTarget() && BattleMaster.allCritters[0] == myCritter)
+        if (redLine.IsHoveringOverTarget() && BattleMaster.allCritters[0] == myCritter && myCritter.canAct == true)
         {
+            myCritter.canAct = false;
             BattleMaster.prepareMove(0);
+        }
+        if(greenLine.IsHoveringOverTarget() && BattleMaster.allCritters[0] == myCritter && myCritter.canAct == true)
+        {
+            myCritter.canAct = false;
+            BattleMaster.prepareMove(1);
         }
         lineRenderState(false);
     }

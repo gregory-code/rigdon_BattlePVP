@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class musicMenu : MonoBehaviour, IDataPersistence
 {
@@ -92,12 +93,12 @@ public class musicMenu : MonoBehaviour, IDataPersistence
 
         if (bGottenList == false) return;
 
-        if (menuSongs[0] != "" && menuSongs.Count > 0)
+        if (menuSongs.Count <= 0) return;
+        if (menuSongs[0] != "") return;
+
+        if (currentSong != null && currentSong.isPlaying == false)
         {
-            if (currentSong != null && currentSong.isPlaying == false)
-            {
-                playRandomSong();
-            }
+            playRandomSong();
         }
     }
 
@@ -413,35 +414,50 @@ public class musicMenu : MonoBehaviour, IDataPersistence
         int songsInList = 0;
         while (dataDictionary.ContainsKey("startSongs" + songsInList))
         {
-            startSongs.Add(dataDictionary["startSongs" + songsInList].ToString());
+            if(dataDictionary["startSongs" + songsInList].ToString() != "")
+            {
+                startSongs.Add(dataDictionary["startSongs" + songsInList].ToString());
+            }
             songsInList++;
         }
 
         songsInList = 0;
         while (dataDictionary.ContainsKey("middleSongs" + songsInList))
         {
-            middleSongs.Add(dataDictionary["middleSongs" + songsInList].ToString());
+            if (dataDictionary["middleSongs" + songsInList].ToString() != "")
+            {
+                middleSongs.Add(dataDictionary["middleSongs" + songsInList].ToString());
+            }
             songsInList++;
         }
 
         songsInList = 0;
         while (dataDictionary.ContainsKey("finalSongs" + songsInList))
         {
-            finalSongs.Add(dataDictionary["finalSongs" + songsInList].ToString());
+            if (dataDictionary["finalSongs" + songsInList].ToString() != "")
+            {
+                finalSongs.Add(dataDictionary["finalSongs" + songsInList].ToString());
+            }
             songsInList++;
         }
 
         songsInList = 0;
         while (dataDictionary.ContainsKey("randomSongs" + songsInList))
         {
-            randomSongs.Add(dataDictionary["randomSongs" + songsInList].ToString());
+            if (dataDictionary["randomSongs" + songsInList].ToString() != "")
+            {
+                randomSongs.Add(dataDictionary["randomSongs" + songsInList].ToString());
+            }
             songsInList++;
         }
 
         songsInList = 0;
         while (dataDictionary.ContainsKey("menuSongs" + songsInList))
         {
-            menuSongs.Add(dataDictionary["menuSongs" + songsInList].ToString());
+            if (dataDictionary["menuSongs" + songsInList].ToString() != "")
+            {
+                menuSongs.Add(dataDictionary["menuSongs" + songsInList].ToString());
+            }
             songsInList++;
         }
 

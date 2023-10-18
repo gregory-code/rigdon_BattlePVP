@@ -11,6 +11,7 @@ public class critter : ScriptableObject
     [SerializeField] private int critterID;
     public bool bMine;
     public int teamPlacement;
+    public bool canAct = false;
     [Space(35)]
 
     [Header("Components")]
@@ -62,6 +63,7 @@ public class critter : ScriptableObject
 
     public int getCurrentHealth() { return currentHP; }
     public int getCurrentStrength() { return currentStrength; }
+    public int getCurrentMagic() { return currentMagic; }
     public int getCurrentSpeed() { return currentSpeed; }
 
 

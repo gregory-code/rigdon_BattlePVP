@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   critterID: 8
   bMine: 0
-  teamPlacement: 0
+  teamPlacement: 1
   critterName: Minfur
   bFlipSprite: 010101
   stages:
@@ -24,15 +24,15 @@ MonoBehaviour:
   circleOutline: {fileID: 21300000, guid: 41b027c93ce75eb4fb1e2bfadf49d257, type: 3}
   matchingColor: {r: 0.27981484, g: 0.43531364, b: 0.6792453, a: 0.78431374}
   initial_HP: 16
-  growthHP: 0
+  growthHP: -1
   initial_Strength: 0
-  growthStrength: 0
+  growthStrength: -1
   initial_Magic: 1
-  growthMagic: 0
+  growthMagic: -1
   initial_Speed: 7
-  growthSpeed: 0
+  growthSpeed: -1
   moves:
   - {fileID: 11400000, guid: ba16ebc708bc2cb4989c4c354c1c5127, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 6ead740924ebd994cbc0129b0e5d326d, type: 2}
   - {fileID: 0}
   - {fileID: 0}

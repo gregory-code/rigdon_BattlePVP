@@ -33,6 +33,6 @@ MonoBehaviour:
   growthSpeed: 0
   moves:
   - {fileID: 11400000, guid: ba16ebc708bc2cb4989c4c354c1c5127, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 6ead740924ebd994cbc0129b0e5d326d, type: 2}
   - {fileID: 0}
   - {fileID: 0}

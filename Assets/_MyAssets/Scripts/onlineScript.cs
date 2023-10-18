@@ -70,6 +70,12 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
         PhotonNetwork.JoinLobby();
     }
 
+    public void rejoinLobby()
+    {
+        bJoiningFightRoom = false;
+        PhotonNetwork.LeaveRoom();
+    }
+
     public override void OnJoinedLobby() 
     {
         RoomOptions roomOptions = new RoomOptions();
