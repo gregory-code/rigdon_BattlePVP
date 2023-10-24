@@ -22,7 +22,7 @@ public class critterBase : MonoBehaviour
     [Header("Health Bar")]
     [SerializeField] private GameObject healthNotif;
     [SerializeField] private GameObject hitParticleEffect;
-    private GameObject healthMask;
+    private Image bar;
     private TMP_Text healthText;
     private TMP_Text nameText;
     bool bShattered;
@@ -33,13 +33,9 @@ public class critterBase : MonoBehaviour
     private bool bAttack;
     private Transform originalParent;
 
-    private Transform healthBar;
-    private Vector3 originalHealthBar;
-    private Vector3 originalHealthBarSize;
-
-    private Transform textCanvas;
-    private Vector3 originalTextCanvas;
-    private Vector3 originalTextCanvasSize;
+    private Transform HUD;
+    private Vector3 originalHUD;
+    private Vector3 originalHUDSize;
 
     public void setCritter(critter reference)
     {
@@ -64,44 +60,43 @@ public class critterBase : MonoBehaviour
         critterAnimator = GetComponent<Animator>();
         renderCamera = GameObject.Find("lineRenderCamera").GetComponent<Camera>();
 
-        nameText = gameObject.transform.Find("textCanvas").transform.Find("name").GetComponent<TextMeshProUGUI>();
-        healthText = gameObject.transform.Find("textCanvas").transform.Find("healthText").GetComponent<TextMeshProUGUI>();
-        healthMask = gameObject.transform.Find("healthBar").transform.Find("Sprite Mask").gameObject;
+        HUD = gameObject.transform.Find("HUD").GetComponent<Transform>();
 
-        healthBar = gameObject.transform.Find("healthBar").transform;
-        textCanvas = gameObject.transform.Find("textCanvas").transform;
+        nameText = HUD.Find("textCanvas").transform.Find("name").GetComponent<TextMeshProUGUI>();
+        healthText = HUD.Find("textCanvas").transform.Find("healthText").GetComponent<TextMeshProUGUI>();
+        bar = HUD.Find("textCanvas").transform.Find("bar").GetComponent<Image>();
 
-        originalHealthBar = healthBar.localPosition;
-        originalHealthBarSize = healthBar.localScale;
-
-        originalTextCanvas = textCanvas.localPosition;
-        originalTextCanvasSize = textCanvas.localScale;
+        originalHUD = HUD.localPosition;
+        originalHUDSize = HUD.localScale;
+        
     }
 
     private void Update()
     {
-        healthBarUpdate();
+        HUDUpdate();
+        attackUpdate();
+        healthUpdate();
+    }
 
-        Vector3 healthLerp = (bAttack) ? new Vector3(-13, 8, 0) : originalHealthBar;
-        Vector3 healthSize = (bAttack) ? new Vector3(3, 4, 0) : originalHealthBarSize;
+    private void HUDUpdate()
+    {
+        Vector3 HUDLerp = (bAttack) ? new Vector3(0, 33, 0) : originalHUD;
+        Vector3 HUDLerpSize = (bAttack) ? new Vector3(0.5f, 0.5f, 0.5f) : originalHUDSize;
 
-        healthBar.transform.localPosition = Vector3.Lerp(healthBar.transform.localPosition, healthLerp, 4 * Time.deltaTime);
-        healthBar.transform.localScale = Vector3.Lerp(healthBar.transform.localScale, healthSize, 4 * Time.deltaTime);
+        HUD.transform.localPosition = Vector3.Lerp(HUD.transform.localPosition, HUDLerp, 4 * Time.deltaTime);
+        HUD.transform.localScale = Vector3.Lerp(HUD.transform.localScale, HUDLerpSize, 4 * Time.deltaTime);
+    }
 
-        Vector3 textLerp = (bAttack) ? new Vector3(-4.5f, 30f, 0) : originalTextCanvas;
-        Vector3 textSize = (bAttack) ? new Vector3(1, 2, 0) : originalTextCanvasSize;
+    private void attackUpdate()
+    {
+        Vector3 attackLerp = Vector3.zero;
+        if (bAttack) attackLerp.x = (bFriendly) ? -40 : 40;
+        transform.localPosition = Vector3.Lerp(transform.localPosition, attackLerp, 5 * Time.deltaTime);
+    }
 
-        textCanvas.transform.localPosition = Vector3.Lerp(textCanvas.transform.localPosition, textLerp, 4 * Time.deltaTime);
-        textCanvas.transform.localScale = Vector3.Lerp(textCanvas.transform.localScale, textSize, 4 * Time.deltaTime);
-
-        float extra = 0;
-        if (bAttack)
-        {
-            extra = (bFriendly) ? -40 : 40;
-        }
-
-        Vector3 lerp = Vector3.Lerp(transform.localPosition, new Vector3(0 + extra, 0, 0), 5 * Time.deltaTime);
-        transform.localPosition = lerp;
+    private void healthUpdate()
+    {
+        bar.fillAmount = Mathf.Lerp(bar.fillAmount, myCritter.getHealthPercentage(), 4 * Time.deltaTime);
     }
 
     public void attackMove(bool state, Transform target)
@@ -110,23 +105,12 @@ public class critterBase : MonoBehaviour
 
         if(state)
         {
-            transform.parent = target;
+            transform.SetParent(target);
         }
         else
         {
-            transform.parent = originalParent;
+            transform.SetParent(originalParent);
         }
-    }
-
-    private void healthBarUpdate()
-    {
-        float value = myCritter.getHealthPercentage();
-        value *= 4.53f;
-        value += 4.62f;
-
-        Vector2 barLerp = Vector2.Lerp(healthMask.transform.localPosition, new Vector2(value, healthMask.transform.localPosition.y), 8 * Time.deltaTime);
-
-        healthMask.transform.localPosition = barLerp;
     }
 
     private void healthParticles(int change)

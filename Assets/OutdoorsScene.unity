@@ -428,6 +428,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 11fa68b07db636e4e81c32964d06c9d1, type: 2}
   - {fileID: 11400000, guid: bed58917a06a5174f8cce52f48836026, type: 2}
   - {fileID: 11400000, guid: 9b8bc01d02ae8244d833ddce1aae145c, type: 2}
+  bBattlePlayListPreference: 0
   randomImage: {fileID: 1256178113}
   perBattleImage: {fileID: 175959535}
   muteIcon: {fileID: 682138203}
