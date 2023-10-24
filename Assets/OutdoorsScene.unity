@@ -7116,6 +7116,7 @@ MonoBehaviour:
   enemyTurnSprite: {fileID: 21300000, guid: 4897601008e3d664cb4ae004a09591a6, type: 3}
   allCritters: []
   turnOrderObjectList: []
+  critterObjects: []
   selectParticles: {fileID: 6790232381760236193, guid: adbadb82c8222154cb46641afa37b606,
     type: 3}
   currentSelectParticles: {fileID: 0}
@@ -7912,6 +7913,7 @@ GameObject:
   m_Component:
   - component: {fileID: 488911903}
   - component: {fileID: 488911902}
+  - component: {fileID: 488911904}
   m_Layer: 0
   m_Name: BattleMenuManager
   m_TagString: BattleMenuManager
@@ -7948,6 +7950,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &488911904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488911901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 426877a1de7746d4088f60a30e6f370f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startSongs: []
+  middleSongs: []
+  finalSongs: []
+  randomSongs: []
+  currentSong: {fileID: 0}
 --- !u!1 &503677588
 GameObject:
   m_ObjectHideFlags: 0
@@ -19949,7 +19968,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -263.5, y: -14.530006}
+  m_AnchoredPosition: {x: -283.5, y: -14.530006}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1182319354
@@ -19966,14 +19985,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: For testing purposes your current team is 1 and battle mode is set to quick
-    play
+  m_text: For Testing You will queue up with Team 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -20001,8 +20019,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 25
-  m_fontSizeBase: 25
+  m_fontSize: 29
+  m_fontSizeBase: 29
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -20037,7 +20055,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -308.83557, y: 0, z: 0, w: 0}
+  m_margin: {x: -387.33575, y: 0, z: -41.42034, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

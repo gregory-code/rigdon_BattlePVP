@@ -11,6 +11,9 @@ public class BattleMenuManager : MonoBehaviourPunCallbacks
     //Online
     onlineScript OnlineScript;
 
+    battleMusicManager battleJukeBox;
+    musicMenu musicBox;
+
     loadingScript loading;
 
     [SerializeField] GameObject menuGameObject;
@@ -22,6 +25,10 @@ public class BattleMenuManager : MonoBehaviourPunCallbacks
     private void Awake()
     {
         OnlineScript = GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>();
+
+        battleJukeBox = GetComponent<battleMusicManager>();
+
+        musicBox = GameObject.Find("music").GetComponent<musicMenu>();
 
         loading = GameObject.Find("LoadingScreen").GetComponent<loadingScript>();
     }
@@ -37,6 +44,10 @@ public class BattleMenuManager : MonoBehaviourPunCallbacks
         loading.show();
 
         yield return new WaitForSeconds(0.5f);
+
+        musicBox.stopListeningToSong();
+        battleJukeBox.setMusicPlaylists(musicBox.startSongs, musicBox.middleSongs, musicBox.finalSongs, musicBox.randomSongs, !musicBox.bBattlePlayListPreference);
+        battleJukeBox.setGameState("start");
 
         menuGameObject.SetActive(false);
         battleFieldGameObject.SetActive(true);
@@ -55,6 +66,7 @@ public class BattleMenuManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(0.5f);
 
+        battleJukeBox.stopSong();
         menuGameObject.SetActive(true);
         OnlineScript.rejoinLobby();
 

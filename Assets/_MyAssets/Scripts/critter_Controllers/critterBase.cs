@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -44,7 +45,7 @@ public class critterBase : MonoBehaviour
     {
         myCritter = reference;
         critterGraphic = gameObject.transform.Find("critterGraphic").GetComponent<SpriteRenderer>(); // flips the sprite
-        critterGraphic.sprite = myCritter.stages[0]; // this is incorrect if they have levels
+        critterGraphic.sprite = reference.stages[0]; // this is incorrect if they have levels
         for (int i = 0; i < 3; ++i) { if (critterGraphic.sprite == myCritter.stages[i] && myCritter.bFlipSprite[i] == true) critterGraphic.flipX = !critterGraphic.flipX; }
         if (bFriendly == false) critterGraphic.flipX = !critterGraphic.flipX;
 

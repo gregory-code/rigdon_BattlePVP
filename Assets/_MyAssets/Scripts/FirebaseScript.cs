@@ -37,7 +37,7 @@ public class FirebaseScript : MonoBehaviour
     public void InitializeDatabase() 
     { 
         dataBaseReference = FirebaseDatabase.DefaultInstance.RootReference;
-        NotificationScript.createNotif($"Database found.", Color.green);
+        //NotificationScript.createNotif($"Database found.", Color.green);
     }
     public void GetUser(FirebaseUser user) { _user = user; }
     public string GetUserID() { return _user.UserId; }
@@ -104,13 +104,13 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("Kills", "0"); 
             StartCoroutine(UpdateObject("Kills", "0"));
 
-            string name = GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>().UsernameField.text;
-            dataDictionary.Add("username", name);
-            StartCoroutine(UpdateObject("username", name));
-
             List<string> emptyFriends = new List<string> { "" };
             dataDictionary.Add("friends", emptyFriends);
             StartCoroutine(UpdateObject("friends", emptyFriends));
+
+            string name = GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>().UsernameField.text;
+            dataDictionary.Add("username", name);
+            StartCoroutine(UpdateObject("username", name));
 
             List<string> emptyStart = new List<string> { "" };
             dataDictionary.Add("startSongs", emptyStart);
@@ -135,7 +135,9 @@ public class FirebaseScript : MonoBehaviour
             //builder                        | team 1 | team 2 | team 3 |
 
             List<string> emptyTeamNames = new List<string> { "", "", "" };
-            dataDictionary.Add("teamNames", emptyTeamNames);
+            dataDictionary.Add("teamNames0", emptyTeamNames[0]);
+            dataDictionary.Add("teamNames1", emptyTeamNames[1]);
+            dataDictionary.Add("teamNames2", emptyTeamNames[2]);
             StartCoroutine(UpdateObject("teamNames", emptyTeamNames));
 
             dataDictionary.Add("critterIDs", "-1_-1_-1*-1_-1_-1*-1_-1_-1");
@@ -212,10 +214,13 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add("MagicGrowth", snapShot.Child("MagicGrowth").Value);
             dataDictionary.Add("SpeedGrowth", snapShot.Child("SpeedGrowth").Value);
 
-            for (int i = 0; i < snapShot.Child("teamNames").ChildrenCount; ++i)
-            {
-                dataDictionary.Add(("teamNames" + i), snapShot.Child("teamNames").Child("" + i).Value);
-            }
+            dataDictionary.Add(("teamNames" + 0), snapShot.Child("teamNames").Child("0").Value);
+            dataDictionary.Add(("teamNames" + 1), snapShot.Child("teamNames").Child("1").Value);
+            dataDictionary.Add(("teamNames" + 2), snapShot.Child("teamNames").Child("2").Value);
+            Debug.Log("" + snapShot.Child("teamNames").Child("0").Value);
+            Debug.Log("" + snapShot.Child("teamNames").Child("1").Value);
+            Debug.Log("" + snapShot.Child("teamNames").Child("2").Value);
+
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {

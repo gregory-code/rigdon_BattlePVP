@@ -4,6 +4,7 @@ using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Extensions;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System;
 using UnityEngine.UI;
@@ -152,11 +153,7 @@ public class AuthManager : MonoBehaviour
             PlayerPrefs.SetString("password", password);
 
             fireBaseScript.LoadCloudData();
-
-            //Load scene here when the login
         }
-
-
     }
 
     public void RegisterButton()
@@ -232,9 +229,13 @@ public class AuthManager : MonoBehaviour
     public void SignOut()
     {
         _auth.SignOut();
-        gameObject.SetActive(true);
         _usernameField.text = "";
         _emailField.text = "";
         _passwordField.text = "";
+
+        _bSaveAutomatically = 0;
+        PlayerPrefs.SetInt("save", _bSaveAutomatically);
+
+        SceneManager.LoadScene(0);
     }
 }

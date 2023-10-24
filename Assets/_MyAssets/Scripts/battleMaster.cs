@@ -168,7 +168,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
     private IEnumerator catchupDelay()
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(1f);
         InitalizeFight();
         yield return new WaitForSeconds(1);
         loadingScreen.SetActive(false); // make sure to set back on when fight is over.
@@ -340,7 +340,11 @@ public class battleMaster : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(0.5f);
 
-        if (moveID == 0) dishAttack(recivingCritter, move);
+        if (moveID == 0)
+        {
+            setCameraShake(0.3f, 6);
+            dishAttack(recivingCritter, move);
+        } 
         else if (moveID == 1) dishHeal(recivingCritter, move);
 
         yield return new WaitForSeconds(move.secondWait);
@@ -379,7 +383,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
         {
             Destroy(game);
         }
-        Destroy(selectParticles);
+        Destroy(currentSelectParticles);
         turnOrderObjectList.Clear();
         critterObjects.Clear();
         allCritters.Clear();

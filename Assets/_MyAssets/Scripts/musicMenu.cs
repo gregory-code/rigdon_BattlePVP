@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 public class musicMenu : MonoBehaviour, IDataPersistence
 {
@@ -58,7 +57,7 @@ public class musicMenu : MonoBehaviour, IDataPersistence
     [SerializeField] GameObject songPrefab;
 
     [SerializeField] song[] songLibrary;
-    private bool bBattlePlayListPreference;
+    public bool bBattlePlayListPreference;
     [SerializeField] Image randomImage;
     [SerializeField] Image perBattleImage;
     [SerializeField] Image muteIcon;
@@ -269,6 +268,11 @@ public class musicMenu : MonoBehaviour, IDataPersistence
         currentSong = GameObject.Find(songName).GetComponent<AudioSource>();
         currentSong.Play();
         NotificationScript.createNotif($"Now Playing: {songName}", Color.magenta);
+    }
+
+    public void stopListeningToSong()
+    {
+        if (currentSong != null) currentSong.Stop();
     }
 
     private void addSong(string songName)

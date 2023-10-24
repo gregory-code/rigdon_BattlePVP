@@ -35,7 +35,10 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     [Header("Cloud Variables")]
     public TMP_InputField UsernameField;
+    private string username;
+
     public TMP_InputField KillsField;
+    private string kills;
 
     private string _fieldString;
     private int _fieldInt;
@@ -186,9 +189,12 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     public void LoadData(Dictionary<string, object> dataDictionary)
     {
-        KillsField.text = dataDictionary["Kills"].ToString();
+        kills = dataDictionary["Kills"].ToString();
+        KillsField.text = kills;
 
-        UsernameField.text = dataDictionary["username"].ToString();
+        username = dataDictionary["username"].ToString();
+        UsernameField.text = username;
+
         OnlineScript.setNickName(dataDictionary["username"].ToString());
     }
 
