@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using UnityEngine.Audio;
 using System.Linq;
+using Firebase.Database;
 
 public class menuScript : MonoBehaviour, IDataPersistence
 {
@@ -19,9 +20,6 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
     //Online
     onlineScript OnlineScript;
-
-    //Music Menu
-    musicMenu musicMenuScript;
 
     //Builder Menu
     builderMenu builderMenuScript;
@@ -69,7 +67,6 @@ public class menuScript : MonoBehaviour, IDataPersistence
 
         menuAnimations = GetComponent<Animator>();
 
-        musicMenuScript = transform.Find("music").GetComponent<musicMenu>();
         builderMenuScript = transform.Find("builder").GetComponent<builderMenu>();
     }
 
@@ -133,9 +130,8 @@ public class menuScript : MonoBehaviour, IDataPersistence
             builderMenuScript.bEditCritter = false;
             builderMenuScript.selectedCritter = -1;
         }
-        else if(musicMenuScript.edittingPlaylist == true)
+        /*else if(/*musicMenuScript.edittingPlaylist == true)
         {
-            musicMenuScript.edittingPlaylist = false;
             menuAnimations.ResetTrigger("editPlaylist");
             menuAnimations.SetTrigger("exitPlaylist");
         }
@@ -144,7 +140,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
             menuAnimations.ResetTrigger("scatter");
             menuAnimations.SetTrigger("leave" + currentMenu);
             currentMenu = "";
-        }    
+        }    */
     }
 
     public void inBuilderSprites(int team)
@@ -187,15 +183,15 @@ public class menuScript : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void LoadData(Dictionary<string, object> dataDictionary)
+    public void LoadData(DataSnapshot data)
     {
-        kills = dataDictionary["Kills"].ToString();
+        /*kills = dataDictionary["Kills"].ToString();
         KillsField.text = kills;
 
         username = dataDictionary["username"].ToString();
         UsernameField.text = username;
 
-        OnlineScript.setNickName(dataDictionary["username"].ToString());
+        OnlineScript.setNickName(dataDictionary["username"].ToString());*/
     }
 
     public void LoadOtherPlayersData(string key, object data)

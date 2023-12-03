@@ -7,6 +7,7 @@ using Photon.Realtime;
 using TMPro;
 using System.Linq;
 using Photon.Pun.Demo.PunBasics;
+using Firebase.Database;
 
 public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 {
@@ -52,7 +53,7 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
     {
         bJoiningFightRoom = false;
 
-        loading = GameObject.Find("LoadingScreen").GetComponent<loadingScript>();
+        loading = GameObject.FindObjectOfType<loadingScript>();
 
         battleMenuManager = GameObject.FindGameObjectWithTag("BattleMenuManager").GetComponent<BattleMenuManager>();
         NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
@@ -235,15 +236,15 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
         }
     }
 
-    public void LoadData(Dictionary<string, object> dataDictionary)
+    public void LoadData(DataSnapshot data)
     {
-        int friendsInList = 0;
+        /*int friendsInList = 0;
         while (dataDictionary.ContainsKey("startSongs" + friendsInList))
         {
             if (dataDictionary["startSongs" + friendsInList].ToString() == "") return;
             addFriend(dataDictionary["startSongs" + friendsInList].ToString());
             friendsInList++;
-        }
+        }*/
     }
 
     public void LoadOtherPlayersData(string key, object data)

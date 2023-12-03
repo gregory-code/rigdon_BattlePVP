@@ -21,14 +21,14 @@ public class FirebaseScript : MonoBehaviour
     public DatabaseReference dataBaseReference;
 
     //User
-    [SerializeField] private FirebaseUser _user;
+    [SerializeField] private FirebaseUser user;
 
     [Header("login")]
     [SerializeField] GameObject loginMenu;
 
     public void Awake()
     {
-        loading = GameObject.Find("LoadingScreen").GetComponent<loadingScript>();
+        loading = GameObject.FindObjectOfType<loadingScript>();
         NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
 
         this.dataPersistenceObjects = FindAllDataPersistenceObjects();
@@ -37,10 +37,10 @@ public class FirebaseScript : MonoBehaviour
     public void InitializeDatabase() 
     { 
         dataBaseReference = FirebaseDatabase.DefaultInstance.RootReference;
-        //NotificationScript.createNotif($"Database found.", Color.green);
     }
-    public void GetUser(FirebaseUser user) { _user = user; }
-    public string GetUserID() { return _user.UserId; }
+
+    public void GetUser(FirebaseUser user) { this.user = user; }
+    public string GetUserID() { return user.UserId; }
 
     public void LoadCloudData()
     {
@@ -52,7 +52,7 @@ public class FirebaseScript : MonoBehaviour
         UserProfile profile = new UserProfile();
         profile.DisplayName = username;
 
-        var profileTask = _user.UpdateUserProfileAsync(profile);
+        var profileTask = user.UpdateUserProfileAsync(profile);
 
         yield return new WaitUntil(predicate: () => profileTask.IsCompleted);
 
@@ -69,7 +69,7 @@ public class FirebaseScript : MonoBehaviour
 
     public IEnumerator UpdateObject(string ID, object value)
     {
-        var dataBaseTask = dataBaseReference.Child("users").Child(_user.UserId).Child(ID).SetValueAsync(value);
+        var dataBaseTask = dataBaseReference.Child("users").Child(user.UserId).Child(ID).SetValueAsync(value);
 
         yield return new WaitUntil(predicate: () => dataBaseTask.IsCompleted);
 
@@ -84,7 +84,7 @@ public class FirebaseScript : MonoBehaviour
 
     private IEnumerator LoadData()
     {
-        var dataBaseTask = dataBaseReference.Child("users").Child(_user.UserId).GetValueAsync();
+        var dataBaseTask = dataBaseReference.Child("users").Child(user.UserId).GetValueAsync();
 
         yield return new WaitUntil(predicate: () => dataBaseTask.IsCompleted);
 
@@ -98,7 +98,7 @@ public class FirebaseScript : MonoBehaviour
         else if(dataBaseTask.Result.Value == null)
         {
             // No data exists yet, set all data to default
-            Dictionary<string, object> dataDictionary = new Dictionary<string, object>();
+            /*Dictionary<string, object> dataDictionary = new Dictionary<string, object>();
 
 
             dataDictionary.Add("Kills", "0"); 
@@ -167,7 +167,7 @@ public class FirebaseScript : MonoBehaviour
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
                 dataPersistenceObj.LoadData(dataDictionary);
-            }
+            }*/
         }
         else
         {
@@ -175,7 +175,7 @@ public class FirebaseScript : MonoBehaviour
 
             //set all of the data, things like
 
-            Dictionary<string, object> dataDictionary = new Dictionary<string, object>();
+            /*Dictionary<string, object> dataDictionary = new Dictionary<string, object>();
             dataDictionary.Add("Kills" ,snapShot.Child("Kills").Value); // This is for ints, "Kills" is the name and snapShot.Chlid("Kills") gets the value from that directoary
             dataDictionary.Add("username", snapShot.Child("username").Value);
 
@@ -219,12 +219,12 @@ public class FirebaseScript : MonoBehaviour
             dataDictionary.Add(("teamNames" + 2), snapShot.Child("teamNames").Child("2").Value);
             Debug.Log("" + snapShot.Child("teamNames").Child("0").Value);
             Debug.Log("" + snapShot.Child("teamNames").Child("1").Value);
-            Debug.Log("" + snapShot.Child("teamNames").Child("2").Value);
+            Debug.Log("" + snapShot.Child("teamNames").Child("2").Value);*/
 
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
-                dataPersistenceObj.LoadData(dataDictionary);
+                dataPersistenceObj.LoadData(snapShot);
             }
         }
     }

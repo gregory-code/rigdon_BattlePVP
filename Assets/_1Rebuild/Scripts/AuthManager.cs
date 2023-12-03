@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Firebase;
 using Firebase.Auth;
-using Firebase.Extensions;
 using UnityEngine.SceneManagement;
-using TMPro;
-using System;
 using UnityEngine.UI;
-using UnityEditor;
+using TMPro;
 
 public class AuthManager : MonoBehaviour
 {
@@ -19,39 +16,42 @@ public class AuthManager : MonoBehaviour
     public FirebaseScript fireBaseScript;
 
     //PlayerPref
-    private string _savedEmail;
-    private string _savedPassword;
-    private int _bSaveAutomatically;
+    private string savedEmail;
+    private string savedPassword;
+    private int bSaveAutomatically;
 
     //Background switching
     [SerializeField] private GameObject background;
 
     //Firebase
     [SerializeField] private DependencyStatus _dependentStatus;
-    [SerializeField] private FirebaseAuth _auth;
-    [SerializeField] private FirebaseUser _user;
+    [SerializeField] private FirebaseAuth auth;
+    [SerializeField] private FirebaseUser user;
 
 
     //Login
-    private TMP_InputField _usernameField;
-    private TMP_InputField _emailField;
-    private TMP_InputField _passwordField;
+    [SerializeField] TMP_InputField usernameField;
+    [SerializeField] TMP_InputField emailField;
+    [SerializeField] TMP_InputField passwordField;
 
     //Checkmark
-    [SerializeField] private Image _checkmark;
+    [SerializeField] private Image checkmarkImage;
 
 
     private void Awake()
     {
-        loading = GameObject.Find("LoadingScreen").GetComponent<loadingScript>();
-        loading.show();
+        NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
+
+        loading = GameObject.FindObjectOfType<loadingScript>();
+        if(loading != null)
+            loading.show();
 
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             _dependentStatus = task.Result;
             if(_dependentStatus == DependencyStatus.Available)
             {
-                _auth = FirebaseAuth.DefaultInstance;
+                auth = FirebaseAuth.DefaultInstance;
                 fireBaseScript.InitializeDatabase();
                 Debug.Log("setting up Auth");
             }
@@ -64,37 +64,26 @@ public class AuthManager : MonoBehaviour
 
     private void Start()
     {
-        getDependencies();
         getPlayerPrefs();
         StartCoroutine(signInDelay());
     }
 
-    private void getDependencies()
-    {
-        //Login
-        _usernameField = background.transform.Find("usernameField").GetComponent<TMP_InputField>();
-        _emailField = background.transform.Find("emailField").GetComponent<TMP_InputField>();
-        _passwordField = background.transform.Find("passwordField").GetComponent<TMP_InputField>();
-
-        NotificationScript = GameObject.FindGameObjectWithTag("Canvas").GetComponent<notifScript>();
-    }
-
     private void getPlayerPrefs()
     {
-        _savedEmail = PlayerPrefs.GetString("email");
-        _savedPassword = PlayerPrefs.GetString("password");
-        _bSaveAutomatically = PlayerPrefs.GetInt("save");
+        savedEmail = PlayerPrefs.GetString("email");
+        savedPassword = PlayerPrefs.GetString("password");
+        bSaveAutomatically = PlayerPrefs.GetInt("save");
 
-        _checkmark.color = (_bSaveAutomatically == 1) ? new Color(255, 255, 255, 255) : new Color(0, 0, 0, 0);
+        checkmarkImage.color = (bSaveAutomatically == 1) ? new Color(255, 255, 255, 255) : new Color(0, 0, 0, 0);
     }
 
     private IEnumerator signInDelay()
     {
         yield return new WaitForSeconds(1);
  
-        if (_bSaveAutomatically == 1 && _savedEmail != "" && _savedPassword != "")
+        if (bSaveAutomatically == 1 && savedEmail != "" && savedPassword != "")
         {
-            StartCoroutine(Login(_savedEmail, _savedPassword));
+            StartCoroutine(Login(savedEmail, savedPassword));
         }
         else
         {
@@ -104,19 +93,19 @@ public class AuthManager : MonoBehaviour
 
     public void loginAutoToggle()
     {
-        _bSaveAutomatically = (_bSaveAutomatically == 0) ? 1 : 0;
-        _checkmark.color = (_bSaveAutomatically == 1) ? new Color(255, 255, 255, 255) : new Color(0, 0, 0, 0);
-        PlayerPrefs.SetInt("save", _bSaveAutomatically);
+        bSaveAutomatically = (bSaveAutomatically == 0) ? 1 : 0;
+        checkmarkImage.color = (bSaveAutomatically == 1) ? new Color(255, 255, 255, 255) : new Color(0, 0, 0, 0);
+        PlayerPrefs.SetInt("save", bSaveAutomatically);
     }
 
     public void LoginButton()
     {
-        StartCoroutine(Login(_emailField.text, _passwordField.text));
+        StartCoroutine(Login(emailField.text, passwordField.text));
     }
 
     private IEnumerator Login(string email, string password)
     {
-        var loginTask = _auth.SignInWithEmailAndPasswordAsync(email, password);
+        var loginTask = auth.SignInWithEmailAndPasswordAsync(email, password);
 
         loading.show();
 
@@ -144,10 +133,10 @@ public class AuthManager : MonoBehaviour
         }
         else
         {
-            _user = loginTask.Result.User;
-            if(_user != null) fireBaseScript.GetUser(_user);
+            user = loginTask.Result.User;
+            if(user != null) fireBaseScript.GetUser(user);
 
-            NotificationScript.createNotif($"User {_user.DisplayName} Signed in", Color.green);
+            NotificationScript.createNotif($"User {user.DisplayName} Signed in", Color.green);
 
             PlayerPrefs.SetString("email", email);
             PlayerPrefs.SetString("password", password);
@@ -158,7 +147,7 @@ public class AuthManager : MonoBehaviour
 
     public void RegisterButton()
     {
-        StartCoroutine(Register(_emailField.text, _passwordField.text, _usernameField.text));
+        StartCoroutine(Register(emailField.text, passwordField.text, usernameField.text));
     }
 
     private IEnumerator Register(string email, string password, string username)
@@ -169,7 +158,7 @@ public class AuthManager : MonoBehaviour
         }
         else
         {
-            var registerTask = _auth.CreateUserWithEmailAndPasswordAsync(email, password);
+            var registerTask = auth.CreateUserWithEmailAndPasswordAsync(email, password);
 
             loading.show();
 
@@ -195,15 +184,15 @@ public class AuthManager : MonoBehaviour
             }
             else
             {
-                _user = registerTask.Result.User;
-                if(_user != null)
+                user = registerTask.Result.User;
+                if(user != null)
                 {
-                    fireBaseScript.GetUser(_user);
+                    fireBaseScript.GetUser(user);
 
                     UserProfile profile = new UserProfile();
                     profile.DisplayName = username;
 
-                    var profileTask = _user.UpdateUserProfileAsync(profile);
+                    var profileTask = user.UpdateUserProfileAsync(profile);
                     yield return new WaitUntil(predicate: () => profileTask.IsCompleted);
 
                     if(profileTask.Exception != null)
@@ -217,8 +206,8 @@ public class AuthManager : MonoBehaviour
                     else
                     {
                         NotificationScript.createNotif($"You Registered!", Color.green);
-                        GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>().setNickName(username);
-                        GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>().UsernameField.text = username;
+                        //GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>().setNickName(username);
+                        //GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>().UsernameField.text = username;
                         StartCoroutine(Login(email, password));
                     }
                 }
@@ -228,13 +217,13 @@ public class AuthManager : MonoBehaviour
 
     public void SignOut()
     {
-        _auth.SignOut();
-        _usernameField.text = "";
-        _emailField.text = "";
-        _passwordField.text = "";
+        auth.SignOut();
+        usernameField.text = "";
+        emailField.text = "";
+        passwordField.text = "";
 
-        _bSaveAutomatically = 0;
-        PlayerPrefs.SetInt("save", _bSaveAutomatically);
+        bSaveAutomatically = 0;
+        PlayerPrefs.SetInt("save", bSaveAutomatically);
 
         SceneManager.LoadScene(0);
     }

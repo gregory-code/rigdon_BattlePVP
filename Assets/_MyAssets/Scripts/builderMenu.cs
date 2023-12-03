@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Firebase.Database;
 
 public class builderMenu : MonoBehaviour, IDataPersistence
 {
@@ -669,9 +670,9 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         selectedTeam = -1;
     }
 
-    public void LoadData(Dictionary<string, object> dataDictionary)
+    public void LoadData(DataSnapshot data)
     {
-        deserializeCritterValue(dataDictionary["critterIDs"].ToString(), 0);
+        /*deserializeCritterValue(dataDictionary["critterIDs"].ToString(), 0);
         deserializeCritterValue(dataDictionary["attackIDs"].ToString(), 1);
         deserializeCritterValue(dataDictionary["abilityIDs"].ToString(), 2);
         deserializeCritterValue(dataDictionary["passiveIDs"].ToString(), 3);
@@ -695,7 +696,7 @@ public class builderMenu : MonoBehaviour, IDataPersistence
             teamName[i].text = name;
         }
 
-        InitalizeBuilder();
+        InitalizeBuilder();*/
     }
 
     public void LoadOtherPlayersData(string key, object data)

@@ -267,8 +267,9 @@ GameObject:
   - component: {fileID: 2346355358495659598}
   - component: {fileID: 1993000013330220868}
   - component: {fileID: 4097070260576539458}
+  - component: {fileID: 6431780052403974152}
   m_Layer: 5
-  m_Name: playPrefab
+  m_Name: songPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -333,6 +334,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6431780052403974152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4413444136618583017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82ccf267a1933b24c91733adae1d9162, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  songNameText: {fileID: 783170082688423948}
+  removeButton: {fileID: 6660372807363585767}
 --- !u!1 &4879833717986593246
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,8 +9,8 @@ public class song : ScriptableObject
     public enum series
     {
         sonic,
-        pokemon,
         birdsEpic,
+        pokemon,
         Limbus
     }
 
