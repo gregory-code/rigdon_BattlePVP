@@ -1,18 +1,47 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class teamBuilder : MonoBehaviour
+public class teamBuilder : canvasGroupRenderer
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] Sprite[] monsterImageLibrary;
+    [SerializeField] menuTab builderTab;
+
+    private teamSelect currentTeam;
+
+    private void Awake()
     {
-        
+        builderTab.onTabSelected += OpenBuilderTab;
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-        
+        teamSelect[] teams = GameObject.FindObjectsOfType<teamSelect>();
+        foreach(teamSelect team in teams)
+        {
+            team.onTeamSelected += SetCurrentTeam;
+        }
+    }
+
+    private void OpenBuilderTab(bool state)
+    {
+        if (state)
+        {
+            SetCanvasStatus(false);
+        }
+    }
+
+    private void SetCurrentTeam(teamSelect team)
+    {
+        SetCanvasStatus(true);
+        currentTeam = team;
+    }
+
+    private void SetMonsterImage(Image target, Sprite newImage)
+    {
+        target.sprite = newImage;
+        target.SetNativeSize();
     }
 }

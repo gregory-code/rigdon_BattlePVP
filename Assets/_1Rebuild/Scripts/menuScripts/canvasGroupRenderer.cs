@@ -8,11 +8,6 @@ public class canvasGroupRenderer : MonoBehaviour
 
     private bool isActiveGroup;
 
-    private void Start()
-    {
-        canvasGroup = GetComponent<CanvasGroup>();
-    }
-
     public void SetCanvasStatus(bool state)
     {
         isActiveGroup = state;
@@ -27,6 +22,9 @@ public class canvasGroupRenderer : MonoBehaviour
 
     public void Update()
     {
+        if (canvasGroup == null)
+            canvasGroup = GetComponent<CanvasGroup>();
+
         int alpha = (isActiveGroup) ? 1 : 0;
         canvasGroup.alpha = Mathf.Lerp(canvasGroup.alpha, alpha, 18 * Time.deltaTime);
     }
