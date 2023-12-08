@@ -1,23 +1,31 @@
+using Firebase.Database;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class teamSelect : canvasGroupRenderer
+public class teamSelect : canvasGroupRenderer, IDataPersistence
 {
     private teamSelect[] teamSelects;
 
     [SerializeField] menuTab builderTab;
-    [SerializeField] Image[] monsterImages;
-
+    [SerializeField] teamBuilder builder;
     [SerializeField] TMP_InputField nameScreen;
+    [SerializeField] TextMeshProUGUI chooseText;
+    [SerializeField] Image[] monsterImages;
+    [SerializeField] monsterPreferences[] monsterPrefs;
+    [SerializeField] int teamSelectIndex;
+
+    private string teamName = "";
+
 
     public delegate void OnTabSelected(teamSelect team);
     public event OnTabSelected onTeamSelected;
 
-    [SerializeField] monsterPreferences[] monsterPrefs;
 
     private void Awake()
     {
@@ -28,6 +36,21 @@ public class teamSelect : canvasGroupRenderer
         {
             monsterPrefs[i] = ScriptableObject.CreateInstance<monsterPreferences>();
         }
+    }
+
+    private void InitalizeTeamPref()
+    {
+        for(int i = 0; i < monsterPrefs.Length; i++)
+        {
+            if (monsterPrefs[i].monsterValues[0] == 0)
+                continue;
+
+            builder.SetMonsterImage(monsterImages[i], builder.GetMonsterImageFromID(monsterPrefs[i].monsterValues[0], 0)); // the 0 means ID and baby form
+            chooseText.text = "";
+        }
+
+        if (teamName != "")
+            nameScreen.text = teamName;
     }
 
     private void OpenBuilderTab(bool state)
@@ -61,5 +84,26 @@ public class teamSelect : canvasGroupRenderer
         }
 
         onTeamSelected?.Invoke(this);
+    }
+
+    public void LoadData(DataSnapshot data)
+    {
+
+        for (int i = 0; i < data.Child("team" + teamSelectIndex).ChildrenCount; ++i)
+        {
+            monsterPrefs[i].DeseralizePref(data.Child("team" + teamSelectIndex).Child("" + i).Value.ToString());
+        }
+
+        if(data.Child("teamName" + teamSelectIndex).Exists)
+        {
+            teamName = data.Child("teamName" + teamSelectIndex).Value.ToString();
+        }
+
+        InitalizeTeamPref();
+    }
+
+    public void LoadOtherPlayersData(string key, object data)
+    {
+        
     }
 }

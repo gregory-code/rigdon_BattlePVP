@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
+  m_Name: Rejuvestor_Decaysease
+  m_EditorClassIdentifier: 
+  critterID: 13
+  critterName: RejuvestorDecaysease
+  bFlipSprite: 000001
+  stages:
+  - {fileID: 21300000, guid: 5de3022d7318db244b60269ed94b689a, type: 3}
+  - {fileID: 0}
+  - {fileID: 21300000, guid: 836e36122dad2e54ab10ae3a711ca464, type: 3}
+  circleOutline: {fileID: 0}
+  matchingColor: {r: 0.8784314, g: 0.65882355, b: 0.8745098, a: 0.39215687}
+  initial_HP: 20
+  initial_Strength: 0
+  initial_Magic: 4
+  initial_Speed: 3
+  moves:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

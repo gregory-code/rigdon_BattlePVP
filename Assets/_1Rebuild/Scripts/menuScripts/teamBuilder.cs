@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class teamBuilder : canvasGroupRenderer
 {
-    [SerializeField] Sprite[] monsterImageLibrary;
+    [SerializeField] Sprite emptyMonster;
     [SerializeField] menuTab builderTab;
+    [SerializeField] monster[] monsters;
 
     private teamSelect currentTeam;
 
@@ -25,6 +26,11 @@ public class teamBuilder : canvasGroupRenderer
         }
     }
 
+    public Sprite GetMonsterImageFromID(int id, int stage)
+    {
+        return monsters[id].stages[stage];
+    }
+
     private void OpenBuilderTab(bool state)
     {
         if (state)
@@ -39,7 +45,7 @@ public class teamBuilder : canvasGroupRenderer
         currentTeam = team;
     }
 
-    private void SetMonsterImage(Image target, Sprite newImage)
+    public void SetMonsterImage(Image target, Sprite newImage)
     {
         target.sprite = newImage;
         target.SetNativeSize();

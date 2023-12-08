@@ -3396,7 +3396,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e819d76ac8d352946a20851bbaf110cf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18518e2a99b354098dc24c3971d960, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3617,7 +3617,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bba7020d6f79fe9488929485c5c948f2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18518e2a99b354098dc24c3971d960, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4132,15 +4132,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   builderTab: {fileID: 1105856943}
+  builder: {fileID: 1005293473}
+  nameScreen: {fileID: 875372023}
+  chooseText: {fileID: 688685432}
   monsterImages:
   - {fileID: 1870026518}
   - {fileID: 760128561}
   - {fileID: 215447317}
-  nameScreen: {fileID: 875372023}
   monsterPrefs:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  teamSelectIndex: 1
 --- !u!1 &269331881
 GameObject:
   m_ObjectHideFlags: 0
@@ -4969,15 +4972,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   builderTab: {fileID: 1105856943}
+  builder: {fileID: 1005293473}
+  nameScreen: {fileID: 1621585113}
+  chooseText: {fileID: 1242739068}
   monsterImages:
   - {fileID: 247682385}
   - {fileID: 541930674}
   - {fileID: 676728698}
-  nameScreen: {fileID: 1621585113}
   monsterPrefs:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  teamSelectIndex: 2
 --- !u!114 &318698716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8637,7 +8643,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f050d222c00f65642a60b2d40d956eaf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18518e2a99b354098dc24c3971d960, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -11103,7 +11109,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: e819d76ac8d352946a20851bbaf110cf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18518e2a99b354098dc24c3971d960, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -12906,7 +12912,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f050d222c00f65642a60b2d40d956eaf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18518e2a99b354098dc24c3971d960, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -15490,19 +15496,7 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 591463893}
-        m_TargetAssemblyTypeName: builderMenu, Assembly-CSharp
-        m_MethodName: updateTeamName
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -17357,9 +17351,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46c693a80db95df478922b076c0cd57f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monsterImageLibrary:
-  - {fileID: 21300000, guid: 2d96b076ef19b3e46801677e58d2dfe2, type: 3}
+  emptyMonster: {fileID: 21300000, guid: 2d96b076ef19b3e46801677e58d2dfe2, type: 3}
   builderTab: {fileID: 1105856943}
+  monsters:
+  - {fileID: 11400000, guid: 5c0fe0376f9379846b5c67919368c754, type: 2}
+  - {fileID: 11400000, guid: 5c0fe0376f9379846b5c67919368c754, type: 2}
+  - {fileID: 11400000, guid: bc902b0526d5fd145a699ca6e37288ca, type: 2}
+  - {fileID: 11400000, guid: 08842a48cb231ed4c8a37aa055723b12, type: 2}
+  - {fileID: 11400000, guid: bee0693e4d8cff645badc0beaaa5ed96, type: 2}
+  - {fileID: 11400000, guid: 6146285a4aa62f1468247bc8c414a982, type: 2}
+  - {fileID: 11400000, guid: 5c1d7bc753dc6d549b21c15ee528eac9, type: 2}
+  - {fileID: 11400000, guid: 12019c356378bcf4d80cec88b13bfce4, type: 2}
+  - {fileID: 11400000, guid: 25100b478f89b2841a52285b063faec7, type: 2}
+  - {fileID: 11400000, guid: 1048f1f9c9cd4ff459ba58dc544e81c3, type: 2}
+  - {fileID: 11400000, guid: 177e615f05efc6449a02db0995c50bc1, type: 2}
+  - {fileID: 11400000, guid: 43c36d9873a021347a74f516187ef1f3, type: 2}
+  - {fileID: 11400000, guid: 493f748652b050f42be5ae7dcd5d740d, type: 2}
+  - {fileID: 11400000, guid: ef79a12bef42c7243966f7021ae9377c, type: 2}
 --- !u!225 &1005293474
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -17472,19 +17480,7 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 591463893}
-        m_TargetAssemblyTypeName: builderMenu, Assembly-CSharp
-        m_MethodName: updateTeamName
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -28384,19 +28380,7 @@ MonoBehaviour:
   m_CharacterLimit: 0
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 591463893}
-        m_TargetAssemblyTypeName: builderMenu, Assembly-CSharp
-        m_MethodName: updateTeamName
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -34520,7 +34504,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 65449a4c7793e6147b56953a6d3a131a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc18518e2a99b354098dc24c3971d960, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

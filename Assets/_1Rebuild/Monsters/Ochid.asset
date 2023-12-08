@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
+  m_Name: Ochid
+  m_EditorClassIdentifier: 
+  critterID: 11
+  critterName: Ochid
+  bFlipSprite: 010101
+  stages:
+  - {fileID: 21300000, guid: 430722f7e6420634ba0863deb32163ff, type: 3}
+  - {fileID: 21300000, guid: 09aeed28ce2b00b488b5049a4e4a2aaf, type: 3}
+  - {fileID: 21300000, guid: 48642c331ae0fd54b956cc659ab7f234, type: 3}
+  circleOutline: {fileID: 0}
+  matchingColor: {r: 0.16078432, g: 0.8392157, b: 0, a: 0.39215687}
+  initial_HP: 19
+  initial_Strength: 4
+  initial_Magic: 2
+  initial_Speed: 4
+  moves:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}

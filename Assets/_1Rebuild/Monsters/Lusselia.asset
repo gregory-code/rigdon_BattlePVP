@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
+  m_Name: Lusselia
+  m_EditorClassIdentifier: 
+  critterID: 8
+  critterName: Lusselia
+  bFlipSprite: 000000
+  stages:
+  - {fileID: 21300000, guid: 32fe9317f5b21cb49b9cc8fd9a66ef67, type: 3}
+  - {fileID: 21300000, guid: 17036e8a1d3a12a4cbdf5f82e255f5fb, type: 3}
+  - {fileID: 21300000, guid: d26efdf5ad4b5ca48996cc7ee1840b06, type: 3}
+  circleOutline: {fileID: 0}
+  matchingColor: {r: 0.4862745, g: 0.34901962, b: 0.93333334, a: 0.39215687}
+  initial_HP: 25
+  initial_Strength: 3
+  initial_Magic: 4
+  initial_Speed: 2
+  moves:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
