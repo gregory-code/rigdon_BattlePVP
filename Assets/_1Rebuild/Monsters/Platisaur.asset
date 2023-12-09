@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
   m_Name: Platisaur
   m_EditorClassIdentifier: 
-  critterID: 12
-  critterName: Platisaur
+  monsterID: 12
+  monsterName: Platisaur
   bFlipSprite: 000001
   stages:
   - {fileID: 21300000, guid: 3451aa506d60d9c42997eb85d1f64766, type: 3}

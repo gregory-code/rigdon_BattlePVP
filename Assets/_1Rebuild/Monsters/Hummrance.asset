@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
   m_Name: Hummrance
   m_EditorClassIdentifier: 
-  critterID: 5
-  critterName: Hummrance
+  monsterID: 5
+  monsterName: Hummrance
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: bd0e7fcfee3276d4ba0a6148e8136184, type: 3}

@@ -1,23 +1,22 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static Photon.Pun.UtilityScripts.TabViewManager;
 
-
-public class menuTab : Button
+public class monsterTab : Button
 {
     [SerializeField] float clickedAmount = 1.1f;
-    [SerializeField] float selectAmount = 1.25f;
+    [SerializeField] float selectAmount = 1.15f;
 
-    private menuTab[] tabs;
+    private monsterTab[] tabs;
 
     private bool isClicked;
     private bool isSelected;
 
-    public delegate void OnTabSelected(bool state);
-    public event OnTabSelected onTabSelected;
+    public delegate void OnMonsterSelected(int which);
+    public event OnMonsterSelected onMonsterSelected;
 
     public override void OnPointerDown(PointerEventData eventData)
     {
@@ -35,23 +34,35 @@ public class menuTab : Button
 
         SetTab(true);
 
+        onMonsterSelected?.Invoke(GetID());
+
         isClicked = false;
+    }
+
+    private int GetID()
+    {
+        int id = 0;
+        if (name.Contains("1"))
+            id = 1;
+        if (name.Contains("2"))
+            id = 2;
+
+        return id;
     }
 
     public void SetTab(bool state)
     {
         isSelected = state;
-        onTabSelected?.Invoke(state);
     }
 
     private void FixTabs()
     {
         if (tabs == null)
         {
-            tabs = GameObject.FindObjectsOfType<menuTab>();
+            tabs = GameObject.FindObjectsOfType<monsterTab>();
         }
 
-        foreach(menuTab tab in tabs)
+        foreach (monsterTab tab in tabs)
         {
             tab.SetTab(false);
         }
@@ -65,17 +76,17 @@ public class menuTab : Button
 
     private void LerpScale()
     {
-        Vector3 scale = Vector3.one;
+        Vector3 scale = new Vector3(0.03f, 0.03f, 1);
         if (isSelected) scale *= selectAmount;
         if (isClicked) scale *= clickedAmount;
 
-        transform.localScale = Vector3.Lerp(transform.localScale, scale, 12 * Time.deltaTime);
+        transform.localScale = Vector3.Lerp(transform.localScale, scale, 5 * Time.deltaTime);
     }
 
     private void LerpMove()
     {
-        Vector3 move = (isSelected) ? new Vector3(-475, transform.localPosition.y, 0) : new Vector3(-525, transform.localPosition.y, 0);
+        Vector3 move = (isSelected) ? new Vector3(transform.localPosition.x, -10, 0) : new Vector3(transform.localPosition.x, 0, 0);
 
-        transform.localPosition = Vector3.Lerp(transform.localPosition, move, 12 * Time.deltaTime);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, move, 5 * Time.deltaTime);
     }
 }

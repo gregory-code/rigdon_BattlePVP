@@ -6,12 +6,12 @@ using UnityEngine;
 public class monster : ScriptableObject
 {
     [Header("ID")]
-    [SerializeField] private int critterID;
+    [SerializeField] private int monsterID;
     [Space(35)]
 
     [Header("Info")]
-    [SerializeField] private string critterName;
-    private string critterNickname;
+    [SerializeField] private string monsterName;
+    private string monsterNickname;
     public bool[] bFlipSprite = new bool[3];
     public Sprite[] stages = new Sprite[3];
     public Sprite circleOutline;
@@ -44,8 +44,8 @@ public class monster : ScriptableObject
     private int AbilityID;
     private int PassiveID;
 
-    public string GetCritterName() { return critterName; }
-    public int GetCritterID() { return critterID; }
+    public string GetMonsterName() { return monsterName; }
+    public int GetMonsterID() { return monsterID; }
     public int GetInitialHP() { return initial_HP; }
     public int GetInitialStrength() { return initial_Strength; }
     public int GetInitialMagic() { return initial_Magic; }
@@ -87,7 +87,7 @@ public class monster : ScriptableObject
         //growthMagic = build.critterValue[6];
         //growthSpeed = build.critterValue[7];
 
-        critterNickname = build.critterNickname;
+        monsterNickname = build.monsterNickname;
     }
 
     public void SetInitialStats()

@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
-  m_Name: Fowlodge
+  m_Name: _empty
   m_EditorClassIdentifier: 
-  monsterID: 3
-  monsterName: Fowlodge
+  critterID: 0
+  critterName: 
   bFlipSprite: 000000
   stages:
-  - {fileID: 21300000, guid: e819d76ac8d352946a20851bbaf110cf, type: 3}
-  - {fileID: 21300000, guid: 806bff959d6c83542ab15597f6ee65fe, type: 3}
-  - {fileID: 21300000, guid: e5108a32fc0fb034f9e8fdc9033229b5, type: 3}
-  circleOutline: {fileID: 21300000, guid: bf0630aa3f9c7f3429b234b8b360899f, type: 3}
-  matchingColor: {r: 0.30980393, g: 0.28627452, b: 0.30980393, a: 0.39215687}
-  initial_HP: 22
-  initial_Strength: 4
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  circleOutline: {fileID: 0}
+  matchingColor: {r: 0, g: 0, b: 0, a: 0}
+  initial_HP: 0
+  initial_Strength: 0
   initial_Magic: 0
-  initial_Speed: 5
+  initial_Speed: 0
   moves:
   - {fileID: 0}
   - {fileID: 0}

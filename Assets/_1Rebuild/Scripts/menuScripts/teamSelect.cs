@@ -46,11 +46,17 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
                 continue;
 
             builder.SetMonsterImage(monsterImages[i], builder.GetMonsterImageFromID(monsterPrefs[i].monsterValues[0], 0)); // the 0 means ID and baby form
-            chooseText.text = "";
+            SetChooseText(false);
         }
 
         if (teamName != "")
             nameScreen.text = teamName;
+    }
+
+    public void SetChooseText(bool state)
+    {
+        string text = (state) ? "Create New" : "" ;
+        chooseText.text = text;
     }
 
     private void OpenBuilderTab(bool state)
@@ -66,9 +72,14 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
         return monsterPrefs[which];
     }
 
-    public Image[] GetMonsterImages()
+    public int AmountOfPrefs()
     {
-        return monsterImages;
+        return monsterPrefs.Length;
+    }
+
+    public Image GetMonsterImage(int which)
+    {
+        return monsterImages[which];
     }
 
     public void SetTeamName(string teamName)
@@ -86,12 +97,17 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
         onTeamSelected?.Invoke(this);
     }
 
+    public int GetTeamIndex()
+    {
+        return teamSelectIndex;
+    }
+
     public void LoadData(DataSnapshot data)
     {
 
         for (int i = 0; i < data.Child("team" + teamSelectIndex).ChildrenCount; ++i)
         {
-            monsterPrefs[i].DeseralizePref(data.Child("team" + teamSelectIndex).Child("" + i).Value.ToString());
+            GetMonsterPref(i).DeseralizePref(data.Child("team" + teamSelectIndex).Child("" + i).Value.ToString());
         }
 
         if(data.Child("teamName" + teamSelectIndex).Exists)

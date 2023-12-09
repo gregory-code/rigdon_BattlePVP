@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
   m_Name: Minfur
   m_EditorClassIdentifier: 
-  critterID: 9
-  critterName: Minfur
+  monsterID: 9
+  monsterName: Minfur
   bFlipSprite: 010101
   stages:
   - {fileID: 21300000, guid: 8f56831267a766e4d95800d9abde7354, type: 3}

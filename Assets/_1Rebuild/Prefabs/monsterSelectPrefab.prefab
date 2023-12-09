@@ -86,9 +86,10 @@ GameObject:
   - component: {fileID: 3531445374943627839}
   - component: {fileID: 8366057653070452077}
   - component: {fileID: 1560367453498576535}
-  - component: {fileID: 3263553117848455228}
+  - component: {fileID: 6489897920839018130}
+  - component: {fileID: 5641201627769552249}
   m_Layer: 5
-  m_Name: critterPrefab
+  m_Name: monsterSelectPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -162,7 +163,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3263553117848455228
+--- !u!114 &6489897920839018130
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -171,7 +172,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 363542361883260516}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f08285f5cab61094a8dc2ff9b5a34f59, type: 3}
+  m_Script: {fileID: 11500000, guid: e7c347db5443bcd4d9b353801bcf920e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterButton: {fileID: 5641201627769552249}
+  nameText: {fileID: 1448670093906329131}
+  monsterImage: {fileID: 7812215347170875800}
+  outlineImage: {fileID: 6366116909499112083}
+  hpText: {fileID: 2138258535812147514}
+  strText: {fileID: 2671243629474798696}
+  magicText: {fileID: 3616396051185158760}
+  speedText: {fileID: 9001648650156284110}
+--- !u!114 &5641201627769552249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363542361883260516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
@@ -183,10 +204,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 0.9019608}
-    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_PressedColor: {r: 1, g: 1, b: 1, a: 1}
-    m_SelectedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -640,7 +661,7 @@ GameObject:
   - component: {fileID: 7952724186409621535}
   - component: {fileID: 1448670093906329131}
   m_Layer: 5
-  m_Name: critterName
+  m_Name: monsterName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
