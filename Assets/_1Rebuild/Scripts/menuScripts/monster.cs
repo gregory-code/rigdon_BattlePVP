@@ -118,17 +118,17 @@ public class monster : ScriptableObject
 
     public void LevelUp()
     {
-        maxHP += growthHP;
-        currentHP += growthHP;
+        maxHP += (growthHP + 3);
+        currentHP += (growthHP + 3);
 
-        baseStrength += growthStrength;
-        currentStrength += growthStrength;
+        baseStrength += (growthStrength + 1) / 2;
+        currentStrength += (growthStrength + 1) / 2;
 
-        baseMagic += growthMagic;
-        currentMagic += growthMagic;
+        baseMagic += (growthMagic + 1) / 2;
+        currentMagic += (growthMagic + 1) / 2;
 
-        baseSpeed += growthSpeed;
-        currentSpeed += growthSpeed;
+        baseSpeed += (growthSpeed + 1) / 2;
+        currentSpeed += (growthSpeed + 1) / 2;
     }
 
     public void SetLevel(int level)
