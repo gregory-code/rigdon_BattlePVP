@@ -43,6 +43,7 @@ public class monster : ScriptableObject
     private int AttackID;
     private int AbilityID;
     private int PassiveID;
+    [SerializeField] moveContent[] moveContents;
 
     public string GetMonsterName() { return monsterName; }
     public int GetMonsterID() { return monsterID; }
@@ -57,7 +58,10 @@ public class monster : ScriptableObject
     public int GetCurrentMagic() { return currentMagic; }
     public int GetCurrentSpeed() { return currentSpeed; }
 
-
+    public moveContent[] GetMoveContents()
+    {
+        return moveContents;
+    }
 
     public void changeHealth(int change)
     {
@@ -105,9 +109,9 @@ public class monster : ScriptableObject
         currentSpeed = initial_Speed;
     }
 
-    public float[] GetStatBlock()
+    public int[] GetStatBlock()
     {
-        float[] statBlock = new float[4];
+        int[] statBlock = new int[4];
         statBlock[0] = GetInitialHP();
         statBlock[1] = GetInitialStrength();
         statBlock[2] = GetInitialMagic();

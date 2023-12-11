@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class teamBuilder : canvasGroupRenderer
 {
@@ -56,6 +55,8 @@ public class teamBuilder : canvasGroupRenderer
 
     private void SelectMonster(int whichMon)
     {
+        dontPopup = true;
+
         currentMonster = whichMon;
         SetOutline(whichMon, true);
         statGrowthPage.SetActive(false);
@@ -63,9 +64,17 @@ public class teamBuilder : canvasGroupRenderer
 
         if (monsterExists[whichMon])
         {
+            DeleteContent();
+            SetMoveContent();
             SetGrowthBars();
-            dontShowPopup = 4;
-            SetEditorStats(1);
+
+            for (int i = 1; i < 4; i++)
+            {
+                moveType = i;
+                SetMoveTransparency(currentTeam.GetMonsterPref(currentMonster).monsterValues[i]);
+            }
+
+            SetEditorStats(level);
             monsterEditCanvasGroup.SetCanvasStatus(true);
             monsterListCanvasGroup.SetCanvasStatus(false);
         }
@@ -75,8 +84,9 @@ public class teamBuilder : canvasGroupRenderer
             monsterListCanvasGroup.SetCanvasStatus(true);
             OpenMonsterList();
         }
-    }
 
+        dontPopup = false;
+    }
     private void SetOutline(int which, bool bSelected)
     {
         for (int i = 0; i < monsterOutlines.Length; i++)
@@ -144,6 +154,13 @@ public class teamBuilder : canvasGroupRenderer
         target.SetNativeSize();
     }
 
+    private int[] GetCurrentStatBlock()
+    {
+        monster mon = monsters[currentTeam.GetMonsterPref(currentMonster).monsterValues[0]];
+        int[] stats = mon.GetStatBlock();
+        return stats;
+    }
+
     [Header("Monster List")]
     [SerializeField] canvasGroupRenderer monsterListCanvasGroup;
     [SerializeField] monsterSelectButton monsterSelectPrefab;
@@ -185,7 +202,7 @@ public class teamBuilder : canvasGroupRenderer
         SetMonsterImage(currentTeam.GetMonsterImage(currentMonster), monsters[ID].stages[0]);
     }
 
-    [Header("Monster Edit")]
+    [Header("Monster Stats")]
     [SerializeField] canvasGroupRenderer monsterEditCanvasGroup;
     [SerializeField] GameObject statGrowthPage;
     [SerializeField] Slider growthPointsSlider;
@@ -197,7 +214,8 @@ public class teamBuilder : canvasGroupRenderer
     [SerializeField] Color[] growthColors;
     [SerializeField] TextMeshProUGUI[] statTexts;
     [SerializeField] statNotif statNotification;
-    int dontShowPopup;
+    [SerializeField] TextMeshProUGUI levelText;
+    bool dontPopup;
     int growthPoints = 5;
     int level = 1;
     int statIndex;
@@ -220,8 +238,16 @@ public class teamBuilder : canvasGroupRenderer
         for (int i = 0; i < statSliders.Length; i++)
         {
             int growthValue = currentTeam.GetMonsterPref(currentMonster).monsterValues[i + 4];
+
+            if (passiveIsGivingGrowth && i == passiveGrowthID)
+                growthValue--;
+
             statSliders[i].value = growthValue;
             growthPoints -= growthValue;
+
+            if (passiveIsGivingGrowth && i == passiveGrowthID)
+                growthValue++;
+
             SetUIFromGrowth(i, growthValue);
         }
 
@@ -245,10 +271,9 @@ public class teamBuilder : canvasGroupRenderer
         {
             if (growthPoints >= 1)
             {
-                UpdateGrowthPoints(-1);
-                UpdateMonsterPref(statIndex, (int)value);
-                SetUIFromGrowth(statIndex - 4, (int)value);
-                SetStatsFromGrowthSlider(int.MinValue, statIndex);
+                if (passiveIsGivingGrowth && passiveGrowthID + 4 == statIndex)
+                    value++;
+                UpdateStatGrowth(-1, int.MinValue, value, statIndex);
             }
             else
             {
@@ -258,19 +283,24 @@ public class teamBuilder : canvasGroupRenderer
         }
         else
         {
-            UpdateGrowthPoints(1);
-            UpdateMonsterPref(statIndex, (int)value);
-            SetUIFromGrowth(statIndex - 4, (int)value);
-            SetStatsFromGrowthSlider(int.MaxValue, statIndex);
+            if (passiveIsGivingGrowth && passiveGrowthID + 4 == statIndex)
+                value++;
+            UpdateStatGrowth(1, int.MaxValue, value, statIndex);
         }
+    }
+
+    private void UpdateStatGrowth(int growthPoint, int minOrMax, float value, int statIndex)
+    {
+        UpdateGrowthPoints(growthPoint);
+        UpdateMonsterPref(statIndex, (int)value);
+        SetUIFromGrowth(statIndex - 4, (int)value);
+        SetStatsFromGrowthSlider(minOrMax, statIndex);
     }
 
     private void SetStatsFromGrowthSlider(int previousLevel, int statIndex)
     {
-        monster mon = monsters[currentTeam.GetMonsterPref(currentMonster).monsterValues[0]];
-        float[] stats = mon.GetStatBlock();
-
-        SetEditorStat(statIndex - 4, previousLevel, stats, true);
+        SetEditorStat(statIndex - 4, previousLevel, GetCurrentStatBlock(), true);
+        UpdateContent();
     }
 
     private void UpdateGrowthPoints(int change)
@@ -288,30 +318,30 @@ public class teamBuilder : canvasGroupRenderer
 
     public void SetEditorStats(float level)
     {
-        monster mon = monsters[currentTeam.GetMonsterPref(currentMonster).monsterValues[0]];
-        float[] stats = mon.GetStatBlock();
         int previousLevel = this.level;
         this.level = (int)level;
 
-        for(int i = 0; i < stats.Length; i++)
+        levelText.text = "Level " + this.level;
+
+        for(int i = 0; i < GetCurrentStatBlock().Length; i++)
         {
-            SetEditorStat(i, previousLevel, stats, false);
+            SetEditorStat(i, previousLevel, GetCurrentStatBlock(), false);
         }
+
+        UpdateContent();
     }
 
-    private void SetEditorStat(int statIndex, int previousLevel, float[] stats, bool isSliderUpdate)
+    private void SetEditorStat(int statIndex, int previousLevel, int[] stats, bool isSliderUpdate)
     {
         int level = this.level - 1;
 
         float statGrowth = currentTeam.GetMonsterPref(currentMonster).monsterValues[statIndex + 4];
-        stats[statIndex] += (statIndex == 0) ? ((statGrowth + 3) * level) : ((statGrowth + 1) / 2 * level);
+        float statToAdd = (statIndex == 0) ? ((statGrowth + 3) * level) : ((statGrowth + 1) / 2 * level);
+        stats[statIndex] += (int)Mathf.Abs(statToAdd);
         statTexts[statIndex].text = stats[statIndex] + "";
 
-        if(dontShowPopup > 0)
-        {
-            dontShowPopup--;
+        if (dontPopup)
             return;
-        }
 
         float statChange = 0;
 
@@ -326,5 +356,174 @@ public class teamBuilder : canvasGroupRenderer
 
         if (level < previousLevel) statChange *= -1f;
         statNotification.spawnStatPopup(statTexts[statIndex].transform, statChange);
+    }
+
+    private int GetTier()
+    {
+        switch(level)
+        {
+            case < 3:
+                return 0;
+
+            case 3:
+            case 4:
+            case 5:
+                return 1;
+
+            case > 5:
+                return 2;
+        }
+    }
+
+    [Header("Monster Moves")]
+    [SerializeField] Transform[] moveParents;
+    [SerializeField] List<moveContent> moveContentList = new List<moveContent>();
+    [SerializeField] Image[] attackButtons;
+    [SerializeField] Image[] supportButtons;
+    [SerializeField] Image[] passiveButtons;
+    bool passiveIsGivingGrowth;
+    int passiveGrowthID;
+    int moveType = 1;
+
+    public void SetMoveIndex(int index)
+    {
+        moveType = index;
+    }
+
+    public void SetMovePref(int moveIndex)
+    {
+        SetMoveTransparency(moveIndex);
+        UpdateMonsterPref(moveType, moveIndex);
+    }
+
+    public void CheckPassiveGrowth(moveContent content, bool updateImmedately)
+    {
+        if (moveType != 3) //only works for passives
+            return;
+
+        if (passiveIsGivingGrowth && content.DoesPassiveGiveGrowth() == true && content.GetPassiveGrowth() == passiveGrowthID)
+            return;
+
+        int growthValue = 0;
+
+        if(passiveIsGivingGrowth && content.DoesPassiveGiveGrowth() == true && content.GetPassiveGrowth() != passiveGrowthID)
+        {
+            growthValue = currentTeam.GetMonsterPref(currentMonster).monsterValues[passiveGrowthID + 4];
+            if(growthValue != 0)
+                UpdatePassiveGrowth(true, growthValue, updateImmedately);
+            passiveIsGivingGrowth = false;
+        }
+
+        passiveGrowthID = content.GetPassiveGrowth();
+        growthValue = currentTeam.GetMonsterPref(currentMonster).monsterValues[passiveGrowthID + 4];
+
+        if (passiveIsGivingGrowth && content.DoesPassiveGiveGrowth() == false)
+        {
+            UpdatePassiveGrowth(true, growthValue, updateImmedately);
+        }
+        else if(passiveIsGivingGrowth == false && content.DoesPassiveGiveGrowth() == true)
+        {
+            UpdatePassiveGrowth(false, growthValue, updateImmedately);
+        }
+
+        passiveIsGivingGrowth = content.DoesPassiveGiveGrowth();
+    }
+
+    private void UpdatePassiveGrowth(bool removeGrowth, int growthValue, bool updateImmedately)
+    {
+        if (removeGrowth)
+        {
+            growthValue--;
+
+            if (updateImmedately)
+                UpdateStatGrowth(0, int.MinValue, growthValue, passiveGrowthID + 4);
+        }
+        else
+        {
+            growthValue++;
+
+            if (updateImmedately)
+                UpdateStatGrowth(0, int.MaxValue, growthValue, passiveGrowthID + 4);
+        }
+    }
+
+    private void SetMoveTransparency(int moveIndex)
+    {
+        switch (moveType)
+        {
+            case 1:
+                attackButtons[0].color = new Color(1, 1, 1, 0.1f);
+                attackButtons[1].color = new Color(1, 1, 1, 0.1f);
+                if (moveIndex == 0) return;
+                attackButtons[moveIndex - 1].color = new Color(1, 1, 1, 1);
+                break; //attack
+
+            case 2: // support
+                supportButtons[0].color = new Color(1, 1, 1, 0.1f);
+                supportButtons[1].color = new Color(1, 1, 1, 0.1f);
+                if (moveIndex == 0) return;
+                supportButtons[moveIndex - 1].color = new Color(1, 1, 1, 1);
+                break;
+
+            case 3: // passive
+                passiveButtons[0].color = new Color(1, 1, 1, 0.1f);
+                passiveButtons[1].color = new Color(1, 1, 1, 0.1f);
+                if (moveIndex == 0) return;
+                passiveButtons[moveIndex - 1].color = new Color(1, 1, 1, 1);
+                break;
+        }
+    }
+
+    private void SetMoveContent()
+    {
+        moveContent[] contents = monsters[currentTeam.GetMonsterPref(currentMonster).monsterValues[0]].GetMoveContents();
+        if(contents.Length > 0)
+        {
+            moveType = 3;
+
+            for (int i = 0; i < contents.Length; i++)
+            {
+                moveContent newContent = Instantiate(contents[i], moveParents[i]);
+                newContent.transform.localPosition = Vector3.zero;
+                newContent.SetUpConnection(this);
+
+                if(newContent.DoesPassiveGiveGrowth() && currentTeam.GetMonsterPref(currentMonster).monsterValues[3] == i - 3)
+                {
+                    passiveIsGivingGrowth = true;
+                    passiveGrowthID = newContent.GetPassiveGrowth();
+                }
+
+                moveContentList.Add(newContent);
+            }
+        }
+    }
+
+    private void DeleteContent()
+    {
+        passiveIsGivingGrowth = false;
+        foreach (moveContent content in moveContentList)
+        {
+            content.RemoveConnection(this);
+            Destroy(content.gameObject);
+        }
+        moveContentList.Clear();
+    }
+
+    private void UpdateContent()
+    {
+        int[] stats = GetCurrentStatBlock();
+        int level = this.level - 1;
+
+        for (int i = 0; i < stats.Length; i++)
+        {
+            float growth = currentTeam.GetMonsterPref(currentMonster).monsterValues[i + 4];
+            float statToAdd = (i == 0) ? ((growth + 3) * level) : (((growth + 1) / 2) * level);
+            stats[i] += (int)Mathf.Abs(statToAdd);
+        }
+
+        foreach(moveContent content in moveContentList)
+        {
+            content.SetTier(GetTier(), stats);
+        }
     }
 }

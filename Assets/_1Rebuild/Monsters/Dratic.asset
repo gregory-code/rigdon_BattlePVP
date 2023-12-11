@@ -30,3 +30,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  moveContents:
+  - {fileID: 2915941332720301111, guid: 0bdd18bea5cef7b4699bfe672db546de, type: 3}
+  - {fileID: -1379904485023640471, guid: 1d84ffa9fed2ef14d800a5ef31a24fa1, type: 3}
+  - {fileID: -5920986968256325797, guid: 7f5fdc49e64949645a4f99dbffe86945, type: 3}
+  - {fileID: -7306581991840822873, guid: 7e8b26ebc2d2cce4bb91da41c9138546, type: 3}
+  - {fileID: -6899095894055132537, guid: dd38da0687fd0d04fb919767054787b0, type: 3}
+  - {fileID: 7349596239097771509, guid: 888a8dff532a3c8469e1b903cea9677f, type: 3}
