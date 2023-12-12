@@ -6,6 +6,7 @@ using Firebase.Auth;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 public class AuthManager : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class AuthManager : MonoBehaviour
 
     [Header("Firebase Data")]
     public FirebaseScript fireBaseScript;
+
+    [SerializeField] TMP_InputField profileUsernameField;
 
     //PlayerPref
     private string savedEmail;
@@ -206,6 +209,9 @@ public class AuthManager : MonoBehaviour
                     else
                     {
                         NotificationScript.createNotif($"You Registered!", Color.green);
+                        profileUsernameField.text = username;
+                        StartCoroutine(fireBaseScript.UpdateUsernameAuth(username));
+                        StartCoroutine(fireBaseScript.UpdateObject("username", username));
                         //GameObject.FindGameObjectWithTag("Online").GetComponent<onlineScript>().setNickName(username);
                         //GameObject.FindGameObjectWithTag("Canvas").transform.Find("menu").GetComponent<menuScript>().UsernameField.text = username;
                         StartCoroutine(Login(email, password));

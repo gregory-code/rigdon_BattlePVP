@@ -546,7 +546,7 @@ MonoBehaviour:
   statIndex: 020000000000000000000000
   usesStatModifier: 010000
   isPerecentage: 010000
-  percentageStatMultiplier: 5
+  percentageStatMultiplier: 2
   scaleNums1: 0a000000140000001e000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000

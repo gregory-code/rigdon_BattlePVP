@@ -10,6 +10,11 @@ TagManager:
   - Online
   - BattleMenuManager
   - BattleField
+  - killBox
+  - FullRect
+  - HoloRect
+  - FullCircle
+  - HoloCircle
   layers:
   - Default
   - TransparentFX

@@ -238,13 +238,7 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
 
     public void LoadData(DataSnapshot data)
     {
-        /*int friendsInList = 0;
-        while (dataDictionary.ContainsKey("startSongs" + friendsInList))
-        {
-            if (dataDictionary["startSongs" + friendsInList].ToString() == "") return;
-            addFriend(dataDictionary["startSongs" + friendsInList].ToString());
-            friendsInList++;
-        }*/
+
     }
 
     public void LoadOtherPlayersData(string key, object data)

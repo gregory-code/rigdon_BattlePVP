@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.DebugUI;
 
 public class teamBuilder : canvasGroupRenderer
 {
@@ -18,6 +16,7 @@ public class teamBuilder : canvasGroupRenderer
     [SerializeField] Image[] monsterImages;
     [SerializeField] Image[] monsterOutlines;
     [SerializeField] bool[] monsterExists;
+    [SerializeField] TMP_InputField teamNameInput;
     private teamSelect currentTeam;
     private int currentMonster;
     private monsterTab[] monsterTabs;
@@ -28,6 +27,7 @@ public class teamBuilder : canvasGroupRenderer
         monsterTabs = GameObject.FindObjectsOfType<monsterTab>();
         for(int i = 0; i < monsterTabs.Length; i++)
         {
+            monsterTabs[i].onMonsterDelete += SpawnDeleteButton;
             monsterTabs[i].onMonsterSelected += SelectMonster;
         }
 
@@ -87,6 +87,7 @@ public class teamBuilder : canvasGroupRenderer
 
         dontPopup = false;
     }
+
     private void SetOutline(int which, bool bSelected)
     {
         for (int i = 0; i < monsterOutlines.Length; i++)
@@ -130,8 +131,9 @@ public class teamBuilder : canvasGroupRenderer
     {
         SetCanvasStatus(true);
         currentTeam = team;
+        teamNameInput.text = currentTeam.GetTeamName();
 
-        for(int i = 0; i < monsterImages.Length; i++)
+        for (int i = 0; i < monsterImages.Length; i++)
         {
             if (team.GetMonsterPref(i).monsterValues[0] == 0)
             {
@@ -161,10 +163,17 @@ public class teamBuilder : canvasGroupRenderer
         return stats;
     }
 
+    public void OnEndEditTeamName(string teamName)
+    {
+        StartCoroutine(fireBaseScript.UpdateObject("teamName" + currentTeam.GetTeamIndex(), teamName));
+        currentTeam.UpdateTeamName(teamName);
+    }
+
     [Header("Monster List")]
     [SerializeField] canvasGroupRenderer monsterListCanvasGroup;
     [SerializeField] monsterSelectButton monsterSelectPrefab;
     [SerializeField] Transform monsterSelectList;
+    [SerializeField] GameObject deletePrefab;
 
     List<monsterSelectButton> monsterSelectButtons = new List<monsterSelectButton>();
 
@@ -200,6 +209,35 @@ public class teamBuilder : canvasGroupRenderer
         SetMonsterImage(monsterImages[currentMonster], monsters[ID].stages[0]);
         SetMonsterImage(monsterOutlines[currentMonster], monsters[ID].circleOutline);
         SetMonsterImage(currentTeam.GetMonsterImage(currentMonster), monsters[ID].stages[0]);
+    }
+
+    private void SpawnDeleteButton(GameObject parent, int which)
+    {
+        currentMonster = which;
+        if (monsterExists[which])
+        {
+            GameObject deleteButton = Instantiate(deletePrefab, parent.transform);
+            deleteButton.transform.localPosition = Vector3.zero;
+            deleteButton.GetComponent<Button>().onClick.AddListener(() => DeleteMonster(which));
+            Destroy(deleteButton, 3f);
+        }
+    }
+
+    private void DeleteMonster(int whichMonster)
+    {
+        monsterExists[currentMonster] = false;
+        statGrowthPage.SetActive(false);
+        monsterEditCanvasGroup.SetCanvasStatus(false);
+        monsterListCanvasGroup.SetCanvasStatus(false);
+
+        for(int i = 0; i < 8; i++)
+        {
+            UpdateMonsterPref(i, 0);
+        }
+
+        SetMonsterImage(monsterImages[currentMonster], emptyMonster);
+        SetMonsterImage(monsterOutlines[currentMonster], transparent);
+        SetMonsterImage(currentTeam.GetMonsterImage(currentMonster), transparent);
     }
 
     [Header("Monster Stats")]

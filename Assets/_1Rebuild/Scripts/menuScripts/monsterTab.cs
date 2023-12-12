@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using static Photon.Pun.UtilityScripts.TabViewManager;
 
 public class monsterTab : Button
 {
@@ -14,13 +13,19 @@ public class monsterTab : Button
 
     private bool isClicked;
     private bool isSelected;
+    private bool deleteButton;
 
     public delegate void OnMonsterSelected(int which);
     public event OnMonsterSelected onMonsterSelected;
 
+    public delegate void OnMonsterDelete(GameObject monster, int which);
+    public event OnMonsterDelete onMonsterDelete;
+
     public override void OnPointerDown(PointerEventData eventData)
     {
         base.OnPointerDown(eventData);
+
+        StartCoroutine(deleteWait());
 
         isClicked = true;
     }
@@ -29,6 +34,13 @@ public class monsterTab : Button
     {
         base.OnPointerUp(eventData);
 
+        StopAllCoroutines();
+
+        if(deleteButton)
+        {
+            deleteButton = false;
+            return;
+        }
 
         FixTabs();
 
@@ -37,6 +49,25 @@ public class monsterTab : Button
         onMonsterSelected?.Invoke(GetID());
 
         isClicked = false;
+    }
+
+    private IEnumerator deleteWait()
+    {
+        yield return new WaitForSeconds(1);
+
+        if (isClicked == true)
+        {
+            isClicked = false;
+            isSelected = false;
+            var pointer = new PointerEventData(EventSystem.current);
+            ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+            ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.submitHandler);
+            deleteButton = true;
+            yield return new WaitForSeconds(0.25f);
+            ExecuteEvents.Execute(this.gameObject, pointer, ExecuteEvents.pointerExitHandler);
+            onMonsterDelete?.Invoke(this.gameObject, GetID());
+            // call builderDelete menu
+        }
     }
 
     private int GetID()

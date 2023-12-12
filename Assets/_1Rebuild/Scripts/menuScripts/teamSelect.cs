@@ -3,8 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +12,7 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
 
     [SerializeField] menuTab builderTab;
     [SerializeField] teamBuilder builder;
-    [SerializeField] TMP_InputField nameScreen;
+    [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] TextMeshProUGUI chooseText;
     [SerializeField] Image[] monsterImages;
     [SerializeField] monsterPreferences[] monsterPrefs;
@@ -50,7 +48,18 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
         }
 
         if (teamName != "")
-            nameScreen.text = teamName;
+            nameText.text = teamName;
+    }
+
+    public void UpdateTeamName(string teamName)
+    {
+        this.teamName = teamName;
+        nameText.text = teamName;
+    }
+
+    public string GetTeamName()
+    {
+        return teamName;
     }
 
     public void SetChooseText(bool state)
@@ -80,11 +89,6 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
     public Image GetMonsterImage(int which)
     {
         return monsterImages[which];
-    }
-
-    public void SetTeamName(string teamName)
-    {
-        nameScreen.GetComponent<TMP_InputField>().text = teamName;
     }
 
     public void SelectThisTeam()
