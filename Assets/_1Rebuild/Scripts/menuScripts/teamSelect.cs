@@ -106,7 +106,7 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
         return teamSelectIndex;
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
 
         for (int i = 0; i < data.Child("team" + teamSelectIndex).ChildrenCount; ++i)
@@ -120,6 +120,8 @@ public class teamSelect : canvasGroupRenderer, IDataPersistence
         }
 
         InitalizeTeamPref();
+
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)

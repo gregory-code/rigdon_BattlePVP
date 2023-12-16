@@ -105,7 +105,7 @@ public class FirebaseScript : MonoBehaviour
 
             foreach (IDataPersistence dataPersistenceObj in dataPersistenceObjects)
             {
-                dataPersistenceObj.LoadData(snapShot);
+                StartCoroutine(dataPersistenceObj.LoadData(snapShot));
             }
         }
     }

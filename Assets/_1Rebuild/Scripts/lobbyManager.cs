@@ -8,15 +8,12 @@ using TMPro;
 using Firebase.Database;
 using System;
 
-public class lobbyManager : MonoBehaviourPunCallbacks, IDataPersistence
+public class lobbyManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] profileSettings profileScript;
-
     notifScript NotificationScript;
     
     string gameRoomID;
     bool isLobbyRoom = true;
-    string username;
 
     [SerializeField] TextMeshProUGUI playersOnlineText;
 
@@ -39,15 +36,7 @@ public class lobbyManager : MonoBehaviourPunCallbacks, IDataPersistence
     {
         NotificationScript = GameObject.FindObjectOfType<notifScript>();
 
-        profileScript.onUsernameChanged += NewUsername;
-
         PhotonNetwork.ConnectUsingSettings();
-    }
-
-    private void NewUsername(string oldname, string newUsername)
-    {
-        username = newUsername;
-        PhotonNetwork.NickName = username;
     }
 
     public override void OnConnectedToMaster()
@@ -57,6 +46,7 @@ public class lobbyManager : MonoBehaviourPunCallbacks, IDataPersistence
 
     public override void OnJoinedLobby()
     {
+
         RoomOptions roomOptions = new RoomOptions();
         roomOptions.IsOpen = true;
         roomOptions.IsVisible = true;
@@ -141,19 +131,5 @@ public class lobbyManager : MonoBehaviourPunCallbacks, IDataPersistence
     {
         connectedWifi.SetActive(state);
         disconnectedWifi.SetActive(!state);
-    }
-
-    public void LoadData(DataSnapshot data)
-    {
-        if (data.Child("username").Exists)
-        {
-            username = data.Child("username").Value.ToString();
-            PhotonNetwork.NickName = username;
-        }
-    }
-
-    public void LoadOtherPlayersData(string key, object data)
-    {
-        
     }
 }

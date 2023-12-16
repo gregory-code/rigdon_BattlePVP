@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Firebase.Database;
 using System;
 using TMPro;
-using UnityEditor;
+using static UnityEngine.Rendering.DebugUI;
 
 public class friendManager : MonoBehaviourPunCallbacks, IDataPersistence
 {
@@ -26,12 +26,14 @@ public class friendManager : MonoBehaviourPunCallbacks, IDataPersistence
     bool isConnectedToRoom;
     string friendSearch = "";
 
+    string foundUsername;
+
     [SerializeField] friendPrefab friendPrefab;
     [SerializeField] friendRequest friendRequestPrefab;
 
     [SerializeField] Transform friendsList;
 
-    private List<friendPrefab> friendsListObjects = new List<friendPrefab>();
+    private List<friendPrefab> friendPrefabList = new List<friendPrefab>();
     private List<friendRequest> friendRequestList = new List<friendRequest>();
 
     private List<string> friendsIDs = new List<string>();
@@ -95,41 +97,58 @@ public class friendManager : MonoBehaviourPunCallbacks, IDataPersistence
             return;
         }
 
-        if(friendsListObjects.Count > 0)
+        foreach (Player player in PhotonNetwork.PlayerList)
         {
-            foreach (friendPrefab friend in friendsListObjects)
-            {
-                if (friendSearch == friend.GetFriendsName())
-                {
-                    NotificationScript.createNotif($"Already friends with {friendSearch}", Color.yellow);
-                    return;
-                }
-            }
-        }
 
-        if(friendRequestList.Count > 0)
-        {
-            foreach (friendRequest request in friendRequestList)
-            {
-                if (request.GetName() == friendSearch)
-                {
-                    NotificationScript.createNotif($"Already have a friend request from {friendSearch}", Color.yellow);
-                    return;
-                }
-            }
-        }
+            if (AlreadyHasFriendRequest(player.NickName))
+                return;
 
-        foreach(Player player in PhotonNetwork.PlayerList)
-        {
-            if(player.NickName == friendSearch)
+            if (AlreadyFriends(player.NickName))
+                return;
+
+            if (player.NickName == friendSearch)
             {
                 NotificationScript.createNotif($"Friend request sent to {friendSearch}!", Color.green);
-                this.photonView.RPC("SendFriendRequestRPC", RpcTarget.Others, friendSearch, PhotonNetwork.NickName, fireBaseScript.GetUserID());
+                this.photonView.RPC("SendFriendRequestRPC", RpcTarget.Others, friendSearch, profileScript.GetUsername(), fireBaseScript.GetUserID());
                 return;
             }
         }
 
-        NotificationScript.createNotif($"User {friendSearch} not found or is offline", Color.red);
+        NotificationScript.createNotif($"{friendSearch} not found or is offline", Color.red);
+    }
+
+    private bool AlreadyHasFriendRequest(string requrestName)
+    {
+        if (friendRequestList.Count <= 0)
+            return false;
+
+        foreach (friendRequest friend in friendRequestList)
+        {
+            if (friend.GetRequestsName() == requrestName)
+            {
+                NotificationScript.createNotif($"Already have a friend invite by {friendSearch}", Color.yellow);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool AlreadyFriends(string friendName)
+    {
+        if (friendPrefabList.Count <= 0)
+            return false;
+
+        foreach (friendPrefab friend in friendPrefabList)
+        {
+            if (friend.GetFriendsName() == friendName)
+            {
+                NotificationScript.createNotif($"Already friends with {friendSearch}", Color.yellow);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void JoinedRoom(bool isLobbyRoom)
@@ -144,61 +163,77 @@ public class friendManager : MonoBehaviourPunCallbacks, IDataPersistence
 
     private void OtherJoinedRoom(Player other)
     {
-        SetFriendOnlineStatus(true, other);
+        SetFriendOnlineStatus(true, other.NickName);
     }
 
     private void OtherLeftRoom(Player other)
     {
-        SetFriendOnlineStatus(false, other);
+        SetFriendOnlineStatus(false, other.NickName);
     }
 
-    private void SetFriendOnlineStatus(bool state, Player player)
+    public void OtherPlayerLoadedIn(string nickname)
     {
-        foreach (friendPrefab friend in friendsListObjects)
+        this.photonView.RPC("OtherPlayerLoadedInRPC", RpcTarget.Others, true, nickname);
+    }
+
+    private void SetFriendOnlineStatus(bool state, string nickname)
+    {
+        foreach (friendPrefab friend in friendPrefabList)
         {
-            if(player.NickName == friend.GetFriendsName())
+            if (nickname == friend.GetFriendsName())
             {
                 friend.SetOnlineStatus(state);
             }
         }
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
         for (int i = 0; i < data.Child("friends").ChildrenCount; ++i)
         {
-            StartCoroutine(fireBaseScript.LoadOtherPlayersData(data.Child("friends").Child("" + i).Value.ToString(), "username"));
+            string currentID = data.Child("friends").Child("" + i).Value.ToString();
+            yield return StartCoroutine(fireBaseScript.LoadOtherPlayersData(currentID, "username"));
+            CreateNewFriendPrefab(currentID, foundUsername);
         }
+
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)
     {
         if (key == "username")
         {
-            friendPrefab friend = Instantiate(friendPrefab, friendsList);
-            friend.Init(data.ToString());
-            friendsListObjects.Add(friend);
+            foundUsername = data.ToString();
+        }
+    }
 
-            foreach(Player player in PhotonNetwork.PlayerList)
+    private void CreateNewFriendPrefab(string friendID, string username)
+    {
+        friendPrefab friend = Instantiate(friendPrefab, friendsList);
+        friend.Init(username, friendID);
+        friendPrefabList.Add(friend);
+
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (player.NickName == username)
             {
-                if(player.NickName == data.ToString())
-                {
-                    friend.SetOnlineStatus(true);
-                }
+                friend.SetOnlineStatus(true);
             }
         }
     }
 
-    private void AddFriendToCloud(string ID)
+    private IEnumerator AddFriendToCloud(string ID)
     {
         friendsIDs.Add(ID);
         StartCoroutine(fireBaseScript.UpdateObject("friends", friendsIDs));
-        StartCoroutine(fireBaseScript.LoadOtherPlayersData(ID, "username"));
+        yield return StartCoroutine(fireBaseScript.LoadOtherPlayersData(ID, "username"));
+
+        CreateNewFriendPrefab(ID, foundUsername);
     }
 
     public void AcceptFriend(friendRequest request, string senderName, string senderID, string yourName)
     {
-        AddFriendToCloud(senderID);
+        StartCoroutine(AddFriendToCloud(senderID));
 
         this.photonView.RPC("AcceptFriendRequestRPC", RpcTarget.Others, senderName, yourName, fireBaseScript.GetUserID());
 
@@ -212,35 +247,26 @@ public class friendManager : MonoBehaviourPunCallbacks, IDataPersistence
         UpdateNotifs(-1);
     }
 
-    private bool AlreadyHasFriendRequest(string senderID)
+    private void NewUsername(string newUsername)
     {
-        foreach(friendRequest friend in friendRequestList)
+        foreach(Player player in PhotonNetwork.PlayerList)
         {
-            if(friend.IsSenderID(senderID))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void NewUsername(string oldName, string newUsername)
-    {
-        foreach (friendPrefab friend in friendsListObjects)
-        {
-            this.photonView.RPC("UpdateFriendsUsername", RpcTarget.Others, friend.GetFriendsName(), oldName, newUsername);
+            this.photonView.RPC("UpdateFriendsUsername", RpcTarget.Others, player.NickName, newUsername, fireBaseScript.GetUserID());
         }
     }
 
     [PunRPC]
     void SendFriendRequestRPC(string myName, string senderName, string senderID)
     {
-        if (myName != PhotonNetwork.NickName)
+        if (myName != profileScript.GetUsername())
             return;
-            
-        if (AlreadyHasFriendRequest(senderID))
-            return;
+
+        foreach(friendRequest request in friendRequestList)
+        {
+            if (request.GetRequestsName() == senderName)
+                return;
+        }
+
 
         UpdateNotifs(1);
         //play a sound plz
@@ -253,24 +279,40 @@ public class friendManager : MonoBehaviourPunCallbacks, IDataPersistence
     [PunRPC]
     void AcceptFriendRequestRPC(string myName, string senderName, string senderID)
     {
-        if (myName != PhotonNetwork.NickName)
+        if (myName != profileScript.GetUsername())
             return;
 
-        AddFriendToCloud(senderID);
+        StartCoroutine(AddFriendToCloud(senderID));
 
         NotificationScript.createNotif($"{senderName} accepted your friend request!", Color.green);
     }
 
     [PunRPC]
-    void UpdateFriendsUsername(string myName, string oldUsername, string newUsername)
+    void UpdateFriendsUsername(string myName, string newUsername, string friendID)
     {
         if (myName != PhotonNetwork.NickName)
             return;
 
-        foreach(friendPrefab friend in friendsListObjects)
+        foreach (friendRequest request in friendRequestList)
         {
-            if(friend.GetFriendsName() == oldUsername)
-                friend.SetFriendsName(newUsername);
+            if (request.GetRequestsID() == friendID)
+            {
+                request.SetRequestsName(newUsername);
+            }
         }
+
+        foreach (friendPrefab friend in friendPrefabList)
+        {
+            if(friend.GetFriendsID() == friendID)
+            {
+                friend.SetFriendsName(newUsername);
+            }
+        }
+    }
+
+    [PunRPC]
+    void OtherPlayerLoadedInRPC(bool state, string nickname)
+    {
+        SetFriendOnlineStatus(true, nickname);
     }
 }

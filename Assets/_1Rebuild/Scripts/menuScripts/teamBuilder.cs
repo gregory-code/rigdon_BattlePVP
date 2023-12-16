@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class teamBuilder : canvasGroupRenderer
 {
     [SerializeField] FirebaseScript fireBaseScript;
+    [SerializeField] battleMenu battleMenuScript;
 
     [SerializeField] Sprite emptyMonster;
     [SerializeField] Sprite transparent;
@@ -167,6 +168,8 @@ public class teamBuilder : canvasGroupRenderer
     {
         StartCoroutine(fireBaseScript.UpdateObject("teamName" + currentTeam.GetTeamIndex(), teamName));
         currentTeam.UpdateTeamName(teamName);
+
+        battleMenuScript.UpdateTeamName(currentTeam.GetTeamIndex(), teamName);
     }
 
     [Header("Monster List")]

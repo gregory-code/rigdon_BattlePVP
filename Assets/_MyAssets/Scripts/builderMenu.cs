@@ -670,33 +670,10 @@ public class builderMenu : MonoBehaviour, IDataPersistence
         selectedTeam = -1;
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
-        /*deserializeCritterValue(dataDictionary["critterIDs"].ToString(), 0);
-        deserializeCritterValue(dataDictionary["attackIDs"].ToString(), 1);
-        deserializeCritterValue(dataDictionary["abilityIDs"].ToString(), 2);
-        deserializeCritterValue(dataDictionary["passiveIDs"].ToString(), 3);
-        deserializeCritterValue(dataDictionary["HPGrowth"].ToString(), 4);
-        deserializeCritterValue(dataDictionary["StrengthGrowth"].ToString(), 5);
-        deserializeCritterValue(dataDictionary["MagicGrowth"].ToString(), 6);
-        deserializeCritterValue(dataDictionary["SpeedGrowth"].ToString(), 7);
 
-
-        // 0  is ID
-        // 1 is attack ID
-        // 2 is ability ID
-        // 3 is passive ID
-        // 4 is HP growth
-        // 5 is Strength growth
-        // 6 is Magic growth
-        // 7 is Speed Growth
-        for(int i = 0; i < 3; ++i)
-        {
-            string name = dataDictionary["teamNames" + i].ToString();
-            teamName[i].text = name;
-        }
-
-        InitalizeBuilder();*/
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)

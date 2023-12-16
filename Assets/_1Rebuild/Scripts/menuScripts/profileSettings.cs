@@ -9,13 +9,17 @@ using UnityEngine.UI;
 
 public class profileSettings : MonoBehaviour, IDataPersistence
 {
+    [SerializeField] notifScript NotificationScript;
     [SerializeField] FirebaseScript fireBaseScript;
+    [SerializeField] friendManager friendScript;
 
     [SerializeField] Sprite[] themeFullRect;
     [SerializeField] Sprite[] themeHoloRect;
     [SerializeField] Sprite[] themeFullCircle;
     [SerializeField] Sprite[] themeHoloCircle;
     [SerializeField] Sprite[] themeBackground;
+
+    [SerializeField] Image teamDropdownTemplate;
 
     GameObject[] fullRects;
     GameObject[] holoRects;
@@ -28,7 +32,7 @@ public class profileSettings : MonoBehaviour, IDataPersistence
     private string username;
     int theme = 0;
 
-    public delegate void OnUsernameChanged(string oldName, string newUsername);
+    public delegate void OnUsernameChanged(string newUsername);
     public event OnUsernameChanged onUsernameChanged;
 
     public void Start()
@@ -41,12 +45,13 @@ public class profileSettings : MonoBehaviour, IDataPersistence
 
     public void UpdateUsername(string newName)
     {
-        string oldName = username;
         username = newName;
         StartCoroutine(fireBaseScript.UpdateUsernameAuth(username));
         StartCoroutine(fireBaseScript.UpdateObject("username", username));
 
-        onUsernameChanged?.Invoke(oldName, newName);
+        PhotonNetwork.NickName = username;
+
+        onUsernameChanged?.Invoke(newName);
     }    
 
     public void ChangeTheme()
@@ -64,10 +69,16 @@ public class profileSettings : MonoBehaviour, IDataPersistence
     private void UpdateTheme()
     {
         backgroundImage.sprite = themeBackground[theme];
+        teamDropdownTemplate.sprite = themeFullRect[theme];
         ChangeTaggedSprites(fullRects, themeFullRect);
         ChangeTaggedSprites(holoRects, themeHoloRect);
         ChangeTaggedSprites(fullCircles, themeFullCircle);
         ChangeTaggedSprites(holoCircles, themeHoloCircle);
+    }
+
+    public string GetUsername()
+    {
+        return username;
     }
 
     private void ChangeTaggedSprites(GameObject[] gameObjectArray, Sprite[] library)
@@ -78,7 +89,7 @@ public class profileSettings : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
         if (data.Child("theme").Exists)
         {
@@ -90,9 +101,14 @@ public class profileSettings : MonoBehaviour, IDataPersistence
         {
             username = data.Child("username").Value.ToString();
             usernameField.text = username;
+            PhotonNetwork.NickName = username;
         }
 
+        friendScript.OtherPlayerLoadedIn(username);
+
         UpdateTheme();
+
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)

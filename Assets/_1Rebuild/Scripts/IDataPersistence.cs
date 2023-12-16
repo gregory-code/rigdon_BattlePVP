@@ -6,7 +6,7 @@ using Firebase.Database;
 
 public interface IDataPersistence
 {
-    void LoadData(DataSnapshot data);
+    IEnumerator LoadData(DataSnapshot data);
 
     void LoadOtherPlayersData(string key, object data);
 }

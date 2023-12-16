@@ -183,7 +183,7 @@ public class menuScript : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
         /*kills = dataDictionary["Kills"].ToString();
         KillsField.text = kills;
@@ -192,6 +192,8 @@ public class menuScript : MonoBehaviour, IDataPersistence
         UsernameField.text = username;
 
         OnlineScript.setNickName(dataDictionary["username"].ToString());*/
+
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)

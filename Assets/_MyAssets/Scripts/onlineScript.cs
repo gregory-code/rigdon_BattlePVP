@@ -236,9 +236,9 @@ public class onlineScript : MonoBehaviourPunCallbacks, IDataPersistence
         }
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
-
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)

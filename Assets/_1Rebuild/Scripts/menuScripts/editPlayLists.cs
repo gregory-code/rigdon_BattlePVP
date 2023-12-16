@@ -174,7 +174,7 @@ public class editPlayLists : MonoBehaviour, IDataPersistence
         }
     }
 
-    public void LoadData(DataSnapshot data)
+    public IEnumerator LoadData(DataSnapshot data)
     {
         for (int i = 0; i < data.Child("menuSongs").ChildrenCount; ++i)
         {
@@ -187,6 +187,8 @@ public class editPlayLists : MonoBehaviour, IDataPersistence
         }
 
         InitalizeMusic();
+
+        yield return new WaitForEndOfFrame();
     }
 
     public void LoadOtherPlayersData(string key, object data)

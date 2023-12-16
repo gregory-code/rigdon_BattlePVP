@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Xml.Linq;
 
 public class friendRequest : MonoBehaviour
 {
@@ -11,26 +12,38 @@ public class friendRequest : MonoBehaviour
     [SerializeField] Button declineButton;
 
     private string requestName;
+    private string myName;
+    private string requestID;
 
-    private string senderID;
+    friendManager friendManager;
 
-    public void Init(string senderName, string senderID, string myName, friendManager manager)
+    public void Init(string senderName, string requestID, string myName, friendManager manager)
     {
-        nameText.text = senderName;
-        requestName = senderName;
-        this.senderID = senderID;
-
-        acceptButton.onClick.AddListener(() => manager.AcceptFriend(this, senderName, senderID, myName));
-        declineButton.onClick.AddListener(() => manager.DeleteFriendRequest(this));
+        this.requestID = requestID;
+        this.myName = myName;
+        friendManager = manager;
+        SetRequestsName(senderName);
     }
 
-    public string GetName()
+    public void SetRequestsName(string newName)
+    {
+        acceptButton.onClick.RemoveAllListeners();
+        declineButton.onClick.RemoveAllListeners();
+
+        nameText.text = newName;
+        requestName = newName;
+
+        acceptButton.onClick.AddListener(() => friendManager.AcceptFriend(this, newName, requestID, myName));
+        declineButton.onClick.AddListener(() => friendManager.DeleteFriendRequest(this));
+    }
+
+    public string GetRequestsName()
     {
         return requestName;
     }
 
-    public bool IsSenderID(string check)
+    public string GetRequestsID()
     {
-        return (senderID == check);
+        return requestID;
     }
 }

@@ -11,16 +11,23 @@ public class friendPrefab : MonoBehaviour
     [SerializeField] GameObject isOffline;
 
     private string friendsName;
+    private string friendID;
 
-    public void Init(string nameText)
+    public void Init(string nameText, string friendID)
     {
         SetFriendsName(nameText);
+        this.friendID = friendID;
     }
 
     public void SetFriendsName(string newName)
     {
         this.nameText.text = newName;
         friendsName = newName;
+    }
+
+    public string GetFriendsID()
+    {
+        return friendID;
     }
 
     public string GetFriendsName()
