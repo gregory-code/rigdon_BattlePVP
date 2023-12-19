@@ -37,6 +37,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     bool gotEnemyTeam;
 
+    [Header("Monster References")]
+    [SerializeField] GameMaster gameMaster;
+    [SerializeField] lineScript redLine;
+    [SerializeField] lineScript greenLine;
+    [SerializeField] Camera renderCamera;
+
     void Start()
     {
         SetCanvasGroup(false);
@@ -81,9 +87,11 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return StartCoroutine(GetUsernames());
         
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
 
         yield return StartCoroutine(SendMyTeamPrefs());
+
+        yield return new WaitForSeconds(1f);
 
         allMenus.SetActive(false);
 

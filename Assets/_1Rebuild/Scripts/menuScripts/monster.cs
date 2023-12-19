@@ -13,11 +13,13 @@ public class monster : ScriptableObject
     [SerializeField] private string monsterName;
     private string monsterNickname;
     public bool[] bFlipSprite = new bool[3];
+    public bool canAct = false;
     public Sprite[] stages = new Sprite[3];
     public Sprite circleOutline;
     public Color matchingColor;
 
     [Header("Stats")]
+    [SerializeField] private int level;
     [SerializeField] private int initial_HP;
     private int maxHP;
     private int currentHP;
@@ -63,6 +65,23 @@ public class monster : ScriptableObject
         return moveContents;
     }
 
+    public int GetSpriteIndexFromLevel()
+    {
+        switch (level)
+        {
+            default:
+                return 0;
+
+            case 3:
+            case 4:
+            case 5:
+                return 1;
+
+            case > 5:
+                return 2;
+        }
+    }
+
     public void changeHealth(int change)
     {
         currentHP += change;
@@ -83,19 +102,21 @@ public class monster : ScriptableObject
 
     public void SetFromPref(monsterPreferences build)
     {
-        //AttackID = build.critterValue[1];
-        //AbilityID = build.critterValue[2];
-        //PassiveID = build.critterValue[3];
-        //growthHP = build.critterValue[4];
-        //growthStrength = build.critterValue[5];
-        //growthMagic = build.critterValue[6];
-        //growthSpeed = build.critterValue[7];
+        AttackID = build.monsterValues[1];
+        AbilityID = build.monsterValues[2];
+        PassiveID = build.monsterValues[3];
+        growthHP = build.monsterValues[4];
+        growthStrength = build.monsterValues[5];
+        growthMagic = build.monsterValues[6];
+        growthSpeed = build.monsterValues[7];
 
         monsterNickname = build.monsterNickname;
     }
 
     public void SetInitialStats()
     {
+        level = 1;
+
         maxHP = initial_HP;
         currentHP = initial_HP;
 
@@ -122,6 +143,8 @@ public class monster : ScriptableObject
 
     public void LevelUp()
     {
+        level++;
+
         maxHP += (growthHP + 3);
         currentHP += (growthHP + 3);
 

@@ -8439,6 +8439,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f092600dd1142c3448d38551b09189fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectedCritter: {fileID: 0}
+  targetedCritter: {fileID: 0}
+  touchedPos: {x: 0, y: 0, z: 0}
+  bRendering: 0
+  activeMonsters: []
 --- !u!1 &425040790
 GameObject:
   m_ObjectHideFlags: 0
@@ -10962,7 +10967,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &556618548
 RectTransform:
   m_ObjectHideFlags: 0
@@ -19912,8 +19917,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 696089178}
   - {fileID: 544751908}
+  - {fileID: 696089178}
   - {fileID: 1380130225}
   - {fileID: 1144257509}
   - {fileID: 2027632371}
@@ -40836,6 +40841,10 @@ MonoBehaviour:
   player1_ID: 
   player2_ID: 
   bIsPlayer1: 0
+  gameMaster: {fileID: 413420229}
+  redLine: {fileID: 544751906}
+  greenLine: {fileID: 696089179}
+  renderCamera: {fileID: 1601034252}
 --- !u!225 &2027632374
 CanvasGroup:
   m_ObjectHideFlags: 0
