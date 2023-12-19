@@ -44,5 +44,5 @@ public class monsterPreferences : ScriptableObject
         return preferences;
     }
 
-    public string monsterNickname;
+    public string monsterNickname = "";
 }

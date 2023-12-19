@@ -172,6 +172,22 @@ public class teamBuilder : canvasGroupRenderer
         battleMenuScript.UpdateTeamName(currentTeam.GetTeamIndex(), teamName);
     }
 
+    public void AssignMonsterImagesFromBattleMenu(teamSelect selectedTeam, Image[] monsterImages)
+    {
+        for(int i = 0; i < monsterImages.Length; i++)
+        {
+            if (selectedTeam.GetMonsterPref(i).monsterValues[0] == 0)
+            {
+                monsterImages[i].sprite = transparent;
+            }
+            else
+            {
+                monsterImages[i].sprite = monsters[selectedTeam.GetMonsterPref(i).monsterValues[0]].stages[0];
+            }
+
+        }
+    }
+
     [Header("Monster List")]
     [SerializeField] canvasGroupRenderer monsterListCanvasGroup;
     [SerializeField] monsterSelectButton monsterSelectPrefab;

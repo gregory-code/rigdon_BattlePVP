@@ -19,8 +19,6 @@ public class profileSettings : MonoBehaviour, IDataPersistence
     [SerializeField] Sprite[] themeHoloCircle;
     [SerializeField] Sprite[] themeBackground;
 
-    [SerializeField] Image teamDropdownTemplate;
-
     GameObject[] fullRects;
     GameObject[] holoRects;
     GameObject[] fullCircles;
@@ -69,7 +67,6 @@ public class profileSettings : MonoBehaviour, IDataPersistence
     private void UpdateTheme()
     {
         backgroundImage.sprite = themeBackground[theme];
-        teamDropdownTemplate.sprite = themeFullRect[theme];
         ChangeTaggedSprites(fullRects, themeFullRect);
         ChangeTaggedSprites(holoRects, themeHoloRect);
         ChangeTaggedSprites(fullCircles, themeFullCircle);
