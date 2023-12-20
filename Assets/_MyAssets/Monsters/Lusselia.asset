@@ -15,12 +15,19 @@ MonoBehaviour:
   monsterID: 8
   monsterName: Lusselia
   bFlipSprite: 000000
+  canAct: 0
+  bMine: 0
   stages:
   - {fileID: 21300000, guid: 32fe9317f5b21cb49b9cc8fd9a66ef67, type: 3}
   - {fileID: 21300000, guid: 17036e8a1d3a12a4cbdf5f82e255f5fb, type: 3}
   - {fileID: 21300000, guid: d26efdf5ad4b5ca48996cc7ee1840b06, type: 3}
+  stagesIcons:
+  - {fileID: 21300000, guid: 5f62786fa7068624b947e263847069bd, type: 3}
+  - {fileID: 21300000, guid: 519e58b6754664c408b9d74e8218ae59, type: 3}
+  - {fileID: 21300000, guid: 771da709c64a87145a479cee3dc480ec, type: 3}
   circleOutline: {fileID: 21300000, guid: 7b21a12e9d1b67641ac12d1c4ef207ae, type: 3}
   matchingColor: {r: 0.4862745, g: 0.34901962, b: 0.93333334, a: 0.39215687}
+  level: 0
   initial_HP: 25
   initial_Strength: 3
   initial_Magic: 4

@@ -6802,7 +6802,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -8439,10 +8439,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f092600dd1142c3448d38551b09189fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  redLine: {fileID: 544751906}
+  greenLine: {fileID: 696089179}
+  renderCamera: {fileID: 1601034252}
   selectedCritter: {fileID: 0}
   targetedCritter: {fileID: 0}
   touchedPos: {x: 0, y: 0, z: 0}
   bRendering: 0
+  player1Team:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  player2Team:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  monsterTurnParent: {fileID: 0}
+  monsterTurnPrefab: {fileID: 6043958394245604590, guid: 8f2ee5d625b99214c9b7b23ce17f683f,
+    type: 3}
   activeMonsters: []
 --- !u!1 &425040790
 GameObject:
@@ -25953,7 +25967,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -40843,9 +40857,6 @@ MonoBehaviour:
   player2_ID: 
   bIsPlayer1: 0
   gameMaster: {fileID: 413420229}
-  redLine: {fileID: 544751906}
-  greenLine: {fileID: 696089179}
-  renderCamera: {fileID: 1601034252}
 --- !u!225 &2027632374
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -43194,7 +43205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

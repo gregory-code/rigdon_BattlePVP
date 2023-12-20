@@ -15,12 +15,19 @@ MonoBehaviour:
   monsterID: 7
   monsterName: Klaatu
   bFlipSprite: 010101
+  canAct: 0
+  bMine: 0
   stages:
   - {fileID: 21300000, guid: edd09550c6987aa4f9e12118d02cf2da, type: 3}
   - {fileID: 21300000, guid: 77e01eea6fcdf8646b0bb58112c6e6c7, type: 3}
   - {fileID: 21300000, guid: 8eba67b0c388ad3448989274e54c808b, type: 3}
+  stagesIcons:
+  - {fileID: 21300000, guid: 5f26ae49eb21210478b70363a29dda40, type: 3}
+  - {fileID: 21300000, guid: be24a98c59338de4b8af79fa6aaf0f5c, type: 3}
+  - {fileID: 21300000, guid: 8cdbc75a83453cb46926c25025920c4a, type: 3}
   circleOutline: {fileID: 21300000, guid: ff812dcee14ef064f90d89e45ab1ee99, type: 3}
   matchingColor: {r: 0.7647059, g: 0.13333334, b: 0.73333335, a: 0.39215687}
+  level: 0
   initial_HP: 17
   initial_Strength: 0
   initial_Magic: 6
@@ -30,3 +37,4 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  moveContents: []

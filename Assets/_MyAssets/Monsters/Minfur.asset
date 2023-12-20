@@ -15,12 +15,19 @@ MonoBehaviour:
   monsterID: 9
   monsterName: Minfur
   bFlipSprite: 010101
+  canAct: 0
+  bMine: 0
   stages:
   - {fileID: 21300000, guid: 8f56831267a766e4d95800d9abde7354, type: 3}
   - {fileID: 21300000, guid: 9298ae965c768be44b86f3c10c4697a9, type: 3}
   - {fileID: 21300000, guid: 9298ae965c768be44b86f3c10c4697a9, type: 3}
+  stagesIcons:
+  - {fileID: 21300000, guid: 92cf1721bebf041418df1eab09dbe109, type: 3}
+  - {fileID: 21300000, guid: d99ba5e2f33da8a41ab1ff0b5538cd5a, type: 3}
+  - {fileID: 21300000, guid: d99ba5e2f33da8a41ab1ff0b5538cd5a, type: 3}
   circleOutline: {fileID: 21300000, guid: 41b027c93ce75eb4fb1e2bfadf49d257, type: 3}
   matchingColor: {r: 0.2784314, g: 0.43529412, b: 0.6784314, a: 0.39215687}
+  level: 0
   initial_HP: 16
   initial_Strength: 0
   initial_Magic: 1
@@ -30,3 +37,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  moveContents:
+  - {fileID: 8812975950963853024, guid: 88644739d6c270b44a593a87f7b69044, type: 3}
+  - {fileID: 8812975950963853024, guid: 415e8b37cd9323448a060269b3d7e413, type: 3}
+  - {fileID: 8812975950963853024, guid: abc0c2de46725c84cb357652b919d4e5, type: 3}
+  - {fileID: 8812975950963853024, guid: ba6c6d652d6ce894dad7d5019d2b5714, type: 3}
+  - {fileID: 8812975950963853024, guid: 1a60042a1677be84da48dc2573585d33, type: 3}
+  - {fileID: 8812975950963853024, guid: d6e7543b58368ee41a370ebbacb7c1c7, type: 3}

@@ -9,7 +9,6 @@ using UnityEngine.UI;
 
 public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 {
-    loadingScript loading;
     [SerializeField] FirebaseScript firebaseScript;
     [SerializeField] battleMenu battleMenuScript;
 
@@ -39,9 +38,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     [Header("Monster References")]
     [SerializeField] GameMaster gameMaster;
-    [SerializeField] lineScript redLine;
-    [SerializeField] lineScript greenLine;
-    [SerializeField] Camera renderCamera;
 
     void Start()
     {
@@ -52,8 +48,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             myTeamPrefs[i] = ScriptableObject.CreateInstance<monsterPreferences>();
             enemyTeamPrefs[i] = ScriptableObject.CreateInstance<monsterPreferences>();
         }
-
-        loading = GameObject.FindObjectOfType<loadingScript>();
     }
 
     void Update()

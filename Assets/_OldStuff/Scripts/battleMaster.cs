@@ -54,12 +54,10 @@ public class battleMaster : MonoBehaviourPunCallbacks
     [SerializeField] Transform spawnLocation;
     [SerializeField] GameObject turnOrderGameObject;
     [SerializeField] GameObject turnOrderPrefab;
-    [SerializeField] Sprite friendlyTurnSprite;
-    [SerializeField] Sprite enemyTurnSprite;
+    private List<GameObject> turnOrderObjectList = new List<GameObject>();
 
     public List<critter> allCritters = new List<critter>();
 
-    [SerializeField] private List<GameObject> turnOrderObjectList = new List<GameObject>();
     [SerializeField] private List<GameObject> critterObjects = new List<GameObject>();
 
     [Header("Particles")]
@@ -214,7 +212,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
             allCritters.Add(player1Team[i]);
             allCritters.Add(player2Team[i]);
         }
-        allCritters.Sort(comparer);
+        //allCritters.Sort(comparer);
 
         foreach (critter c in allCritters)
         {
@@ -228,7 +226,6 @@ public class battleMaster : MonoBehaviourPunCallbacks
         newTurnOrder.transform.localScale = new Vector3(1, 1, 1);
         newTurnOrder.transform.SetParent(turnOrderGameObject.transform);
         newTurnOrder.transform.localPosition = spawnLocation.localPosition;
-        newTurnOrder.GetComponent<Image>().sprite = (c.bMine) ? friendlyTurnSprite : enemyTurnSprite;
         newTurnOrder.transform.Find("critterGraphic").GetComponent<Image>().sprite = critterIcons[c.GetCritterID()]; // check levels to see if it's a higher evolution
         turnOrderObjectList.Add(newTurnOrder);
     }

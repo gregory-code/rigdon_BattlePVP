@@ -15,12 +15,19 @@ MonoBehaviour:
   monsterID: 11
   monsterName: Ochid
   bFlipSprite: 010101
+  canAct: 0
+  bMine: 0
   stages:
   - {fileID: 21300000, guid: 430722f7e6420634ba0863deb32163ff, type: 3}
   - {fileID: 21300000, guid: 09aeed28ce2b00b488b5049a4e4a2aaf, type: 3}
   - {fileID: 21300000, guid: 48642c331ae0fd54b956cc659ab7f234, type: 3}
+  stagesIcons:
+  - {fileID: 21300000, guid: e61076fefc048cd4a89bbf9c91f2c8cb, type: 3}
+  - {fileID: 21300000, guid: 7769a1fe3e3690441a25cd88faa0ff7d, type: 3}
+  - {fileID: 21300000, guid: bfea66018c9443546a27ee5d225dd535, type: 3}
   circleOutline: {fileID: 21300000, guid: 089281f93a342a8488b45a7e7164ef8c, type: 3}
   matchingColor: {r: 0.16078432, g: 0.8392157, b: 0, a: 0.39215687}
+  level: 0
   initial_HP: 19
   initial_Strength: 4
   initial_Magic: 2
@@ -30,3 +37,4 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  moveContents: []

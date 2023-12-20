@@ -14,7 +14,9 @@ public class monster : ScriptableObject
     private string monsterNickname;
     public bool[] bFlipSprite = new bool[3];
     public bool canAct = false;
+    public bool bMine;
     public Sprite[] stages = new Sprite[3];
+    public Sprite[] stagesIcons = new Sprite[3];
     public Sprite circleOutline;
     public Color matchingColor;
 
