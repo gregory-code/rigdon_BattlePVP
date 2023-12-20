@@ -9,8 +9,6 @@ public class monsterBase : MonoBehaviour
 {
     [Header("BaseClass")]
     [SerializeField] bool bMouseOver;
-
-    [SerializeField] Animator monsterAnimator;
     
     public GameMaster gameMaster { get; private set; }
     public lineScript redLine { get; private set; }
@@ -19,11 +17,14 @@ public class monsterBase : MonoBehaviour
 
     [Header("Monster Prefab")]
     [SerializeField] monster myMonster;
-    [SerializeField] SpriteRenderer monsterSprite;
-    [SerializeField] Image health;
-    [SerializeField] TextMeshProUGUI healthText;
+    private SpriteRenderer monsterSprite;
+    private Image health;
+    private TextMeshProUGUI healthText;
+    private TextMeshProUGUI nameText;
+    private Transform HUD;
+    private Animator monsterAnimator;
 
-    public void Init(monster myMonster, monsterPreferences myPref, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera)
+    public void Init(monster myMonster, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera)
     {
         this.myMonster = myMonster;
         this.gameMaster = gameMaster;
@@ -31,16 +32,34 @@ public class monsterBase : MonoBehaviour
         this.greenLine = greenLine;
         this.renderCamera = renderCamera;
 
+        monsterDependecy dependecies = GetComponent<monsterDependecy>();
+        GrabDependecies(dependecies);
+
         int stage = myMonster.GetSpriteIndexFromLevel();
         monsterSprite.sprite = myMonster.stages[stage];
         if (myMonster.bFlipSprite[stage] == true)
             monsterSprite.flipX = !monsterSprite.flipX;
 
         if(myMonster.isMine() == false)
-            monsterSprite.flipX = !monsterSprite.flipX;
+        {
+            Vector3 flipRotation = new Vector3(0, 180, 0);
+            transform.localEulerAngles = flipRotation;
+            HUD.localEulerAngles = flipRotation;
+        }
 
+        nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
         healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
+    }
+
+    private void GrabDependecies(monsterDependecy dependecy)
+    {
+        monsterSprite = dependecy.GetMonsterSprite();
+        health = dependecy.GetHealthBar();
+        healthText = dependecy.GetHealthText();
+        nameText = dependecy.GetNameText();
+        HUD = dependecy.GetHUD();
+        monsterAnimator = dependecy.GetAnimator(myMonster.GetMonsterID(), myMonster.GetSpriteIndexFromLevel());
     }
 
     void Update()
@@ -63,7 +82,7 @@ public class monsterBase : MonoBehaviour
         if (gameMaster.bRendering == false || bMouseOver == true) return;
 
         bMouseOver = true;
-        gameMaster.targetedCritter = myMonster;
+        gameMaster.targetedMonster = myMonster;
 
         if (myMonster.isMine())
         {

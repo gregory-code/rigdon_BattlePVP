@@ -43,13 +43,13 @@ public class monster : ScriptableObject
     private int growthSpeed;
 
     [Header("MoveSet")]
-    public moveBase[] moves = new moveBase[4];
     private int AttackID;
     private int AbilityID;
     private int PassiveID;
     [SerializeField] moveContent[] moveContents;
 
     public string GetMonsterName() { return monsterName; }
+    public string GetMonsterNickname() { return monsterNickname; }
     public int GetMonsterID() { return monsterID; }
     public int GetInitialHP() { return initial_HP; }
     public int GetInitialStrength() { return initial_Strength; }

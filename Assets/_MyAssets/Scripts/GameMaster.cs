@@ -12,16 +12,23 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [SerializeField] lineScript greenLine;
     [SerializeField] Camera renderCamera;
 
+    [SerializeField] Transform[] playerSpawns;
+    [SerializeField] Transform[] enemySpawns;
+
+    [SerializeField] GameObject monsterPrefab;
+
+    [SerializeField] monsterAlly[] monsterAllies; // like each seperate script
+
     [Header("Targeting")]
-    public monster selectedCritter;
-    public monster targetedCritter;
+    public monster selectedMonster;
+    public monster targetedMonster;
 
     public Vector3 touchedPos;
     public bool bRendering;
 
     public void StartFight()
     {
-        // put in all the boys
+        spawnTeams();
         sortBySpeed();
         selectNew();
     }
@@ -29,6 +36,20 @@ public class GameMaster : MonoBehaviourPunCallbacks
     void Update()
     {
         handleTurnOrder();
+    }
+
+    public void spawnTeams()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            GameObject newAlly = Instantiate(monsterPrefab, playerSpawns[i]);
+            monsterAlly allyScript = newAlly.AddComponent<monsterAlly>();
+            allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera);
+
+            GameObject newEnemy = Instantiate(monsterPrefab, enemySpawns[i]);
+            monsterBase enemyScript = newEnemy.AddComponent<monsterBase>();
+            enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera);
+        }
     }
 
     [Header("Turn Order")]
@@ -77,7 +98,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     private void selectNew()
     {
-        selectParticleScript newSelect = Instantiate(selectParticlesPrefab); // give it a parent to go to
+        selectParticleScript newSelect = Instantiate(selectParticlesPrefab, playerSpawns[0]); // give it a parent to go to
         newSelect.Init(activeMonsters[0].matchingColor);
         newSelect.transform.localPosition = Vector3.one;
 

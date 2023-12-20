@@ -21,7 +21,7 @@ public class monsterAlly : monsterBase
         if (gameMaster.activeMonsters[0] == GetMyMonster())
         {
             lineRenderState(true);
-            gameMaster.selectedCritter = GetMyMonster();
+            gameMaster.selectedMonster = GetMyMonster();
             greenLine.resetReticle(renderCamera.ScreenToWorldPoint(gameMaster.touchedPos));
         }
     }

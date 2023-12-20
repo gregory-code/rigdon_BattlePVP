@@ -19,6 +19,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] TextMeshProUGUI myTitle;
     [SerializeField] TextMeshProUGUI enemyTitle;
     [SerializeField] GameObject allMenus;
+    [SerializeField] GameObject menuChecks;
     bool showCurtain;
 
 
@@ -102,10 +103,14 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.StartFight();
-
         allMenus.SetActive(false);
         showCurtain = false;
+        menuChecks.SetActive(false);
+
+        yield return new WaitForSeconds(0.5f);
+
+        gameMaster.StartFight();
+
         SetCanvasGroup(false);
     }
 

@@ -15,8 +15,8 @@ public class monsterTurnScript : MonoBehaviour
     {
         transform.localScale = new Vector3(1, 1, 1);
         monsterImage.sprite = desiredImage;
-        friendlyBackground.SetActive(isMine);
-        enemyBackground.SetActive(!isMine);
+        friendlyBackground.SetActive(!isMine);
+        enemyBackground.SetActive(isMine);
     }
 
     public void Discard()
