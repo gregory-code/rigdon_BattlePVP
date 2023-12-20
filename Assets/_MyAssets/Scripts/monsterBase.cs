@@ -9,7 +9,6 @@ public class monsterBase : MonoBehaviour
 {
     [Header("BaseClass")]
     [SerializeField] bool bMouseOver;
-    [SerializeField] bool bFriendly;
 
     [SerializeField] Animator monsterAnimator;
     
@@ -26,22 +25,18 @@ public class monsterBase : MonoBehaviour
 
     public void Init(monster myMonster, monsterPreferences myPref, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera)
     {
-        myMonster.SetFromPref(myPref);
         this.myMonster = myMonster;
-        this.gameMaster = gameMaster; // Master not menu
+        this.gameMaster = gameMaster;
         this.redLine = redLine;
         this.greenLine = greenLine;
         this.renderCamera = renderCamera;
-
-        myMonster.SetInitialStats();
-
 
         int stage = myMonster.GetSpriteIndexFromLevel();
         monsterSprite.sprite = myMonster.stages[stage];
         if (myMonster.bFlipSprite[stage] == true)
             monsterSprite.flipX = !monsterSprite.flipX;
 
-        if(bFriendly == false)
+        if(myMonster.isMine() == false)
             monsterSprite.flipX = !monsterSprite.flipX;
 
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -70,7 +65,7 @@ public class monsterBase : MonoBehaviour
         bMouseOver = true;
         gameMaster.targetedCritter = myMonster;
 
-        if (bFriendly)
+        if (myMonster.isMine())
         {
             redLine.enable(false, Vector2.zero);
             greenLine.enable(true, renderCamera.ScreenToWorldPoint(gameMaster.touchedPos));
@@ -91,7 +86,7 @@ public class monsterBase : MonoBehaviour
 
         bMouseOver = false;
 
-        if (bFriendly)
+        if (myMonster.isMine())
         {
             greenLine.focusTarget(false, gameObject.transform);
         }

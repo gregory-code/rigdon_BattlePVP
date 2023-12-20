@@ -48,7 +48,6 @@ public class battleMaster : MonoBehaviourPunCallbacks
     public bool bRendering;
 
     private bool bGameStart = false;
-    private bool bBlockFirstLerp = false;
 
     [Header("Turn Order")]
     [SerializeField] Transform spawnLocation;
@@ -90,7 +89,7 @@ public class battleMaster : MonoBehaviourPunCallbacks
     {
         for(int i = 0; i < turnOrderObjectList.Count; ++i)
         {
-            if(i == 0 && bBlockFirstLerp == false)
+            if(i == 0)
             {
                 Vector3 highlightLerp = Vector3.Lerp(turnOrderObjectList[i].transform.localPosition, new Vector3(-235.4f, 7.23f, 0), 5 * Time.deltaTime);
                 Vector3 sizeLerp = Vector3.Lerp(turnOrderObjectList[i].transform.localScale, new Vector3(1.359545f, 1.359545f, 1.359545f), 5 * Time.deltaTime);

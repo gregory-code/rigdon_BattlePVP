@@ -1,11 +1,13 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameMaster : MonoBehaviourPunCallbacks
 {
     [Header("References")]
+    [SerializeField] GameMenu gameMenu;
     [SerializeField] lineScript redLine;
     [SerializeField] lineScript greenLine;
     [SerializeField] Camera renderCamera;
@@ -17,24 +19,24 @@ public class GameMaster : MonoBehaviourPunCallbacks
     public Vector3 touchedPos;
     public bool bRendering;
 
-    [Header("Team Info")]
-    [SerializeField] private monster[] player1Team = new monster[3];
-    [SerializeField] private monster[] player2Team = new monster[3];
-
-    void Start()
+    public void StartFight()
     {
-        
+        // put in all the boys
+        sortBySpeed();
+        selectNew();
     }
-
 
     void Update()
     {
-        
+        handleTurnOrder();
     }
 
     [Header("Turn Order")]
     [SerializeField] Transform monsterTurnParent;
     [SerializeField] monsterTurnScript monsterTurnPrefab;
+    [SerializeField] selectParticleScript selectParticlesPrefab;
+    GameObject selectParticles;
+    bool myTurn;
 
     private List<monsterTurnScript> monsterTurnList = new List<monsterTurnScript>();
 
@@ -49,21 +51,20 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     private void deleteTurn(int where)
     {
-        monsterTurnList[where].GetComponent<Animator>().SetTrigger("discard");
-        Destroy(monsterTurnList[where], 0.5f);
+        monsterTurnList[where].Discard();
         monsterTurnList.RemoveAt(where);
         activeMonsters.RemoveAt(where);
     }
 
-    private void SortBySpeed()
+    private void sortBySpeed()
     {
         activeMonsters.Clear();
         StatComparer comparer = new StatComparer();
 
-        for (int i = 0; i < player1Team.Length; ++i)
+        for (int i = 0; i < gameMenu.GetMyTeam().Length; ++i)
         {
-            activeMonsters.Add(player1Team[i]);
-            activeMonsters.Add(player2Team[i]);
+            activeMonsters.Add(gameMenu.GetMyTeam()[i]);
+            activeMonsters.Add(gameMenu.GetEnemyTeam()[i]);
         }
 
         activeMonsters.Sort(comparer);
@@ -71,6 +72,32 @@ public class GameMaster : MonoBehaviourPunCallbacks
         foreach (monster mon in activeMonsters)
         {
             addTurn(mon);
+        }
+    }
+
+    private void selectNew()
+    {
+        selectParticleScript newSelect = Instantiate(selectParticlesPrefab); // give it a parent to go to
+        newSelect.Init(activeMonsters[0].matchingColor);
+        newSelect.transform.localPosition = Vector3.one;
+
+        myTurn = activeMonsters[0].bMine;
+        activeMonsters[0].canAct = true;
+        selectParticles = newSelect.gameObject;
+    }
+
+    private void handleTurnOrder()
+    {
+        if (monsterTurnList.Count <= 0)
+            return;
+
+        for (int i = 0; i < monsterTurnList.Count; ++i)
+        {
+            Vector3 lerp = (i == 0) ? new Vector3(-535, 77, 0) : new Vector3(-438 + (69 * (i - 1)), 70, 0);
+            Vector3 size = (i == 0) ? new Vector3(1.357f, 1.357f, 1.357f) : Vector3.one ;
+
+            monsterTurnList[i].transform.localPosition = lerp;
+            monsterTurnList[i].transform.localScale = size;
         }
     }
 }

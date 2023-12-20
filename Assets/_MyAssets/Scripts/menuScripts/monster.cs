@@ -62,6 +62,11 @@ public class monster : ScriptableObject
     public int GetCurrentMagic() { return currentMagic; }
     public int GetCurrentSpeed() { return currentSpeed; }
 
+    public bool isMine()
+    {
+        return bMine;
+    }
+
     public moveContent[] GetMoveContents()
     {
         return moveContents;

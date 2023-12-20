@@ -85,6 +85,7 @@ MonoBehaviour:
   monsterImage: {fileID: 362186143788996534}
   friendlyBackground: {fileID: 2344160837104647875}
   enemyBackground: {fileID: 2394297954718972906}
+  myAnimator: {fileID: 4612132131891064021}
 --- !u!1 &2344160837104647875
 GameObject:
   m_ObjectHideFlags: 0

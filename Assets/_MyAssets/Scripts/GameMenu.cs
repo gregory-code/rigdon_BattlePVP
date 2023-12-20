@@ -38,6 +38,19 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     [Header("Monster References")]
     [SerializeField] GameMaster gameMaster;
+    [SerializeField] monster[] monsters;
+    [SerializeField] private monster[] player1Team = new monster[3];
+    [SerializeField] private monster[] player2Team = new monster[3];
+
+    public monster[] GetEnemyTeam()
+    {
+        return (bIsPlayer1) ? player2Team : player1Team;
+    }
+
+    public monster[] GetMyTeam()
+    {
+        return (bIsPlayer1) ? player1Team : player2Team ;
+    }
 
     void Start()
     {
@@ -81,14 +94,17 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return StartCoroutine(GetUsernames());
         
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         yield return StartCoroutine(SendMyTeamPrefs());
 
-        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(CreateTeams());
+
+        yield return new WaitForSeconds(0.5f);
+
+        gameMaster.StartFight();
 
         allMenus.SetActive(false);
-
         showCurtain = false;
         SetCanvasGroup(false);
     }
@@ -120,7 +136,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         for (int i = 0; i < 3; i++)
         {
             myPref[i] = myTeamPrefs[i].SeralizedPref();
-            Debug.Log(myPref[i]);
             nickname[i] = myTeamPrefs[i].monsterNickname;
         }
 
@@ -130,6 +145,34 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         {
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    private IEnumerator CreateTeams()
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            monster newAlly = Instantiate(monsters[myTeamPrefs[i].monsterValues[0]]);
+            newAlly.SetInitialStats();
+            newAlly.SetFromPref(myTeamPrefs[i]);
+            newAlly.bMine = true;
+
+            monster newEnemy = Instantiate(monsters[enemyTeamPrefs[i].monsterValues[0]]);
+            newEnemy.SetInitialStats();
+            newEnemy.SetFromPref(enemyTeamPrefs[i]);
+
+            if (bIsPlayer1)
+            {
+                player1Team[i] = newAlly;
+                player2Team[i] = newEnemy;
+            }
+            else
+            {
+                player2Team[i] = newAlly;
+                player1Team[i] = newEnemy;
+            }
+        }
+
+        yield return new WaitForEndOfFrame();
     }
 
     [PunRPC]
