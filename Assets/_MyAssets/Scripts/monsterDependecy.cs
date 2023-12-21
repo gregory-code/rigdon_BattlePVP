@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,9 +13,10 @@ public class monsterDependecy : MonoBehaviour
     [SerializeField] TextMeshProUGUI healthText;
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] Transform HUD;
-    [SerializeField] AnimatorController[] babyMonsterControllers;
-    [SerializeField] AnimatorController[] midMonsterControllers;
-    [SerializeField] AnimatorController[] finalMonsterControllers;
+    [SerializeField] Transform attackPoint;
+    [SerializeField] RuntimeAnimatorController[] babyMonsterControllers;
+    [SerializeField] RuntimeAnimatorController[] midMonsterControllers;
+    [SerializeField] RuntimeAnimatorController[] finalMonsterControllers;
 
     public Animator GetAnimator(int monsterID, int whichStage)
     {
@@ -61,5 +61,10 @@ public class monsterDependecy : MonoBehaviour
     public Transform GetHUD()
     {
         return HUD;
+    }
+
+    public Transform GetAttackPoint()
+    {
+        return attackPoint;
     }
 }

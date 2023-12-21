@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_Dissolve_Veronio
+  m_Name: defaultShader
   m_Shader: {fileID: -6465566751694194690, guid: 0479d45fa7795724c87e298649e8c7fc,
     type: 3}
   m_Parent: {fileID: 0}
@@ -43,11 +43,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Vector1_450D3E32: 9.3
+    - Vector1_450D3E32: 10
     - Vector1_7772CFC0: 8.3
     - Vector1_E974001A: 2
     m_Colors:
-    - Color_2ED9CBC6: {r: 0.31132078, g: 0.28684586, b: 0.30873844, a: 0.39215687}
+    - Color_2ED9CBC6: {r: 1, g: 0.8748697, b: 0, a: 1}
     - Vector2_5A865DE9: {r: 1, g: 1, b: 0, a: 0}
     - Vector2_D2FA87F5: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

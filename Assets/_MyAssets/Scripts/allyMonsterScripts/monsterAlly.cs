@@ -7,6 +7,12 @@ using UnityEngine.UI;
 
 public class monsterAlly : monsterBase
 {
+    public delegate void OnAttack(int attackID);
+    public event OnAttack onAttack;
+
+    public delegate void OnAbility(int abilityID);
+    public event OnAbility onAbility;
+
     private void LateUpdate()
     {
         if (gameMaster.bRendering == false || redLine.IsHoveringOverTarget() || greenLine.IsHoveringOverTarget()) return;
@@ -18,10 +24,10 @@ public class monsterAlly : monsterBase
 
     public void OnMouseDown()
     {
-        if (gameMaster.activeMonsters[0] == GetMyMonster())
+        if (gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().bMine)
         {
             lineRenderState(true);
-            gameMaster.selectedMonster = GetMyMonster();
+            gameMaster.selectedMonster = this;
             greenLine.resetReticle(renderCamera.ScreenToWorldPoint(gameMaster.touchedPos));
         }
     }
@@ -31,12 +37,12 @@ public class monsterAlly : monsterBase
         if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true)
         {
             GetMyMonster().canAct = false;
-            //gameMaster.prepareMove(0); // prepare the attack ID of this monster, derive a class from monsterAlly for each type of critter
+            onAttack?.Invoke(GetMyMonster().GetAttackID());
         }
         if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true)
         {
             GetMyMonster().canAct = false;
-            //gameMaster.prepareMove(1); // prepare the ability of this monster, derive a class from monsterAlly for each type of critter
+            onAbility?.Invoke(GetMyMonster().GetAbilityID());
         }
         lineRenderState(false);
     }

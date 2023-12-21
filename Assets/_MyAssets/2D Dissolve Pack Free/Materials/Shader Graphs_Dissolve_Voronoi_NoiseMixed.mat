@@ -61,7 +61,7 @@ Material:
     - Vector1_BF7B720C: -0.23
     - Vector1_D0EB4D5: 50
     - Vector1_DA105505: 1
-    - Vector1_E974001A: 0
+    - Vector1_E974001A: 12
     m_Colors:
     - Color_2ED9CBC6: {r: 16.784933, g: 23.968628, b: 0, a: 0}
     - Vector2_CF8E4F5A: {r: -3, g: 3, b: 0, a: 0}

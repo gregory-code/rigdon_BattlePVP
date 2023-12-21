@@ -160,10 +160,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             newAlly.SetInitialStats();
             newAlly.SetFromPref(myTeamPrefs[i]);
             newAlly.bMine = true;
+            newAlly.teamIndex = i;
 
             monster newEnemy = Instantiate(monsters[enemyTeamPrefs[i].monsterValues[0]]);
             newEnemy.SetInitialStats();
             newEnemy.SetFromPref(enemyTeamPrefs[i]);
+            newEnemy.teamIndex = i;
 
             if (bIsPlayer1)
             {

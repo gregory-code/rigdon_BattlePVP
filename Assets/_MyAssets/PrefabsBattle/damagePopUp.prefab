@@ -100,7 +100,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -169,6 +169,7 @@ GameObject:
   - component: {fileID: 5948526650596034706}
   - component: {fileID: 5948526650596034701}
   - component: {fileID: 5948526650596034700}
+  - component: {fileID: 2821367167744139789}
   m_Layer: 5
   m_Name: damagePopUp
   m_TagString: Untagged
@@ -259,3 +260,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &2821367167744139789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5948526650596034702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6869530c6843d642bbdd885fea187eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  popAnimator: {fileID: 5948526650150331696}
+  damageText: {fileID: 5948526650150331697}
+  damagedColor: {r: 1, g: 0, b: 0, a: 1}
+  healedColor: {r: 0.24019432, g: 1, b: 0, a: 1}

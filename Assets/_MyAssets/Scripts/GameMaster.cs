@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -17,14 +18,16 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     [SerializeField] GameObject monsterPrefab;
 
-    [SerializeField] monsterAlly[] monsterAllies; // like each seperate script
-
     [Header("Targeting")]
-    public monster selectedMonster;
-    public monster targetedMonster;
+    public monsterBase selectedMonster;
+    public monsterBase targetedMonster;
 
     public Vector3 touchedPos;
     public bool bRendering;
+
+    [Header("Effects")]
+    [SerializeField] damagePopScript damagePop;
+    [SerializeField] projectileScript[] projectilePrefabs;
 
     public void StartFight()
     {
@@ -43,13 +46,27 @@ public class GameMaster : MonoBehaviourPunCallbacks
         for (int i = 0; i < 3; ++i)
         {
             GameObject newAlly = Instantiate(monsterPrefab, playerSpawns[i]);
-            monsterAlly allyScript = newAlly.AddComponent<monsterAlly>();
-            allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera);
+            monsterAlly allyScript = AddMonsterScript(gameMenu.GetMyTeam()[i].GetMonsterID(), newAlly);
+            allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera, damagePop);
 
             GameObject newEnemy = Instantiate(monsterPrefab, enemySpawns[i]);
-            monsterBase enemyScript = newEnemy.AddComponent<monsterBase>();
-            enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera);
+            monsterBase enemyScript = AddMonsterScript(gameMenu.GetEnemyTeam()[i].GetMonsterID(), newEnemy);
+            enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera, damagePop);
         }
+    }
+
+    private monsterAlly AddMonsterScript(int monsterID, GameObject newMonster)
+    {
+        switch(monsterID)
+        {
+            case 2:
+                return newMonster.AddComponent<draticAlly>();
+
+            case 8:
+                return newMonster.AddComponent<lusseliaAlly>();
+        }
+
+        return newMonster.AddComponent<draticAlly>();
     }
 
     [Header("Turn Order")]
@@ -57,7 +74,6 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [SerializeField] monsterTurnScript monsterTurnPrefab;
     [SerializeField] selectParticleScript selectParticlesPrefab;
     GameObject selectParticles;
-    bool myTurn;
 
     private List<monsterTurnScript> monsterTurnList = new List<monsterTurnScript>();
 
@@ -104,7 +120,23 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         myTurn = activeMonsters[0].bMine;
         activeMonsters[0].canAct = true;
+
+        if(selectParticles != null)
+            Destroy(selectParticles);
+
         selectParticles = newSelect.gameObject;
+    }
+
+    public void removeFromCritterBase(monsterBase toRemove)
+    {
+        for (int i = 0; i < activeMonsters.Count; ++i)
+        {
+            if (toRemove.GetMyMonster() == activeMonsters[i])
+            {
+                deleteTurn(i);
+                break;
+            }
+        }
     }
 
     private void handleTurnOrder()
@@ -121,4 +153,120 @@ public class GameMaster : MonoBehaviourPunCallbacks
             monsterTurnList[i].transform.localScale = size;
         }
     }
+
+    #region Commands
+
+    [Header("Commands")]
+    [SerializeField] bool myTurn;
+
+    private monster GetSpecificMonster(bool bMine, int teamIndex) // bMine will be the same for both players RPC call
+    {
+        if (bMine && myTurn)
+        {
+            return gameMenu.GetMyTeam()[teamIndex];
+        }
+
+        if(bMine == false && myTurn == false)
+        {
+            return gameMenu.GetMyTeam()[teamIndex];
+        }
+
+
+        return gameMenu.GetEnemyTeam()[teamIndex];
+    }
+
+    public void NextTurn()
+    {
+        this.photonView.RPC("NextTurnRPC", RpcTarget.AllBuffered);
+    }
+
+    [PunRPC]
+    void NextTurnRPC()
+    {
+        bool team1Alive = false;
+        bool team2Alive = false;
+        foreach (monster mon in activeMonsters)
+        {
+            if (mon.bMine == true) 
+                team1Alive = true;
+
+            if (mon.bMine == false) 
+                team2Alive = true;
+        }
+
+        if (team1Alive == false || team2Alive == false)
+        {
+            // game over
+            return;
+        }
+
+        monster finishedMonster = activeMonsters[0];
+        deleteTurn(0);
+
+        for (int i = 0; i < gameMenu.GetMyTeam().Length; ++i)
+        {
+            if (gameMenu.GetMyTeam()[i] == finishedMonster)
+            {
+                activeMonsters.Add(gameMenu.GetMyTeam()[i]);
+                addTurn(gameMenu.GetMyTeam()[i]);
+                break;
+            }
+
+            if (gameMenu.GetEnemyTeam()[i] == finishedMonster)
+            {
+                activeMonsters.Add(gameMenu.GetEnemyTeam()[i]);
+                addTurn(gameMenu.GetEnemyTeam()[i]);
+                break;
+            }
+        }
+
+        selectNew();
+    }
+
+    public void MoveMonster(bool bMine, int teamIndex, Vector3 desiredLocation)
+    {
+        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, desiredLocation);
+    }
+
+    [PunRPC]
+    void MoveMonsterRPC(bool bMine, int teamIndex, Vector3 desiredLocation)
+    {
+
+    }
+
+    public void AnimateMonster(bool bMine, int teamIndex, string animName)
+    {
+        this.photonView.RPC("AnimateMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, animName);
+    }
+
+    [PunRPC]
+    void AnimateMonsterRPC(bool bMine, int teamIndex, string animName)
+    {
+        GetSpecificMonster(bMine, teamIndex).PlayAnimation(animName);
+    }
+
+    public void ChangeMonsterHealth(bool bMine, int teamIndex, int healthChange)
+    {
+        this.photonView.RPC("ChangeMonsterHealthRPC", RpcTarget.AllBuffered, bMine, teamIndex, healthChange);
+    }
+
+    [PunRPC]
+    void ChangeMonsterHealthRPC(bool bMine, int teamIndex, int healthChange)
+    {
+        GetSpecificMonster(bMine, teamIndex).ChangeHealth(healthChange);
+    }
+
+    public void ShootProjectile(bool bMine, int teamIndex, int projectileIndex, bool bMine2, int TargetIndex)
+    {
+        this.photonView.RPC("ShootProjectileRPC", RpcTarget.AllBuffered, bMine, teamIndex, projectileIndex, bMine2, TargetIndex);
+    }
+
+    [PunRPC]
+    void ShootProjectileRPC(bool bMine, int teamIndex, int projectileIndex, bool bMine2, int TargetIndex)
+    {
+        Transform target = GetSpecificMonster(bMine2, TargetIndex).myBase.transform;
+        GetSpecificMonster(bMine, teamIndex).ShootProjectile(projectilePrefabs[projectileIndex], target);
+    }
+
+    #endregion
 }

@@ -17,6 +17,7 @@ MonoBehaviour:
   bFlipSprite: 010101
   canAct: 0
   bMine: 0
+  teamIndex: 0
   stages:
   - {fileID: 21300000, guid: f050d222c00f65642a60b2d40d956eaf, type: 3}
   - {fileID: 21300000, guid: 332476cc368f33b4787c1cbf7e8b0639, type: 3}
@@ -27,15 +28,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: f1bbe26eacf756c4aa80427857deb04e, type: 3}
   circleOutline: {fileID: 21300000, guid: f754ced6497d34e4c92d82a1a6c22cb0, type: 3}
   matchingColor: {r: 0.972549, g: 0.85490197, b: 0.13333334, a: 0.39215687}
-  monsterAnimatorController:
-  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
-  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
-  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   level: 0
   initial_HP: 24
   initial_Strength: 3
   initial_Magic: 2
-  initial_Speed: 3
+  initial_Speed: 12
   moveContents:
   - {fileID: 2915941332720301111, guid: 0bdd18bea5cef7b4699bfe672db546de, type: 3}
   - {fileID: -1379904485023640471, guid: 1d84ffa9fed2ef14d800a5ef31a24fa1, type: 3}

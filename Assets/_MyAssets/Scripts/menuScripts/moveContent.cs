@@ -44,6 +44,23 @@ public class moveContent : MonoBehaviour
         transform.parent.GetComponent<Button>().onClick.AddListener(onClickAction);
     }
 
+    public int[] GetScaleValues(int whichNumGroup)
+    {
+        switch(whichNumGroup)
+        {
+            case 0:
+                return scaleNums1;
+
+            case 1:
+                return scaleNums2;
+
+            case 2:
+                return scaleNums3;
+        }
+
+        return scaleNums1;
+    }
+
     private UnityAction onClickAction;
 
     public void RemoveConnection(teamBuilder builder)

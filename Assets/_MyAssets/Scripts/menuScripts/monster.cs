@@ -15,6 +15,8 @@ public class monster : ScriptableObject
     public bool[] bFlipSprite = new bool[3];
     public bool canAct = false;
     public bool bMine;
+    public int teamIndex;
+    public monsterBase myBase;
     public Sprite[] stages = new Sprite[3];
     public Sprite[] stagesIcons = new Sprite[3];
     public Sprite circleOutline;
@@ -56,6 +58,10 @@ public class monster : ScriptableObject
     public int GetInitialMagic() { return initial_Magic; }
     public int GetInitialSpeed() { return initial_Speed; }
 
+    public int GetAttackID() { return AttackID; }
+    public int GetAbilityID() { return AbilityID; }
+    public int GetPassiveID() { return PassiveID; }
+
 
     public int GetCurrentHealth() { return currentHP; }
     public int GetCurrentStrength() { return currentStrength; }
@@ -89,16 +95,38 @@ public class monster : ScriptableObject
         }
     }
 
-    public void changeHealth(int change)
+    public delegate void OnHealthChanged(int change, bool died);
+    public event OnHealthChanged onHealthChanged;
+
+    public void ChangeHealth(int change)
     {
+        bool died = false;
         currentHP += change;
 
         if (currentHP >= maxHP) currentHP = maxHP;
         if (currentHP <= 0)
         {
             currentHP = 0;
-            //die
+            died = true;
         }
+
+        onHealthChanged?.Invoke(change, died);
+    }
+
+    public delegate void OnAnimPlayed(string animName);
+    public event OnAnimPlayed onAnimPlayed;
+
+    public void PlayAnimation(string anim)
+    {
+        onAnimPlayed?.Invoke(anim);
+    }
+
+    public delegate void OnProjectileShot(projectileScript projectilePrefab, Transform target);
+    public event OnProjectileShot onProjectileShot;
+
+    public void ShootProjectile(projectileScript projectilePrefab, Transform target)
+    {
+        onProjectileShot?.Invoke(projectilePrefab, target);
     }
 
     public float getHealthPercentage()
