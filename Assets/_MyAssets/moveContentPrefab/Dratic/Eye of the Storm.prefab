@@ -680,7 +680,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -815,7 +815,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "            Ally becomes prioritzed by attacks for    turn(s) and gains
+  m_text: "            Ally becomes prioritzed by attacks for    turns and gains
     a    \n         max "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
@@ -1088,9 +1088,11 @@ MonoBehaviour:
   usesStatModifier: 000100
   isPerecentage: 000100
   percentageStatMultiplier: 5
-  scaleNums1: 010000000200000003000000
+  scaleNums1: 030000000500000008000000
   scaleNums2: 000000000f0000001e000000
   scaleNums3: 000000000000000000000000
+  givesStatGrowth: 0
+  statGrowthIndex: 0
 --- !u!1 &8816856066030205735
 GameObject:
   m_ObjectHideFlags: 0

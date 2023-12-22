@@ -26,6 +26,8 @@ public class monsterBase : MonoBehaviour
     private Transform attackPoint;
     private damagePopScript damagePop;
 
+    public int attackMultiplier = 100;
+
     public void Init(monster myMonster, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera, damagePopScript damagePop)
     {
         this.myMonster = myMonster;
@@ -52,9 +54,11 @@ public class monsterBase : MonoBehaviour
             HUD.localEulerAngles = flipRotation;
         }
 
-        myMonster.onHealthChanged += healthChanged;
+        myMonster.onTakeDamage += takeDamage;
         myMonster.onAnimPlayed += playAnimation;
         myMonster.onProjectileShot += ShootProjectile;
+        myMonster.onApplyStatus += applyStatus;
+        myMonster.onProcStatus += procStatus;
 
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -70,6 +74,7 @@ public class monsterBase : MonoBehaviour
         HUD = dependecy.GetHUD();
         monsterAnimator = dependecy.GetAnimator(myMonster.GetMonsterID(), myMonster.GetSpriteIndexFromLevel());
         attackPoint = dependecy.GetAttackPoint();
+        statusProcPrefabs = dependecy.GetStatusPrefabs();
     }
 
     void Update()
@@ -92,7 +97,7 @@ public class monsterBase : MonoBehaviour
         monsterAnimator.SetTrigger(animName);
     }
 
-    private void healthChanged(int change, bool died)
+    private void takeDamage(int change, bool died, bool bMine, int userIndex)
     {
         healthText.text = myMonster.GetCurrentHealth() + "";
         healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
@@ -102,11 +107,73 @@ public class monsterBase : MonoBehaviour
         {
             monsterAnimator.SetTrigger("dead");
             gameMaster.removeFromCritterBase(this);
+            return;
         }
 
-        if (change < 0)
+        monsterAnimator.SetTrigger("damaged");
+    }
+
+    GameObject[] statusPrefabs = new GameObject[3];
+    GameObject[] statusProcPrefabs = new GameObject[3];
+
+    private void applyStatus(int whichStatus, GameObject statusPrefab, int statusCounter)
+    {
+        statusPrefabs[whichStatus] = Instantiate(statusPrefab, transform);
+        statusPrefabs[whichStatus].transform.localPosition = Vector3.one;
+
+        if(whichStatus == 2)
+            SetTaunt();
+    }
+
+    private void procStatus(bool shouldDestroy, int whichStatus, bool triggerProc)
+    {
+        if(shouldDestroy)
+            Destroy(statusPrefabs[whichStatus]);
+
+        if (whichStatus == 2)
+            RemoveTaunt();
+
+        if (triggerProc == false)
+            return;
+
+        GameObject proc = Instantiate(statusProcPrefabs[whichStatus], transform);
+        proc.transform.localPosition = Vector3.one;
+        Destroy(proc, 1f);
+    }
+
+    private void SetTaunt()
+    {
+        monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
+        for (int i = 0; i < myTeam.Length; i++)
         {
-            monsterAnimator.SetTrigger("damaged");
+            if (myTeam[i].hasStatus[2] == false)
+            {
+                myTeam[i].isTargetable = false;
+            }
+        }
+    }
+
+    private void RemoveTaunt()
+    {
+        monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
+        bool someoneIsTaunting = false;
+        for (int i = 0; i < myTeam.Length; i++)
+        {
+            if (myTeam[i].hasStatus[2] == true)
+            {
+                someoneIsTaunting = true;
+            }
+        }
+
+        if (someoneIsTaunting)
+        {
+            myMonster.isTargetable = true;
+            return;
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            myTeam[i].isTargetable = true;
         }
     }
 
@@ -166,6 +233,18 @@ public class monsterBase : MonoBehaviour
         explodeHealthBar(force);
     }*/
 
+    public int GetMoveDamage(int moveContentID, int moveScaleID)
+    {
+        int tier = GetMyMonster().GetSpriteIndexFromLevel();
+        return GetCurrentMove(moveContentID).GetScaleValues(moveScaleID)[tier];
+    }
+
+    public int GetMultiplierDamage(int damage)
+    {
+        float Multiplier = damage * (1f * attackMultiplier / 100f);
+        return Mathf.RoundToInt(Multiplier);
+    }
+
     public monster GetTargetedMonster()
     {
         return gameMaster.targetedMonster.GetMyMonster();
@@ -179,6 +258,9 @@ public class monsterBase : MonoBehaviour
 
     public void OnMouseOver()
     {
+        if (myMonster.isTargetable == false)
+            return;
+
         if (gameMaster.bRendering == false || bMouseOver == true) return;
 
         bMouseOver = true;
@@ -201,7 +283,8 @@ public class monsterBase : MonoBehaviour
 
     public void OnMouseExit()
     {
-        if (bMouseOver == false) return;
+        if (bMouseOver == false) 
+            return;
 
         bMouseOver = false;
 

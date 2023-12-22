@@ -4037,6 +4037,10 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   midMonsterControllers: []
   finalMonsterControllers: []
+  statusProcPrefabs:
+  - {fileID: 166006, guid: a2e78dba7d7f8f34e9be44acb8469dc2, type: 3}
+  - {fileID: 177804, guid: 7568214281a1fb443bc81a02ed35c3a6, type: 3}
+  - {fileID: 153256, guid: b056e3fe90727c54192ced1b360380d0, type: 3}
 --- !u!1 &5297733555498542932
 GameObject:
   m_ObjectHideFlags: 0

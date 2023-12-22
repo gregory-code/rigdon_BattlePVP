@@ -17,6 +17,8 @@ public class monster : ScriptableObject
     public bool bMine;
     public int teamIndex;
     public monsterBase myBase;
+    public bool[] hasStatus = new bool[3];
+    public bool isTargetable = true;
     public Sprite[] stages = new Sprite[3];
     public Sprite[] stagesIcons = new Sprite[3];
     public Sprite circleOutline;
@@ -64,6 +66,7 @@ public class monster : ScriptableObject
 
 
     public int GetCurrentHealth() { return currentHP; }
+    public int GetMaxHealth() { return maxHP; }
     public int GetCurrentStrength() { return currentStrength; }
     public int GetCurrentMagic() { return currentMagic; }
     public int GetCurrentSpeed() { return currentSpeed; }
@@ -95,22 +98,43 @@ public class monster : ScriptableObject
         }
     }
 
-    public delegate void OnHealthChanged(int change, bool died);
-    public event OnHealthChanged onHealthChanged;
+    public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex);
+    public event OnTakeDamage onTakeDamage;
 
-    public void ChangeHealth(int change)
+    public delegate void OnHealed(int change, bool bMine, int userIndex);
+    public event OnHealed onHealed;
+
+    public void ChangeHealth(int change, bool bMine, int userIndex) // for who did the attack
     {
         bool died = false;
+
+        if (hasStatus[0]) // conductive
+        {
+            float conductiveDamage = (change * 0.5f) + change;
+            change = Mathf.RoundToInt(conductiveDamage);
+            hasStatus[0] = false;
+            onProcStatus?.Invoke(true, 0, true);
+        }
+
         currentHP += change;
 
-        if (currentHP >= maxHP) currentHP = maxHP;
+        if (currentHP >= maxHP) 
+            currentHP = maxHP;
+
         if (currentHP <= 0)
         {
             currentHP = 0;
             died = true;
         }
 
-        onHealthChanged?.Invoke(change, died);
+        if(change < 0)
+        {
+            onTakeDamage?.Invoke(change, died, bMine, userIndex);
+        }
+        else if(change > 0)
+        {
+            onHealed?.Invoke(change, bMine, userIndex);
+        }
     }
 
     public delegate void OnAnimPlayed(string animName);
@@ -121,12 +145,65 @@ public class monster : ScriptableObject
         onAnimPlayed?.Invoke(anim);
     }
 
+    public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab, int statusCounter);
+    public event OnApplyStatus onApplyStatus;
+
+    public delegate void OnProcStatus(bool shouldDestroy, int whichStatus, bool triggerProc);
+    public event OnProcStatus onProcStatus;
+
+    private int[] statusCounter = new int[3];
+
+    public void ApplyStatus(int statusIndex, GameObject statusPrefab, int statusCounter)
+    {
+        if (hasStatus[statusIndex])
+            return;
+
+        this.statusCounter[statusIndex] = statusCounter;
+        hasStatus[statusIndex] = true;
+        onApplyStatus?.Invoke(statusIndex, statusPrefab, statusCounter);
+    }
+
+    public delegate void OnAttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex);
+    public event OnAttackAgain onAttackAgain;
+
+    public void AttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
+    {
+        onAttackAgain?.Invoke(percentageMultiplier, bMine2, TargetOfTargetIndex);
+    }
+
     public delegate void OnProjectileShot(projectileScript projectilePrefab, Transform target);
     public event OnProjectileShot onProjectileShot;
 
     public void ShootProjectile(projectileScript projectilePrefab, Transform target)
     {
         onProjectileShot?.Invoke(projectilePrefab, target);
+    }
+
+    public delegate void OnNextTurn();
+    public event OnNextTurn onNextTurn;
+
+    public void NextTurn()
+    {
+        for(int i = 0; i < statusCounter.Length; i++)
+        {
+            if (hasStatus[i] == false)
+                continue;
+
+            if(i == 1) // 1 is bubble
+            {
+                float newBubbleValue = (statusCounter[1] * 0.9f) - 1;
+                statusCounter[1] = Mathf.RoundToInt(newBubbleValue);
+            }
+            else
+            {
+                statusCounter[i]--;
+            }
+
+            if (statusCounter[i] == 0)
+                onProcStatus?.Invoke(true, i, true);
+        }
+
+        onNextTurn?.Invoke();
     }
 
     public float getHealthPercentage()

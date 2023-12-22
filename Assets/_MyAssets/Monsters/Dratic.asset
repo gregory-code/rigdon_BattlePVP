@@ -18,6 +18,9 @@ MonoBehaviour:
   canAct: 0
   bMine: 0
   teamIndex: 0
+  myBase: {fileID: 0}
+  hasStatus: 000000
+  isTargetable: 1
   stages:
   - {fileID: 21300000, guid: f050d222c00f65642a60b2d40d956eaf, type: 3}
   - {fileID: 21300000, guid: 332476cc368f33b4787c1cbf7e8b0639, type: 3}

@@ -19,7 +19,7 @@ public class projectileScript : MonoBehaviour
     {
         transform.position = Vector3.Lerp(transform.position, target.position, speed * Time.deltaTime);
 
-        if (Vector3.Distance(transform.position, target.position) < 4)
+        if (Vector3.Distance(transform.position, target.position) < 3)
         {
             GameObject hit = Instantiate(hitEffect, transform.position, transform. rotation);
             hit.transform.SetParent(null);

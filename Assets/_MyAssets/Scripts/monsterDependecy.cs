@@ -18,6 +18,8 @@ public class monsterDependecy : MonoBehaviour
     [SerializeField] RuntimeAnimatorController[] midMonsterControllers;
     [SerializeField] RuntimeAnimatorController[] finalMonsterControllers;
 
+    [SerializeField] GameObject[] statusProcPrefabs;
+
     public Animator GetAnimator(int monsterID, int whichStage)
     {
         switch(whichStage)
@@ -66,5 +68,10 @@ public class monsterDependecy : MonoBehaviour
     public Transform GetAttackPoint()
     {
         return attackPoint;
+    }
+
+    public GameObject[] GetStatusPrefabs()
+    {
+        return statusProcPrefabs;
     }
 }

@@ -8463,6 +8463,10 @@ MonoBehaviour:
   - {fileID: 8544347371870730517, guid: a96304a2fe2bef942a6f2a439d8008f0, type: 3}
   - {fileID: 402210983715648509, guid: 8e65f3dda4973aa4b9189421ef495394, type: 3}
   - {fileID: 2126521984534280433, guid: 5fa74b09eaf08494d90196f730dc9f29, type: 3}
+  statusPrefabs:
+  - {fileID: 145170, guid: 4f9f5c792c78b6e4bb91286ba103cf5b, type: 3}
+  - {fileID: 1135644536747142, guid: 9116a8c6e83d27543896c0ec8be7944e, type: 3}
+  - {fileID: 111730, guid: 0ceabfcccc4ee1d41ba720801d2f378d, type: 3}
   monsterTurnParent: {fileID: 799796891}
   monsterTurnPrefab: {fileID: 6043958394245604590, guid: 8f2ee5d625b99214c9b7b23ce17f683f,
     type: 3}

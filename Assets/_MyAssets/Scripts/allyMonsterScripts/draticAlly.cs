@@ -8,9 +8,28 @@ public class draticAlly : monsterAlly
     {
         onAttack += UseAttack;
         onAbility += UseAbility;
+        GetMyMonster().onAttackAgain += AttackAgain;
+        GetMyMonster().onTakeDamage += TookDamage;
     }
 
-    private void UseAttack(int attackID)
+    private void AttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
+    {
+        if (GetMyMonster().bMine == false)
+            return;
+
+        attackMultiplier = percentageMultiplier;
+        UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
+    }
+
+    private void TookDamage(int change, bool died, bool bMine, int userIndex)
+    {
+        if (GetMyMonster().GetPassiveID() == 2) // index for cloud legend
+        {
+            gameMaster.ApplyStatus(0, bMine, userIndex, 4); // index 0  for conductive status
+        }
+    }
+
+    private void UseAttack(int attackID, int targetIndex, bool consumeTurn)
     {
         switch (attackID)
         {
@@ -18,11 +37,11 @@ public class draticAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(RingingThunder());
+                StartCoroutine(RingingThunder(targetIndex, consumeTurn));
                 break;
 
             case 2:
-                StartCoroutine(BoomSpear());
+                StartCoroutine(BoomSpear(targetIndex, consumeTurn));
                 break;
         }
     }
@@ -35,80 +54,157 @@ public class draticAlly : monsterAlly
                 break;
 
             case 1:
+                StartCoroutine(LightningRound());
+                attackMultiplier = 100;
+                gameMaster.waitForAction = false;
                 break;
 
             case 2:
+                StartCoroutine(EyeOfTheStorm());
+                attackMultiplier = 100;
+                gameMaster.waitForAction = false;
                 break;
         }
     }
 
-    private IEnumerator RingingThunder() // handle passives and stuff here too
+    private void FinishMove(bool consumeTurn)
     {
-        int tier = GetMyMonster().GetSpriteIndexFromLevel();
+        attackMultiplier = 100;
+        gameMaster.waitForAction = false;
 
-        int attack1 = GetMyMonster().GetCurrentStrength() + GetCurrentMove(0).GetScaleValues(0)[tier]; // consider reducing by a % that would be hype
-        int attack2 = GetMyMonster().GetCurrentStrength() + GetCurrentMove(0).GetScaleValues(1)[tier];
-        int attack3 = GetMyMonster().GetCurrentStrength() + GetCurrentMove(0).GetScaleValues(2)[tier];
+        if (consumeTurn == true)
+            gameMaster.NextTurn();
+    }
+
+    private IEnumerator RingingThunder(int targetIndex, bool consumeTurn) // handle passives and stuff here too
+    {
+        int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0,0); // consider reducing by a % that would be hype
+        attack1 = GetMultiplierDamage(attack1);
+
+        int attack2 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 1);
+        attack2 = GetMultiplierDamage(attack2);
+
+        int attack3 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 2);
+        attack3 = GetMultiplierDamage(attack3);
 
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack1");
 
-        int[] enemyIndexes = new int[3] { 0, 1, 2 };
-
-
-        yield return new WaitForSeconds(0.4f);
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 2, false, GetTargetedMonster().teamIndex);
-        enemyIndexes[GetTargetedMonster().teamIndex] = -1;
+        yield return new WaitForSeconds(0.6f);
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 2, false, targetIndex);
 
         yield return new WaitForSeconds(0.65f);
-        gameMaster.ChangeMonsterHealth(false, GetTargetedMonster().teamIndex, -attack1);
-
-        int nextTarget = -1;
-        while(nextTarget == -1)
-        {
-            nextTarget = enemyIndexes[Random.Range(0, 3)];
-        }
-
-        gameMaster.ShootProjectile(false, GetTargetedMonster().teamIndex, 2, false, nextTarget);
-        enemyIndexes[nextTarget] = -1;
+        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
 
         yield return new WaitForSeconds(0.1f);
-        gameMaster.ChangeMonsterHealth(false, nextTarget, -attack2);
 
-        int finalTarget = -1;
-        while (finalTarget == -1)
+        if (GetMyMonster().GetPassiveID() == 1)
+            gameMaster.ApplyStatus(0, false, targetIndex, 4);
+
+        int nextTarget = gameMaster.GetRandomEnemyIndex(targetIndex, -1);
+        if(nextTarget != 5)
         {
-            finalTarget = enemyIndexes[Random.Range(0, 3)];
+            gameMaster.ShootProjectile(false, targetIndex, 2, false, nextTarget);
+
+            yield return new WaitForSeconds(0.1f);
+            gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, nextTarget, -attack2);
+
+            yield return new WaitForSeconds(0.1f);
+
+            if (GetMyMonster().GetPassiveID() == 1)
+                gameMaster.ApplyStatus(0, false, nextTarget, 4);
+
+            int finalTarget = gameMaster.GetRandomEnemyIndex(targetIndex, nextTarget);
+            if(finalTarget != 5)
+            {
+                gameMaster.ShootProjectile(false, nextTarget, 2, false, finalTarget);
+
+                yield return new WaitForSeconds(0.1f);
+                gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, finalTarget, -attack3);
+
+                yield return new WaitForSeconds(0.1f);
+
+                if (GetMyMonster().GetPassiveID() == 1)
+                    gameMaster.ApplyStatus(0, false, finalTarget, 4);
+            }
         }
 
-        gameMaster.ShootProjectile(false, nextTarget, 2, false, finalTarget);
-
-        yield return new WaitForSeconds(0.1f);
-        gameMaster.ChangeMonsterHealth(false, finalTarget, -attack3);
-
-        gameMaster.NextTurn();
+        FinishMove(consumeTurn);
     }
 
-    private IEnumerator BoomSpear()
+    private IEnumerator BoomSpear(int targetIndex, bool consumeTurn)
     {
-        int tier = GetMyMonster().GetSpriteIndexFromLevel();
+        int attack1 = GetMyMonster().GetCurrentMagic() + GetMoveDamage(1,0);
+        attack1 = GetMultiplierDamage(attack1);
 
-        int attack1 = GetMyMonster().GetCurrentMagic() + GetCurrentMove(1).GetScaleValues(0)[tier];
-        int attack2 = GetMyMonster().GetCurrentStrength() + GetCurrentMove(1).GetScaleValues(1)[tier];
+        int attack2 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1,1);
+        attack2 = GetMultiplierDamage(attack2);
 
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack2");
 
-        yield return new WaitForSeconds(0.16f); // when the shot should come out
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 0, false, GetTargetedMonster().teamIndex);
+        yield return new WaitForSeconds(0.3f);
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 0, false, targetIndex);
 
         yield return new WaitForSeconds(0.5f);
-        gameMaster.ChangeMonsterHealth(false, GetTargetedMonster().teamIndex, -attack1); // - for damage
+        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1); // - for damage
 
-        yield return new WaitForSeconds(0.6f);
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 1, false, GetTargetedMonster().teamIndex);
+        yield return new WaitForSeconds(0.1f);
 
-        yield return new WaitForSeconds(0.5f);
-        gameMaster.ChangeMonsterHealth(false, GetTargetedMonster().teamIndex, -attack2); // - for damage
+        if (GetMyMonster().GetPassiveID() == 1)
+            gameMaster.ApplyStatus(0, false, targetIndex, 4);
 
-        gameMaster.NextTurn();
+        yield return new WaitForSeconds(0.4f);
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 1, false, targetIndex);
+
+        yield return new WaitForSeconds(0.45f);
+        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack2); // - for damage
+
+        yield return new WaitForSeconds(0.3f);
+
+        if (GetMyMonster().GetPassiveID() == 1)
+            gameMaster.ApplyStatus(0, false, targetIndex, 4);
+
+        FinishMove(consumeTurn);
+    }
+
+    private IEnumerator LightningRound()
+    {
+        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability1");
+        
+        yield return new WaitForSeconds(0.3f);
+
+        int randomTarget = gameMaster.GetRandomConductiveEnemyIndex();
+        if(randomTarget == 5)
+            randomTarget = gameMaster.GetRandomEnemyIndex(-1, -1);
+
+        int abilityMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
+
+        gameMaster.AttackAgain(true, GetTargetedMonster().teamIndex, abilityMultiplier, false, randomTarget);
+
+        gameMaster.waitForAction = true;
+        while(gameMaster.waitForAction)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        FinishMove(true);
+    }
+
+    private IEnumerator EyeOfTheStorm()
+    {
+        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability2");
+        yield return new WaitForSeconds(0.3f);
+        int shieldMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 1);
+        float shieldStrength = GetTargetedMonster().GetMaxHealth() * (1f * shieldMultiplier / 100f);
+        int shield = Mathf.RoundToInt(shieldStrength);
+
+        float newBubbleBuffer = (shield * 1.1f) + 1;
+        shield = Mathf.RoundToInt(newBubbleBuffer);
+
+        gameMaster.ApplyStatus(1, true, GetTargetedMonster().teamIndex, shield);
+        gameMaster.ApplyStatus(2, true, GetTargetedMonster().teamIndex, GetMoveDamage(3, 0) + 1); // I think however many turns +1 since NextTurn();
+
+        yield return new WaitForSeconds(0.3f);
+
+        FinishMove(true);
     }
 }

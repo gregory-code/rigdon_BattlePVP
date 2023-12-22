@@ -37,6 +37,11 @@ public class moveContent : MonoBehaviour
         return statGrowthIndex;
     }
 
+    public int GetPercentageMultiplier()
+    {
+        return percentageStatMultiplier;
+    }
+
     public void SetUpConnection(teamBuilder builder)
     {
         onClickAction = () => builder.CheckPassiveGrowth(this, true);

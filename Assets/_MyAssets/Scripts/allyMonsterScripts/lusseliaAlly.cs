@@ -11,7 +11,7 @@ public class lusseliaAlly : monsterAlly
         onAbility += UseAbility;
     }
 
-    private void UseAttack(int attackID)
+    private void UseAttack(int attackID, int targetIndex, bool consumeTurn)
     {
         switch(attackID)
         {
