@@ -55,14 +55,10 @@ public class draticAlly : monsterAlly
 
             case 1:
                 StartCoroutine(LightningRound());
-                attackMultiplier = 100;
-                gameMaster.waitForAction = false;
                 break;
 
             case 2:
                 StartCoroutine(EyeOfTheStorm());
-                attackMultiplier = 100;
-                gameMaster.waitForAction = false;
                 break;
         }
     }
