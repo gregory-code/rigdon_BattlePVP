@@ -10,6 +10,7 @@ public class monsterDependecy : MonoBehaviour
     [SerializeField] Animator monsterAnimator;
     [SerializeField] SpriteRenderer monsterSprite;
     [SerializeField] Image health;
+    [SerializeField] Image tempHealth;
     [SerializeField] TextMeshProUGUI healthText;
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] Transform HUD;
@@ -73,5 +74,10 @@ public class monsterDependecy : MonoBehaviour
     public GameObject[] GetStatusPrefabs()
     {
         return statusProcPrefabs;
+    }
+
+    public Image GetTempHealth()
+    {
+        return tempHealth;
     }
 }

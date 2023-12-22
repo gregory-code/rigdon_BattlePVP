@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Monster")]
@@ -101,11 +102,17 @@ public class monster : ScriptableObject
     public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex);
     public event OnTakeDamage onTakeDamage;
 
+    public delegate void OnDamagePopup(int change, bool shielededAttack);
+    public event OnDamagePopup onDamagePopup;
+
     public delegate void OnHealed(int change, bool bMine, int userIndex);
     public event OnHealed onHealed;
 
     public void ChangeHealth(int change, bool bMine, int userIndex) // for who did the attack
     {
+        if (change == 0)
+            return;
+
         bool died = false;
 
         if (hasStatus[0]) // conductive
@@ -114,6 +121,30 @@ public class monster : ScriptableObject
             change = Mathf.RoundToInt(conductiveDamage);
             hasStatus[0] = false;
             onProcStatus?.Invoke(true, 0, true);
+        }
+
+        if (hasStatus[1] && statusCounter[1] > 0) // bubble
+        {
+            int bubbleAmount = statusCounter[1];
+            statusCounter[1] += change;
+
+            while (statusCounter[1] < 0)
+            {
+                statusCounter[1]++;
+            }
+
+            if (statusCounter[1] > 0)
+            {
+                onDamagePopup?.Invoke(change, true);
+                change = 0;
+            }
+            else
+            {
+                hasStatus[1] = false;
+                onProcStatus?.Invoke(true, 1, true);
+                change += bubbleAmount;
+                onDamagePopup?.Invoke(-bubbleAmount, true);
+            }
         }
 
         currentHP += change;
@@ -130,6 +161,7 @@ public class monster : ScriptableObject
         if(change < 0)
         {
             onTakeDamage?.Invoke(change, died, bMine, userIndex);
+            onDamagePopup?.Invoke(change, false);
         }
         else if(change > 0)
         {
@@ -209,6 +241,11 @@ public class monster : ScriptableObject
     public float getHealthPercentage()
     {
         return (currentHP * 1.0f / maxHP);
+    }
+
+    public float GetBubblePercentage()
+    {
+        return (statusCounter[1] * 1.0f / maxHP);
     }
 
 

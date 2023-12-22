@@ -19,6 +19,7 @@ public class monsterBase : MonoBehaviour
     [SerializeField] monster myMonster;
     private SpriteRenderer monsterSprite;
     private Image health;
+    private Image tempHealth;
     private TextMeshProUGUI healthText;
     private TextMeshProUGUI nameText;
     private Transform HUD;
@@ -59,6 +60,7 @@ public class monsterBase : MonoBehaviour
         myMonster.onProjectileShot += ShootProjectile;
         myMonster.onApplyStatus += applyStatus;
         myMonster.onProcStatus += procStatus;
+        myMonster.onDamagePopup += damagePopup;
 
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -75,11 +77,13 @@ public class monsterBase : MonoBehaviour
         monsterAnimator = dependecy.GetAnimator(myMonster.GetMonsterID(), myMonster.GetSpriteIndexFromLevel());
         attackPoint = dependecy.GetAttackPoint();
         statusProcPrefabs = dependecy.GetStatusPrefabs();
+        tempHealth = dependecy.GetTempHealth();
     }
 
     void Update()
     {
         health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
+        tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
     }
 
     public monster GetMyMonster()
@@ -101,7 +105,6 @@ public class monsterBase : MonoBehaviour
     {
         healthText.text = myMonster.GetCurrentHealth() + "";
         healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
-        healthParticles(change);
 
         if (died)
         {
@@ -143,18 +146,21 @@ public class monsterBase : MonoBehaviour
 
     private void SetTaunt()
     {
+        if (myMonster.bMine)
+            return;
+
         monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
         for (int i = 0; i < myTeam.Length; i++)
         {
-            if (myTeam[i].hasStatus[2] == false)
-            {
-                myTeam[i].isTargetable = false;
-            }
+            myTeam[i].isTargetable = myTeam[i].hasStatus[2];
         }
     }
 
     private void RemoveTaunt()
     {
+        if (myMonster.bMine)
+            return;
+
         monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
         bool someoneIsTaunting = false;
         for (int i = 0; i < myTeam.Length; i++)
@@ -167,7 +173,7 @@ public class monsterBase : MonoBehaviour
 
         if (someoneIsTaunting)
         {
-            myMonster.isTargetable = true;
+            myMonster.isTargetable = false;
             return;
         }
 
@@ -183,10 +189,10 @@ public class monsterBase : MonoBehaviour
         newProjectile.Init(target);
     }
 
-    private void healthParticles(int change)
+    private void damagePopup(int change, bool shieldedAttack)
     {
         damagePopScript popUp = Instantiate(damagePop, transform.position, transform.rotation);
-        popUp.Init(change);
+        popUp.Init(change, shieldedAttack);
 
         /*GameObject hitParticles = Instantiate(hitParticleEffect); //rotate it here
         hitParticles.transform.SetParent(transform);

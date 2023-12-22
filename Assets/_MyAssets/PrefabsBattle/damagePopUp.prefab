@@ -78,13 +78,13 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 1
-  m_colorMode: 2
+  m_enableVertexGradient: 0
+  m_colorMode: 0
   m_fontColorGradient:
-    topLeft: {r: 1, g: 0, b: 0, a: 1}
-    topRight: {r: 1, g: 0, b: 0, a: 1}
-    bottomLeft: {r: 0.8207547, g: 0.23745102, b: 0.23745102, a: 1}
-    bottomRight: {r: 0.8207547, g: 0.23745102, b: 0.23745102, a: 1}
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -274,5 +274,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   popAnimator: {fileID: 5948526650150331696}
   damageText: {fileID: 5948526650150331697}
-  damagedColor: {r: 1, g: 0, b: 0, a: 1}
-  healedColor: {r: 0.24019432, g: 1, b: 0, a: 1}
+  damagedColor: {r: 0.9622642, g: 0.026931182, b: 0, a: 1}
+  healedColor: {r: 0.28035352, g: 1, b: 0.06289297, a: 1}
+  shieldedColor: {r: 0.06864834, g: 0.7762213, b: 0.8396226, a: 1}
