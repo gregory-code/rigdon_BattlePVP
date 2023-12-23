@@ -109,7 +109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -84.4, y: -7.4}
+  m_AnchoredPosition: {x: -81.7, y: -7.4}
   m_SizeDelta: {x: -158.79, y: -64.1636}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6014881688285071914
@@ -410,7 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "     Allies gain                  and           \n          for   turn(s)"
+  m_text: "      Allies gain                   and           \n           for their
+    next    move(s)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -856,7 +857,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -11.6, y: 14.5}
+  m_AnchoredPosition: {x: -6.7, y: 14.5}
   m_SizeDelta: {x: -138.9876, y: -67.4726}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
@@ -991,7 +992,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 21.1, y: 14.9}
+  m_AnchoredPosition: {x: 26.9, y: 14.9}
   m_SizeDelta: {x: -144.6252, y: -69.2632}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
@@ -1126,7 +1127,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -40.8, y: -7.6}
+  m_AnchoredPosition: {x: 27.5, y: -7.6}
   m_SizeDelta: {x: -175.7794, y: -74.2813}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9157608670724634358

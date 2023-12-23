@@ -9366,10 +9366,12 @@ MonoBehaviour:
   - {fileID: 8544347371870730517, guid: a96304a2fe2bef942a6f2a439d8008f0, type: 3}
   - {fileID: 402210983715648509, guid: 8e65f3dda4973aa4b9189421ef495394, type: 3}
   - {fileID: 2126521984534280433, guid: 5fa74b09eaf08494d90196f730dc9f29, type: 3}
+  - {fileID: 575826296823167567, guid: 42720db704295bf489dd77d3dfb29820, type: 3}
   statusPrefabs:
   - {fileID: 145170, guid: 4f9f5c792c78b6e4bb91286ba103cf5b, type: 3}
   - {fileID: 1135644536747142, guid: 9116a8c6e83d27543896c0ec8be7944e, type: 3}
   - {fileID: 111730, guid: 0ceabfcccc4ee1d41ba720801d2f378d, type: 3}
+  - {fileID: 101216, guid: 4da4ab246ce5c994fbd113011621b780, type: 3}
   monsterTurnParent: {fileID: 799796891}
   monsterTurnPrefab: {fileID: 6043958394245604590, guid: 8f2ee5d625b99214c9b7b23ce17f683f,
     type: 3}
@@ -20134,6 +20136,7 @@ MonoBehaviour:
   - {fileID: 5447297565404100616, guid: 1784f9d044b54774981a27cd26c8bb7a, type: 3}
   - {fileID: 6070293028441550235, guid: 8cbdf050f0fa62c48bafa20c6abbca8f, type: 3}
   - {fileID: 4328858284941032501, guid: bb74f3deae3792e488fa44084b7307e9, type: 3}
+  - {fileID: 4328858284941032501, guid: eb42c74e5263a214eb33d5042cbb6dc1, type: 3}
   scrollBar: {fileID: 1723099849}
   moveContentList: []
 --- !u!114 &957664542
@@ -33515,6 +33518,74 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1550555418
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -63.069412
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12.34669
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.8191521
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5735764
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 70
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3758703766934008911, guid: 514425abd9c3d8c49800872ccd66c761,
+        type: 3}
+      propertyPath: m_Name
+      value: LevelupNovaRed
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 514425abd9c3d8c49800872ccd66c761, type: 3}
 --- !u!1 &1562275315
 GameObject:
   m_ObjectHideFlags: 0
@@ -49521,3 +49592,4 @@ SceneRoots:
   - {fileID: 15539182}
   - {fileID: 1870511357}
   - {fileID: 1657145553}
+  - {fileID: 1550555418}

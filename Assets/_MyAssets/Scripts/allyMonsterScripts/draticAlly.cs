@@ -197,7 +197,7 @@ public class draticAlly : monsterAlly
         shield = Mathf.RoundToInt(newBubbleBuffer);
 
         gameMaster.ApplyStatus(1, true, GetTargetedMonster().teamIndex, shield);
-        gameMaster.ApplyStatus(2, true, GetTargetedMonster().teamIndex, GetMoveDamage(3, 0) + 1); // I think however many turns +1 since NextTurn();
+        gameMaster.ApplyStatus(2, true, GetTargetedMonster().teamIndex, (GetMoveDamage(3, 0) + 1)); // I think however many turns +1 since NextTurn();
 
         yield return new WaitForSeconds(0.3f);
 

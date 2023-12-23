@@ -17,6 +17,10 @@ MonoBehaviour:
   bFlipSprite: 010101
   canAct: 0
   bMine: 0
+  teamIndex: 0
+  myBase: {fileID: 0}
+  spawnLocation: {x: 0, y: 0, z: 0}
+  isTargetable: 1
   stages:
   - {fileID: 21300000, guid: 65449a4c7793e6147b56953a6d3a131a, type: 3}
   - {fileID: 21300000, guid: 834d7def8f3173947a0e5ee7126488f2, type: 3}
@@ -32,9 +36,5 @@ MonoBehaviour:
   initial_Strength: 1
   initial_Magic: 5
   initial_Speed: 1
-  moves:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   moveContents: []
+  hasStatus: 00000000

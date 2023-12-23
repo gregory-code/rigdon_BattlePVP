@@ -18,7 +18,7 @@ public class monster : ScriptableObject
     public bool bMine;
     public int teamIndex;
     public monsterBase myBase;
-    public bool[] hasStatus = new bool[3];
+    public Vector3 spawnLocation;
     public bool isTargetable = true;
     public Sprite[] stages = new Sprite[3];
     public Sprite[] stagesIcons = new Sprite[3];
@@ -220,6 +220,19 @@ public class monster : ScriptableObject
         onAnimPlayed?.Invoke(anim);
     }
 
+    public delegate void OnMovePosition(bool goHome, float x, float y);
+    public event OnMovePosition onMovePosition;
+
+    public void MovePosition(bool goHome, float x, float y)
+    {
+        onMovePosition?.Invoke(goHome, x, y);
+    }
+
+    public void ApplyActionBasedStatus(int actionStatusIndex, GameObject actionStatusPrefab, int actionCounter, int power)
+    {
+        
+    }
+
     public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab, int statusCounter);
     public event OnApplyStatus onApplyStatus;
 
@@ -229,7 +242,9 @@ public class monster : ScriptableObject
     public delegate void OnUpdateStatusUI(bool createNew, int statusCounter, int index);
     public event OnUpdateStatusUI onUpdateStatusUI;
 
-    private int[] statusCounter = new int[3];
+    private int[] statusCounter = new int[4];
+    public bool[] hasStatus = new bool[4];
+
     public int GetStatusCounter(int which)
     {
         return statusCounter[which];

@@ -410,8 +410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "            Reduce the targets          \n              by     for    
-    turns "
+  m_text: "            Reduce the targets next           \n   moves by"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -992,7 +991,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -76.7, y: -7.4}
+  m_AnchoredPosition: {x: 11, y: -7.4}
   m_SizeDelta: {x: -156.6312, y: -57.5746}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
@@ -1127,8 +1126,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 12.1, y: -7.5}
-  m_SizeDelta: {x: -157.2421, y: -68.4661}
+  m_AnchoredPosition: {x: 97.7, y: 14.6}
+  m_SizeDelta: {x: -201.5299, y: -68.4661}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9157608670724634358
 CanvasRenderer:

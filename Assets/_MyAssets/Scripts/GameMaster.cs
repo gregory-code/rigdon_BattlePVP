@@ -51,11 +51,11 @@ public class GameMaster : MonoBehaviourPunCallbacks
         {
             GameObject newAlly = Instantiate(monsterPrefab, playerSpawns[i]);
             monsterAlly allyScript = AddMonsterScript(gameMenu.GetMyTeam()[i].GetMonsterID(), newAlly);
-            allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera, damagePop);
+            allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera, damagePop, playerSpawns[i]);
 
             GameObject newEnemy = Instantiate(monsterPrefab, enemySpawns[i]);
             monsterBase enemyScript = AddMonsterScript(gameMenu.GetEnemyTeam()[i].GetMonsterID(), newEnemy);
-            enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera, damagePop);
+            enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera, damagePop, enemySpawns[i]);
         }
     }
 
@@ -141,6 +141,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
             case 8:
                 return newMonster.AddComponent<lusseliaAlly>();
+
+            case 9:
+                return newMonster.AddComponent<minfurAlly>();
         }
 
         return newMonster.AddComponent<draticAlly>();
@@ -324,15 +327,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
 
 
-    public void MoveMonster(bool bMine, int teamIndex, Vector3 desiredLocation)
+    public void MoveMonster(bool bMine, int teamIndex, bool goHome, Vector3 location)
     {
-        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, desiredLocation);
+        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, goHome, location.x, location.y);
     }
 
     [PunRPC]
-    void MoveMonsterRPC(bool bMine, int teamIndex, Vector3 desiredLocation)
+    void MoveMonsterRPC(bool bMine, int teamIndex, bool goHome, float desiredLocationX, float desiredLocationY)
     {
-
+        GetSpecificMonster(bMine, teamIndex).MovePosition(goHome, desiredLocationX, desiredLocationY);
     }
 
     public void AnimateMonster(bool bMine, int teamIndex, string animName)
@@ -366,6 +369,17 @@ public class GameMaster : MonoBehaviourPunCallbacks
     void ApplyStatusRPC(int statusIndex, bool bMine, int TargetIndex, int statusCounter)
     {
         GetSpecificMonster(bMine, TargetIndex).ApplyStatus(statusIndex, statusPrefabs[statusIndex], statusCounter);
+    }
+
+    public void ApplyActionBasedStatus(int actionStatusIndex, bool bMine, int TargetIndex, int actionCounter, int power)
+    {
+        this.photonView.RPC("ApplyActionBasedStatusRPC", RpcTarget.AllBuffered, actionStatusIndex, bMine, TargetIndex, actionCounter, power);
+    }
+
+    [PunRPC]
+    void ApplyActionBasedStatusRPC(int actionStatusIndex, bool bMine, int TargetIndex, int actionCounter, int power)
+    {
+        //GetSpecificMonster(bMine, TargetIndex).ApplyActionBasedStatus();
     }
 
     public void AttackAgain(bool bMine, int TargetIndex, int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)

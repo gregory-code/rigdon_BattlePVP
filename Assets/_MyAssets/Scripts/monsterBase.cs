@@ -31,12 +31,15 @@ public class monsterBase : MonoBehaviour
     private Transform effectsList;
     private statusEffectUI statusEffectPrefab;
 
+    private Transform spawnLocation;
+    private Vector3 lerpLocation;
+
     public int attackMultiplier = 100;
 
     public delegate void OnOpenInfo();
     public event OnOpenInfo onOpenInfo;
 
-    public void Init(monster myMonster, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera, damagePopScript damagePop)
+    public void Init(monster myMonster, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera, damagePopScript damagePop, Transform spawnLocation)
     {
         this.myMonster = myMonster;
         this.gameMaster = gameMaster;
@@ -44,6 +47,10 @@ public class monsterBase : MonoBehaviour
         this.greenLine = greenLine;
         this.renderCamera = renderCamera;
         this.damagePop = damagePop;
+        this.spawnLocation = spawnLocation;
+        this.myMonster.spawnLocation = spawnLocation.transform.position;
+        lerpLocation.x = spawnLocation.transform.position.x;
+        lerpLocation.y = spawnLocation.transform.position.y;
 
         myMonster.myBase = this;
 
@@ -69,6 +76,7 @@ public class monsterBase : MonoBehaviour
         myMonster.onProcStatus += procStatus;
         myMonster.onDamagePopup += damagePopup;
         myMonster.onUpdateStatusUI += updateStatusUI;
+        myMonster.onMovePosition += movePosition;
 
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -94,6 +102,7 @@ public class monsterBase : MonoBehaviour
     {
         health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
         tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
     }
 
     public monster GetMyMonster()
@@ -104,6 +113,20 @@ public class monsterBase : MonoBehaviour
     public void SetIsMouseOver(bool state)
     {
         bMouseOver = state;
+    }
+
+    private void movePosition(bool goHome, float x, float y)
+    {
+        if(goHome)
+        {
+            lerpLocation.x = spawnLocation.transform.position.x;
+            lerpLocation.y = spawnLocation.transform.position.y;
+            return;
+        }
+
+        lerpLocation.x = x;
+        lerpLocation.y = y;
+
     }
 
     private void playAnimation(string animName)
@@ -126,8 +149,8 @@ public class monsterBase : MonoBehaviour
         monsterAnimator.SetTrigger("damaged");
     }
 
-    GameObject[] statusPrefabs = new GameObject[3];
-    GameObject[] statusProcPrefabs = new GameObject[3];
+    GameObject[] statusPrefabs = new GameObject[4];
+    GameObject[] statusProcPrefabs = new GameObject[4];
     List<statusEffectUI> statusEffectUIs = new List<statusEffectUI>();
 
     private void applyStatus(int whichStatus, GameObject statusPrefab, int statusCounter)

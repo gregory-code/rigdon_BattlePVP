@@ -12,21 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a6ad7da85540146917803e41116543, type: 3}
   m_Name: _empty
   m_EditorClassIdentifier: 
-  critterID: 0
-  critterName: 
+  monsterID: 0
+  monsterName: 
   bFlipSprite: 000000
+  canAct: 0
+  bMine: 0
+  teamIndex: 0
+  myBase: {fileID: 0}
+  spawnLocation: {x: 0, y: 0, z: 0}
+  isTargetable: 1
   stages:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  stagesIcons:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   circleOutline: {fileID: 0}
   matchingColor: {r: 0, g: 0, b: 0, a: 0}
+  level: 0
   initial_HP: 0
   initial_Strength: 0
   initial_Magic: 0
   initial_Speed: 0
-  moves:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  moveContents: []
+  hasStatus: 00000000
