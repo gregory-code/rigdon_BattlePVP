@@ -4,11 +4,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class monsterBase : MonoBehaviour
 {
     [Header("BaseClass")]
     [SerializeField] bool bMouseOver;
+    bool loadingInfoScreen;
     
     public GameMaster gameMaster { get; private set; }
     public lineScript redLine { get; private set; }
@@ -26,8 +28,13 @@ public class monsterBase : MonoBehaviour
     private Animator monsterAnimator;
     private Transform attackPoint;
     private damagePopScript damagePop;
+    private Transform effectsList;
+    private statusEffectUI statusEffectPrefab;
 
     public int attackMultiplier = 100;
+
+    public delegate void OnOpenInfo();
+    public event OnOpenInfo onOpenInfo;
 
     public void Init(monster myMonster, GameMaster gameMaster, lineScript redLine, lineScript greenLine, Camera renderCamera, damagePopScript damagePop)
     {
@@ -61,6 +68,7 @@ public class monsterBase : MonoBehaviour
         myMonster.onApplyStatus += applyStatus;
         myMonster.onProcStatus += procStatus;
         myMonster.onDamagePopup += damagePopup;
+        myMonster.onUpdateStatusUI += updateStatusUI;
 
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -78,6 +86,8 @@ public class monsterBase : MonoBehaviour
         attackPoint = dependecy.GetAttackPoint();
         statusProcPrefabs = dependecy.GetStatusPrefabs();
         tempHealth = dependecy.GetTempHealth();
+        effectsList = dependecy.GetEffectsList();
+        statusEffectPrefab = dependecy.GetStatusEffectPrefab();
     }
 
     void Update()
@@ -118,6 +128,7 @@ public class monsterBase : MonoBehaviour
 
     GameObject[] statusPrefabs = new GameObject[3];
     GameObject[] statusProcPrefabs = new GameObject[3];
+    List<statusEffectUI> statusEffectUIs = new List<statusEffectUI>();
 
     private void applyStatus(int whichStatus, GameObject statusPrefab, int statusCounter)
     {
@@ -128,10 +139,43 @@ public class monsterBase : MonoBehaviour
             SetTaunt();
     }
 
+    private void updateStatusUI(bool createNew, int statusCounter, int index)
+    {
+        if(createNew)
+        {
+            statusEffectUI newUI = Instantiate(statusEffectPrefab, effectsList);
+            newUI.SetStatusIndex(index, statusCounter);
+            statusEffectUIs.Add(newUI);
+        }
+        else
+        {
+            foreach(statusEffectUI status in statusEffectUIs)
+            {
+                if(status.GetIndex() == index)
+                {
+                    status.UpdateStatusCounter(statusCounter);
+                    return;
+                }
+            }
+        }
+    }
+
     private void procStatus(bool shouldDestroy, int whichStatus, bool triggerProc)
     {
         if(shouldDestroy)
+        {
+            foreach (statusEffectUI status in statusEffectUIs)
+            {
+                if (status.GetIndex() == whichStatus)
+                {
+                    Destroy(status.gameObject);
+                    statusEffectUIs.Remove(status);
+                    return;
+                }
+            }
+            
             Destroy(statusPrefabs[whichStatus]);
+        }
 
         if (whichStatus == 2)
             RemoveTaunt();
@@ -264,10 +308,17 @@ public class monsterBase : MonoBehaviour
 
     public void OnMouseOver()
     {
-        if (myMonster.isTargetable == false)
+        if(gameMaster.bRendering == false)
+        {
+            loadingInfoScreen = true;
+            StartCoroutine(loadInfoScreen());
+        }
+
+        if (gameMaster.bRendering == false || bMouseOver == true || gameMaster.inInfoScreen == true) 
             return;
 
-        if (gameMaster.bRendering == false || bMouseOver == true) return;
+        if (myMonster.isTargetable == false)
+            return;
 
         bMouseOver = true;
         gameMaster.targetedMonster = this;
@@ -289,7 +340,10 @@ public class monsterBase : MonoBehaviour
 
     public void OnMouseExit()
     {
-        if (bMouseOver == false) 
+        loadingInfoScreen = false;
+        StopAllCoroutines();
+
+        if (bMouseOver == false || gameMaster.inInfoScreen == true) 
             return;
 
         bMouseOver = false;
@@ -301,6 +355,18 @@ public class monsterBase : MonoBehaviour
         else
         {
             redLine.focusTarget(false, gameObject.transform);
+        }
+    }
+
+    private IEnumerator loadInfoScreen()
+    {
+        yield return new WaitForSeconds(1);
+
+        onOpenInfo?.Invoke();
+
+        if (loadingInfoScreen == true)
+        {
+            GameObject.FindObjectOfType<infoPageScript>().DisplayMonster(myMonster);
         }
     }
 }

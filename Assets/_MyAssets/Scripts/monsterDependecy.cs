@@ -15,6 +15,8 @@ public class monsterDependecy : MonoBehaviour
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] Transform HUD;
     [SerializeField] Transform attackPoint;
+    [SerializeField] Transform effectsList;
+    [SerializeField] statusEffectUI statusEffectPrefab;
     [SerializeField] RuntimeAnimatorController[] babyMonsterControllers;
     [SerializeField] RuntimeAnimatorController[] midMonsterControllers;
     [SerializeField] RuntimeAnimatorController[] finalMonsterControllers;
@@ -79,5 +81,15 @@ public class monsterDependecy : MonoBehaviour
     public Image GetTempHealth()
     {
         return tempHealth;
+    }
+
+    public Transform GetEffectsList()
+    {
+        return effectsList;
+    }
+
+    public statusEffectUI GetStatusEffectPrefab()
+    {
+        return statusEffectPrefab;
     }
 }

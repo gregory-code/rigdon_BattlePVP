@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class GameMaster : MonoBehaviourPunCallbacks
 {
+    [Header("UI")]
+    public bool inInfoScreen;
+
     [Header("References")]
     [SerializeField] GameMenu gameMenu;
     [SerializeField] lineScript redLine;

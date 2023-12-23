@@ -13,6 +13,11 @@ public class monsterAlly : monsterBase
     public delegate void OnAbility(int abilityID);
     public event OnAbility onAbility;
 
+    private void Awake()
+    {
+        onOpenInfo += openInfo;
+    }
+
     private void LateUpdate()
     {
         if (gameMaster.bRendering == false || redLine.IsHoveringOverTarget() || greenLine.IsHoveringOverTarget()) return;
@@ -22,8 +27,16 @@ public class monsterAlly : monsterBase
         greenLine.updateReticleLocation(renderCamera.ScreenToWorldPoint(touchPos));
     }
 
+    private void openInfo()
+    {
+        lineRenderState(false);
+    }
+
     public void OnMouseDown()
     {
+        if (gameMaster.inInfoScreen)
+            return;
+
         if (gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().bMine)
         {
             lineRenderState(true);
@@ -34,6 +47,12 @@ public class monsterAlly : monsterBase
 
     public void OnMouseUp()
     {
+        if (gameMaster.inInfoScreen)
+        {
+            lineRenderState(false);
+            return;
+        }
+
         if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true)
         {
             GetMyMonster().canAct = false;

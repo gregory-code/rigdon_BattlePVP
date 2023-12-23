@@ -35,7 +35,7 @@ MonoBehaviour:
   initial_HP: 24
   initial_Strength: 3
   initial_Magic: 2
-  initial_Speed: 3
+  initial_Speed: 6
   moveContents:
   - {fileID: 2915941332720301111, guid: 0bdd18bea5cef7b4699bfe672db546de, type: 3}
   - {fileID: -1379904485023640471, guid: 1d84ffa9fed2ef14d800a5ef31a24fa1, type: 3}

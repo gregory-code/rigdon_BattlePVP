@@ -72,6 +72,48 @@ public class monster : ScriptableObject
     public int GetCurrentMagic() { return currentMagic; }
     public int GetCurrentSpeed() { return currentSpeed; }
 
+    public int GetBaseStrength() { return baseStrength; }
+    public int GetBaseMagic() { return baseMagic; }
+    public int GetBaseSpeed() { return baseSpeed; }
+
+    public int[] GetGrowths()
+    {
+        int[] growths = new int[4];
+        growths[0] = growthHP;
+        growths[1] = growthStrength;
+        growths[2] = growthMagic;
+        growths[3] = growthSpeed;
+
+        return growths;
+    }
+
+    public int[] GetStatBlock()
+    {
+        int[] statBlock = new int[4];
+        statBlock[0] = GetInitialHP();
+        statBlock[1] = GetInitialStrength();
+        statBlock[2] = GetInitialMagic();
+        statBlock[3] = GetInitialSpeed();
+
+        return statBlock;
+    }
+
+    public int[] GetCurrentStatBlock()
+    {
+        int[] statBlock = new int[4];
+        statBlock[0] = GetCurrentHealth();
+        statBlock[1] = GetCurrentStrength();
+        statBlock[2] = GetCurrentMagic();
+        statBlock[3] = GetCurrentSpeed();
+
+        return statBlock;
+    }
+
+    public int GetLevel()
+    {
+        return level;
+    }
+
     public bool isMine()
     {
         return bMine;
@@ -136,6 +178,7 @@ public class monster : ScriptableObject
             if (statusCounter[1] > 0)
             {
                 onDamagePopup?.Invoke(change, true);
+                onUpdateStatusUI?.Invoke(false, statusCounter[1], 1);
                 change = 0;
             }
             else
@@ -183,15 +226,27 @@ public class monster : ScriptableObject
     public delegate void OnProcStatus(bool shouldDestroy, int whichStatus, bool triggerProc);
     public event OnProcStatus onProcStatus;
 
+    public delegate void OnUpdateStatusUI(bool createNew, int statusCounter, int index);
+    public event OnUpdateStatusUI onUpdateStatusUI;
+
     private int[] statusCounter = new int[3];
+    public int GetStatusCounter(int which)
+    {
+        return statusCounter[which];
+    }
 
     public void ApplyStatus(int statusIndex, GameObject statusPrefab, int statusCounter)
     {
         if (hasStatus[statusIndex])
+        {
+            this.statusCounter[statusIndex] += statusCounter;
+            onUpdateStatusUI?.Invoke(false, statusCounter, statusIndex);
             return;
+        }
 
         this.statusCounter[statusIndex] = statusCounter;
         hasStatus[statusIndex] = true;
+        onUpdateStatusUI?.Invoke(true, statusCounter, statusIndex);
         onApplyStatus?.Invoke(statusIndex, statusPrefab, statusCounter);
     }
 
@@ -231,8 +286,15 @@ public class monster : ScriptableObject
                 statusCounter[i]--;
             }
 
+
             if (statusCounter[i] == 0)
+            {
                 onProcStatus?.Invoke(true, i, true);
+            }
+            else
+            {
+                onUpdateStatusUI?.Invoke(false, statusCounter[i], i);
+            }
         }
 
         onNextTurn?.Invoke();
@@ -277,17 +339,6 @@ public class monster : ScriptableObject
 
         baseSpeed = initial_Speed;
         currentSpeed = initial_Speed;
-    }
-
-    public int[] GetStatBlock()
-    {
-        int[] statBlock = new int[4];
-        statBlock[0] = GetInitialHP();
-        statBlock[1] = GetInitialStrength();
-        statBlock[2] = GetInitialMagic();
-        statBlock[3] = GetInitialSpeed();
-
-        return statBlock;
     }
 
     public void LevelUp()
