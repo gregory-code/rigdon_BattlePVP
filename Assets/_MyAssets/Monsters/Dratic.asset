@@ -43,4 +43,4 @@ MonoBehaviour:
   - {fileID: -7306581991840822873, guid: 7e8b26ebc2d2cce4bb91da41c9138546, type: 3}
   - {fileID: -6899095894055132537, guid: dd38da0687fd0d04fb919767054787b0, type: 3}
   - {fileID: 7349596239097771509, guid: 888a8dff532a3c8469e1b903cea9677f, type: 3}
-  hasStatus: 00000000
+  statusEffects: []

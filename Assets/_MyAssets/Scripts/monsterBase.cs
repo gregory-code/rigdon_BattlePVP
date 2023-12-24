@@ -341,7 +341,6 @@ public class monsterBase : MonoBehaviour
     public void OnMouseExit()
     {
         loadingInfoScreen = false;
-        StopAllCoroutines();
 
         if (bMouseOver == false || gameMaster.inInfoScreen == true) 
             return;

@@ -67,12 +67,13 @@ public class lusseliaAlly : monsterAlly
     private void FinishMove(bool consumeTurn, bool isAttack)
     {
         attackMultiplier = 100;
-        gameMaster.waitForAction = false;
+        gameMaster.waitingForAction = false;
 
         gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
-
+        
         if (consumeTurn == true)
             gameMaster.NextTurn();
+        
     }
 
     private IEnumerator Starfall(int targetIndex, bool consumeTurn)

@@ -9359,7 +9359,7 @@ MonoBehaviour:
   targetedMonster: {fileID: 0}
   touchedPos: {x: 0, y: 0, z: 0}
   bRendering: 0
-  waitForAction: 0
+  waitingForAction: 0
   damagePop: {fileID: 2821367167744139789, guid: 01df6b197e88bb147a5b2df75de84332,
     type: 3}
   projectilePrefabs:
@@ -9372,6 +9372,7 @@ MonoBehaviour:
   - {fileID: 1135644536747142, guid: 9116a8c6e83d27543896c0ec8be7944e, type: 3}
   - {fileID: 111730, guid: 0ceabfcccc4ee1d41ba720801d2f378d, type: 3}
   - {fileID: 101216, guid: 4da4ab246ce5c994fbd113011621b780, type: 3}
+  - {fileID: 5273686884121143755, guid: 4f49f1f157453e44097334e4d50feddf, type: 3}
   monsterTurnParent: {fileID: 799796891}
   monsterTurnPrefab: {fileID: 6043958394245604590, guid: 8f2ee5d625b99214c9b7b23ce17f683f,
     type: 3}
@@ -20137,6 +20138,7 @@ MonoBehaviour:
   - {fileID: 6070293028441550235, guid: 8cbdf050f0fa62c48bafa20c6abbca8f, type: 3}
   - {fileID: 4328858284941032501, guid: bb74f3deae3792e488fa44084b7307e9, type: 3}
   - {fileID: 4328858284941032501, guid: eb42c74e5263a214eb33d5042cbb6dc1, type: 3}
+  - {fileID: 4328858284941032501, guid: 4e0d58375a502264bafdc6c3e9601527, type: 3}
   moveContentList: []
 --- !u!114 &957664542
 MonoBehaviour:

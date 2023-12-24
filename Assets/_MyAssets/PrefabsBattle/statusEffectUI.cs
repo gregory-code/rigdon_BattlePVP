@@ -31,6 +31,12 @@ public class statusEffectUI : MonoBehaviour
         {
             StatChange(0, power);
         }
+
+        if (statusIndex == 4)
+        {
+            StatChange(0, power);
+            StatChange(1, power);
+        }
     }
 
     public int GetIndex()
@@ -82,15 +88,15 @@ public class statusEffectUI : MonoBehaviour
             UpdateStatusCounter(counter + newCounter);
         }
 
-        if(statusIndex == 3)
+        if(statusIndex == 3 || statusIndex == 4)
         {
-
+            // do a thing here
         }
     }
 
     private void UsedAction(bool isAttack)
     {
-        if(statusIndex == 3)
+        if(statusIndex == 3 || statusIndex == 4)
         {
             counter--;
         }
@@ -106,6 +112,12 @@ public class statusEffectUI : MonoBehaviour
         if (statusIndex == 3)
         {
             StatChange(0, -power);
+        }
+
+        if (statusIndex == 4)
+        {
+            StatChange(0, -power);
+            StatChange(1, -power);
         }
     }
 

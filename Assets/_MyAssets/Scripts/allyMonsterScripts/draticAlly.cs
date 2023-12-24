@@ -66,15 +66,18 @@ public class draticAlly : monsterAlly
     private void FinishMove(bool consumeTurn, bool isAttack)
     {
         attackMultiplier = 100;
-        gameMaster.waitForAction = false;
+        gameMaster.waitingForAction = false;
 
         gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
-
+        
         if (consumeTurn == true)
+        {
             gameMaster.NextTurn();
+        }
+        
     }
 
-    private IEnumerator RingingThunder(int targetIndex, bool consumeTurn) // handle passives and stuff here too
+    private IEnumerator RingingThunder(int targetIndex, bool consumeTurn)
     {
         int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0,0); // consider reducing by a % that would be hype
         attack1 = GetMultiplierDamage(attack1);
@@ -93,7 +96,8 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.65f);
         gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
 
-        yield return new WaitForSeconds(0.1f);
+
+        yield return new WaitForSeconds(0.2f);
 
         if (GetMyMonster().GetPassiveID() == 1)
             gameMaster.ApplyStatus(0, false, targetIndex, 4, 0);
@@ -103,23 +107,23 @@ public class draticAlly : monsterAlly
         {
             gameMaster.ShootProjectile(false, targetIndex, 2, false, nextTarget);
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
             gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, nextTarget, -attack2);
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
 
             if (GetMyMonster().GetPassiveID() == 1)
                 gameMaster.ApplyStatus(0, false, nextTarget, 4, 0);
 
             int finalTarget = gameMaster.GetRandomEnemyIndex(targetIndex, nextTarget);
-            if(finalTarget != 5)
+            if (finalTarget != 5)
             {
                 gameMaster.ShootProjectile(false, nextTarget, 2, false, finalTarget);
 
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.2f);
                 gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, finalTarget, -attack3);
 
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.2f);
 
                 if (GetMyMonster().GetPassiveID() == 1)
                     gameMaster.ApplyStatus(0, false, finalTarget, 4, 0);
@@ -169,17 +173,18 @@ public class draticAlly : monsterAlly
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability1");
         
         yield return new WaitForSeconds(0.3f);
-
+        
         int randomTarget = gameMaster.GetRandomConductiveEnemyIndex();
-        if(randomTarget == 5)
+
+        if (randomTarget == 5)
             randomTarget = gameMaster.GetRandomEnemyIndex(-1, -1);
 
         int abilityMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
 
         gameMaster.AttackAgain(true, GetTargetedMonster().teamIndex, abilityMultiplier, false, randomTarget);
 
-        gameMaster.waitForAction = true;
-        while(gameMaster.waitForAction)
+        gameMaster.waitingForAction = true;
+        while(gameMaster.waitingForAction == true)
         {
             yield return new WaitForEndOfFrame();
         }

@@ -26,7 +26,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public Vector3 touchedPos;
     public bool bRendering;
-    public bool waitForAction;
+    public bool waitingForAction;
 
     [Header("Effects")]
     [SerializeField] damagePopScript damagePop;
@@ -114,7 +114,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < enemyTeam.Length; i++)
         {
-            if (enemyTeam[i].GetStatus(0) != null && enemyTeam[i].GetCurrentHealth() > 0)
+            statusEffectUI conductive = enemyTeam[i].GetStatus(0);
+
+            if (conductive != null && enemyTeam[i].GetCurrentHealth() > 0)
             {
                 enemyIndexes[i] = enemyTeam[i].teamIndex;
             }
@@ -367,6 +369,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [PunRPC]
     void ChangeMonsterHealthRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
     {
+        Debug.Log($"Changing target {targetTeamIndex} by {healthChange}");
         GetSpecificMonster(bMine2, targetTeamIndex).ChangeHealth(healthChange, bMine, userTeamIndex);
     }
 
