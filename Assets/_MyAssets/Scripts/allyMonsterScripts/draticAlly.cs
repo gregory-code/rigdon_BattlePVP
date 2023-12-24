@@ -25,7 +25,7 @@ public class draticAlly : monsterAlly
     {
         if (GetMyMonster().GetPassiveID() == 2) // index for cloud legend
         {
-            gameMaster.ApplyStatus(0, bMine, userIndex, 4); // index 0  for conductive status
+            gameMaster.ApplyStatus(0, bMine, userIndex, 4, 0); // index 0  for conductive status
         }
     }
 
@@ -63,10 +63,12 @@ public class draticAlly : monsterAlly
         }
     }
 
-    private void FinishMove(bool consumeTurn)
+    private void FinishMove(bool consumeTurn, bool isAttack)
     {
         attackMultiplier = 100;
         gameMaster.waitForAction = false;
+
+        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
 
         if (consumeTurn == true)
             gameMaster.NextTurn();
@@ -94,7 +96,7 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.1f);
 
         if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(0, false, targetIndex, 4);
+            gameMaster.ApplyStatus(0, false, targetIndex, 4, 0);
 
         int nextTarget = gameMaster.GetRandomEnemyIndex(targetIndex, -1);
         if(nextTarget != 5)
@@ -107,7 +109,7 @@ public class draticAlly : monsterAlly
             yield return new WaitForSeconds(0.1f);
 
             if (GetMyMonster().GetPassiveID() == 1)
-                gameMaster.ApplyStatus(0, false, nextTarget, 4);
+                gameMaster.ApplyStatus(0, false, nextTarget, 4, 0);
 
             int finalTarget = gameMaster.GetRandomEnemyIndex(targetIndex, nextTarget);
             if(finalTarget != 5)
@@ -120,11 +122,11 @@ public class draticAlly : monsterAlly
                 yield return new WaitForSeconds(0.1f);
 
                 if (GetMyMonster().GetPassiveID() == 1)
-                    gameMaster.ApplyStatus(0, false, finalTarget, 4);
+                    gameMaster.ApplyStatus(0, false, finalTarget, 4, 0);
             }
         }
 
-        FinishMove(consumeTurn);
+        FinishMove(consumeTurn, true);
     }
 
     private IEnumerator BoomSpear(int targetIndex, bool consumeTurn)
@@ -146,7 +148,7 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.1f);
 
         if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(0, false, targetIndex, 4);
+            gameMaster.ApplyStatus(0, false, targetIndex, 4, 0);
 
         yield return new WaitForSeconds(0.4f);
         gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 1, false, targetIndex);
@@ -157,9 +159,9 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.3f);
 
         if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(0, false, targetIndex, 4);
+            gameMaster.ApplyStatus(0, false, targetIndex, 4, 0);
 
-        FinishMove(consumeTurn);
+        FinishMove(consumeTurn, true);
     }
 
     private IEnumerator LightningRound()
@@ -182,7 +184,7 @@ public class draticAlly : monsterAlly
             yield return new WaitForEndOfFrame();
         }
 
-        FinishMove(true);
+        FinishMove(true, false);
     }
 
     private IEnumerator EyeOfTheStorm()
@@ -196,11 +198,11 @@ public class draticAlly : monsterAlly
         float newBubbleBuffer = (shield * 1.1f) + 1;
         shield = Mathf.RoundToInt(newBubbleBuffer);
 
-        gameMaster.ApplyStatus(1, true, GetTargetedMonster().teamIndex, shield);
-        gameMaster.ApplyStatus(2, true, GetTargetedMonster().teamIndex, (GetMoveDamage(3, 0) + 1)); // I think however many turns +1 since NextTurn();
+        gameMaster.ApplyStatus(1, true, GetTargetedMonster().teamIndex, shield, 0);
+        gameMaster.ApplyStatus(2, true, GetTargetedMonster().teamIndex, (GetMoveDamage(3, 0) + 1), 0); // I think however many turns +1 since NextTurn();
 
         yield return new WaitForSeconds(0.3f);
 
-        FinishMove(true);
+        FinishMove(true, false);
     }
 }

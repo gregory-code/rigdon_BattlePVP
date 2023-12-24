@@ -28,8 +28,6 @@ public class monsterBase : MonoBehaviour
     private Animator monsterAnimator;
     private Transform attackPoint;
     private damagePopScript damagePop;
-    private Transform effectsList;
-    private statusEffectUI statusEffectPrefab;
 
     private Transform spawnLocation;
     private Vector3 lerpLocation;
@@ -75,8 +73,8 @@ public class monsterBase : MonoBehaviour
         myMonster.onApplyStatus += applyStatus;
         myMonster.onProcStatus += procStatus;
         myMonster.onDamagePopup += damagePopup;
-        myMonster.onUpdateStatusUI += updateStatusUI;
         myMonster.onMovePosition += movePosition;
+        myMonster.onRemoveTaunt += RemoveTaunt;
 
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -94,8 +92,9 @@ public class monsterBase : MonoBehaviour
         attackPoint = dependecy.GetAttackPoint();
         statusProcPrefabs = dependecy.GetStatusPrefabs();
         tempHealth = dependecy.GetTempHealth();
-        effectsList = dependecy.GetEffectsList();
-        statusEffectPrefab = dependecy.GetStatusEffectPrefab();
+
+        myMonster.SetEffectsList(dependecy.GetEffectsList());
+        myMonster.SetStatusEffectPrefab(dependecy.GetStatusEffectPrefab());
     }
 
     void Update()
@@ -149,11 +148,10 @@ public class monsterBase : MonoBehaviour
         monsterAnimator.SetTrigger("damaged");
     }
 
-    GameObject[] statusPrefabs = new GameObject[4];
-    GameObject[] statusProcPrefabs = new GameObject[4];
-    List<statusEffectUI> statusEffectUIs = new List<statusEffectUI>();
+    GameObject[] statusPrefabs = new GameObject[12];
+    GameObject[] statusProcPrefabs = new GameObject[12];
 
-    private void applyStatus(int whichStatus, GameObject statusPrefab, int statusCounter)
+    private void applyStatus(int whichStatus, GameObject statusPrefab)
     {
         statusPrefabs[whichStatus] = Instantiate(statusPrefab, transform);
         statusPrefabs[whichStatus].transform.localPosition = Vector3.one;
@@ -162,46 +160,18 @@ public class monsterBase : MonoBehaviour
             SetTaunt();
     }
 
-    private void updateStatusUI(bool createNew, int statusCounter, int index)
-    {
-        if(createNew)
-        {
-            statusEffectUI newUI = Instantiate(statusEffectPrefab, effectsList);
-            newUI.SetStatusIndex(index, statusCounter);
-            statusEffectUIs.Add(newUI);
-        }
-        else
-        {
-            foreach(statusEffectUI status in statusEffectUIs)
-            {
-                if(status.GetIndex() == index)
-                {
-                    status.UpdateStatusCounter(statusCounter);
-                    return;
-                }
-            }
-        }
-    }
-
     private void procStatus(bool shouldDestroy, int whichStatus, bool triggerProc)
     {
         if(shouldDestroy)
         {
-            foreach (statusEffectUI status in statusEffectUIs)
+            statusEffectUI status = myMonster.GetStatus(whichStatus);
+            if(status != null)
             {
-                if (status.GetIndex() == whichStatus)
-                {
-                    Destroy(status.gameObject);
-                    statusEffectUIs.Remove(status);
-                    return;
-                }
-            }
-            
-            Destroy(statusPrefabs[whichStatus]);
-        }
+                Destroy(statusPrefabs[whichStatus]);
 
-        if (whichStatus == 2)
-            RemoveTaunt();
+                status.GettingRemoved();
+            }
+        }
 
         if (triggerProc == false)
             return;
@@ -219,7 +189,14 @@ public class monsterBase : MonoBehaviour
         monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
         for (int i = 0; i < myTeam.Length; i++)
         {
-            myTeam[i].isTargetable = myTeam[i].hasStatus[2];
+            if(myTeam[i].GetStatus(2) == null)
+            {
+                myTeam[i].isTargetable = false;
+            }
+            else
+            {
+                myTeam[i].isTargetable = true;
+            }
         }
     }
 
@@ -232,7 +209,7 @@ public class monsterBase : MonoBehaviour
         bool someoneIsTaunting = false;
         for (int i = 0; i < myTeam.Length; i++)
         {
-            if (myTeam[i].hasStatus[2] == true)
+            if (myTeam[i].GetStatus(2) != null)
             {
                 someoneIsTaunting = true;
             }

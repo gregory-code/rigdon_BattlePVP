@@ -25,7 +25,7 @@ public class minfurAlly : monsterAlly
     {
         if (GetMyMonster().GetPassiveID() == 2) // index for cloud legend
         {
-            gameMaster.ApplyStatus(0, bMine, userIndex, 4); // index 0  for conductive status
+            
         }
     }
 
@@ -63,10 +63,12 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private void FinishMove(bool consumeTurn)
+    private void FinishMove(bool consumeTurn, bool isAttack)
     {
         attackMultiplier = 100;
         gameMaster.waitForAction = false;
+
+        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
 
         if (consumeTurn == true)
             gameMaster.NextTurn();
@@ -75,7 +77,7 @@ public class minfurAlly : monsterAlly
     private IEnumerator Cuddle(int targetIndex, bool consumeTurn)
     {
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack1");
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, GetTargetedMonster().spawnLocation);
+        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, false, targetIndex);
 
         yield return new WaitForSeconds(0.83f);
 
@@ -83,21 +85,21 @@ public class minfurAlly : monsterAlly
         attack = GetMultiplierDamage(attack);
 
         gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 3, false, targetIndex);
-        gameMaster.ApplyActionBasedStatus(0, false, targetIndex, GetMoveDamage(0, 1), attack);
+        gameMaster.ApplyStatus(3, false, targetIndex, GetMoveDamage(0, 1), -attack);
 
         yield return new WaitForSeconds(1f);
 
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, GetMyMonster().spawnLocation);
+        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, true, GetMyMonster().teamIndex);
 
         yield return new WaitForSeconds(0.5f);
 
-        FinishMove(consumeTurn);
+        FinishMove(consumeTurn, true);
     }
 
     private IEnumerator FluffyRoll(int targetIndex, bool consumeTurn)
     {
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack2");
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, GetTargetedMonster().spawnLocation);
+        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, false, targetIndex);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -110,11 +112,11 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(1f);
 
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, GetMyMonster().spawnLocation);
+        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, true, GetMyMonster().teamIndex);
 
 
 
-        FinishMove(consumeTurn);
+        FinishMove(consumeTurn, true);
     }
 
     private IEnumerator Yippers()
@@ -123,7 +125,7 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(0.3f);
 
-        FinishMove(true);
+        FinishMove(true, false);
     }
 
     private IEnumerator BestFriends()
@@ -132,6 +134,6 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(0.3f);
 
-        FinishMove(true);
+        FinishMove(true, false);
     }
 }

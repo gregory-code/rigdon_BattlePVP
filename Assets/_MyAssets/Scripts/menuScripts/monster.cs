@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEditor;
 using UnityEngine;
 
@@ -72,9 +75,16 @@ public class monster : ScriptableObject
     public int GetCurrentMagic() { return currentMagic; }
     public int GetCurrentSpeed() { return currentSpeed; }
 
+    public void ChangeCurrentStrength(int change) { currentStrength += change; }
+    public void ChangeCurrentMagic(int change) { currentMagic += change; }
+    public void ChangeCurrentSpeed(int change) { currentSpeed += change; }
+
     public int GetBaseStrength() { return baseStrength; }
     public int GetBaseMagic() { return baseMagic; }
     public int GetBaseSpeed() { return baseSpeed; }
+
+    public void SetEffectsList(Transform list) { effectsList = list; }
+    public void SetStatusEffectPrefab(statusEffectUI prefab) { statusEffectPrefab = prefab; }
 
     public int[] GetGrowths()
     {
@@ -157,33 +167,31 @@ public class monster : ScriptableObject
 
         bool died = false;
 
-        if (hasStatus[0]) // conductive
+        if (GetStatus(0) != null) // conductive
         {
             float conductiveDamage = (change * 0.5f) + change;
             change = Mathf.RoundToInt(conductiveDamage);
-            hasStatus[0] = false;
             onProcStatus?.Invoke(true, 0, true);
         }
 
-        if (hasStatus[1] && statusCounter[1] > 0) // bubble
+        statusEffectUI bubbleStatus = GetStatus(1);
+        if (bubbleStatus != null && bubbleStatus.GetCounter() > 0) // bubble
         {
-            int bubbleAmount = statusCounter[1];
-            statusCounter[1] += change;
+            int bubbleAmount = bubbleStatus.GetCounter();
+            bubbleStatus.UpdateStatusCounter(bubbleAmount + change);
 
-            while (statusCounter[1] < 0)
+            while (bubbleStatus.GetCounter() < 0)
             {
-                statusCounter[1]++;
+                bubbleStatus.UpdateStatusCounter(bubbleStatus.GetCounter() + 1);
             }
 
-            if (statusCounter[1] > 0)
+            if (bubbleStatus.GetCounter() > 0)
             {
                 onDamagePopup?.Invoke(change, true);
-                onUpdateStatusUI?.Invoke(false, statusCounter[1], 1);
                 change = 0;
             }
             else
             {
-                hasStatus[1] = false;
                 onProcStatus?.Invoke(true, 1, true);
                 change += bubbleAmount;
                 onDamagePopup?.Invoke(-bubbleAmount, true);
@@ -220,6 +228,14 @@ public class monster : ScriptableObject
         onAnimPlayed?.Invoke(anim);
     }
 
+    public delegate void OnUsedAction(bool isAttack);
+    public event OnUsedAction onUsedAction;
+
+    public void UsedAction(bool isAttack)
+    {
+        onUsedAction?.Invoke(isAttack);
+    }
+
     public delegate void OnMovePosition(bool goHome, float x, float y);
     public event OnMovePosition onMovePosition;
 
@@ -228,41 +244,56 @@ public class monster : ScriptableObject
         onMovePosition?.Invoke(goHome, x, y);
     }
 
-    public void ApplyActionBasedStatus(int actionStatusIndex, GameObject actionStatusPrefab, int actionCounter, int power)
-    {
-        
-    }
-
-    public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab, int statusCounter);
+    public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab);
     public event OnApplyStatus onApplyStatus;
 
-    public delegate void OnProcStatus(bool shouldDestroy, int whichStatus, bool triggerProc);
+    public delegate void OnProcStatus(bool shouldDestroy, int statusIndex, bool triggerProc);
     public event OnProcStatus onProcStatus;
 
-    public delegate void OnUpdateStatusUI(bool createNew, int statusCounter, int index);
-    public event OnUpdateStatusUI onUpdateStatusUI;
+    public delegate void OnRemoveTaunt();
+    public event OnRemoveTaunt onRemoveTaunt;
 
-    private int[] statusCounter = new int[4];
-    public bool[] hasStatus = new bool[4];
+    public List<statusEffectUI> statusEffects = new List<statusEffectUI>();
+    private Transform effectsList;
+    private statusEffectUI statusEffectPrefab;
 
-    public int GetStatusCounter(int which)
+    public statusEffectUI GetStatus(int which)
     {
-        return statusCounter[which];
-    }
+        if (statusEffects.Count <= 0)
+            return null;
 
-    public void ApplyStatus(int statusIndex, GameObject statusPrefab, int statusCounter)
-    {
-        if (hasStatus[statusIndex])
+        foreach(statusEffectUI status in statusEffects)
         {
-            this.statusCounter[statusIndex] += statusCounter;
-            onUpdateStatusUI?.Invoke(false, statusCounter, statusIndex);
-            return;
+            if(status.GetIndex() == which)
+            {
+                return status;
+            }
         }
 
-        this.statusCounter[statusIndex] = statusCounter;
-        hasStatus[statusIndex] = true;
-        onUpdateStatusUI?.Invoke(true, statusCounter, statusIndex);
-        onApplyStatus?.Invoke(statusIndex, statusPrefab, statusCounter);
+        return null;
+    }
+
+    public void procStatus(bool shouldDestroy, int statusIndex, bool triggerProc)
+    {
+        onProcStatus?.Invoke(shouldDestroy, statusIndex, triggerProc);
+    }
+
+    public void ApplyStatus(int statusIndex, GameObject statusPrefab, int counter, int power)
+    {
+        statusEffectUI status = GetStatus(statusIndex);
+
+        if(status == null)
+        {
+            statusEffectUI newUI = Instantiate(statusEffectPrefab, effectsList);
+            newUI.SetStatusIndex(statusIndex, counter, power, this);
+            statusEffects.Add(newUI);
+
+            onApplyStatus?.Invoke(statusIndex, statusPrefab);
+        }
+        else
+        {
+            status.StatusGotReapplied(counter, power);
+        }
     }
 
     public delegate void OnAttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex);
@@ -286,29 +317,32 @@ public class monster : ScriptableObject
 
     public void NextTurn()
     {
-        for(int i = 0; i < statusCounter.Length; i++)
+        if(statusEffects.Count <= 0)
         {
-            if (hasStatus[i] == false)
-                continue;
+            onNextTurn?.Invoke();
+            return;
+        }
 
-            if(i == 1) // 1 is bubble
+        List<int> listOfIndexesToDelete = new List<int>();
+        foreach( statusEffectUI status in statusEffects)
+        {
+            if(status.NextTurnVanish() == true)
             {
-                float newBubbleValue = (statusCounter[1] * 0.9f) - 1;
-                statusCounter[1] = Mathf.RoundToInt(newBubbleValue);
+                onProcStatus?.Invoke(true, status.GetIndex(), true);
+                listOfIndexesToDelete.Add(status.GetIndex());
             }
-            else
-            {
-                statusCounter[i]--;
-            }
+        }
 
-
-            if (statusCounter[i] == 0)
+        if(listOfIndexesToDelete.Count > 0)
+        {
+            foreach (int index in listOfIndexesToDelete)
             {
-                onProcStatus?.Invoke(true, i, true);
-            }
-            else
-            {
-                onUpdateStatusUI?.Invoke(false, statusCounter[i], i);
+                Destroy(GetStatus(index).gameObject);
+                statusEffects.Remove(GetStatus(index));
+                if(index == 2)
+                {
+                    onRemoveTaunt?.Invoke();
+                }
             }
         }
 
@@ -322,7 +356,12 @@ public class monster : ScriptableObject
 
     public float GetBubblePercentage()
     {
-        return (statusCounter[1] * 1.0f / maxHP);
+        statusEffectUI status = GetStatus(1);
+
+        if (status == null)
+            return 0;
+
+        return (status.GetCounter() * 1.0f / maxHP);
     }
 
 

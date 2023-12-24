@@ -20137,7 +20137,6 @@ MonoBehaviour:
   - {fileID: 6070293028441550235, guid: 8cbdf050f0fa62c48bafa20c6abbca8f, type: 3}
   - {fileID: 4328858284941032501, guid: bb74f3deae3792e488fa44084b7307e9, type: 3}
   - {fileID: 4328858284941032501, guid: eb42c74e5263a214eb33d5042cbb6dc1, type: 3}
-  scrollBar: {fileID: 1723099849}
   moveContentList: []
 --- !u!114 &957664542
 MonoBehaviour:
@@ -33518,74 +33517,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1550555418
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -63.069412
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -12.34669
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.8191521
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.5735764
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 70
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 98703379960929076, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3758703766934008911, guid: 514425abd9c3d8c49800872ccd66c761,
-        type: 3}
-      propertyPath: m_Name
-      value: LevelupNovaRed
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 514425abd9c3d8c49800872ccd66c761, type: 3}
 --- !u!1 &1562275315
 GameObject:
   m_ObjectHideFlags: 0
@@ -49592,4 +49523,3 @@ SceneRoots:
   - {fileID: 15539182}
   - {fileID: 1870511357}
   - {fileID: 1657145553}
-  - {fileID: 1550555418}

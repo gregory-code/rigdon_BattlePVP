@@ -36,5 +36,11 @@ MonoBehaviour:
   initial_Strength: 2
   initial_Magic: 3
   initial_Speed: 3
-  moveContents: []
-  hasStatus: 00000000
+  moveContents:
+  - {fileID: 8812975950963853024, guid: f8c3f2f4212dcce498217d5732b76d5d, type: 3}
+  - {fileID: 8812975950963853024, guid: e8eff30b946836a4fbacf1ef14a0a299, type: 3}
+  - {fileID: 8812975950963853024, guid: 517324d50b811e04995ef15d18adacd5, type: 3}
+  - {fileID: 8812975950963853024, guid: 7cddfd8269361134d8e848846a1ec066, type: 3}
+  - {fileID: 8812975950963853024, guid: eac037d3ac18cf241827c36c86b98d83, type: 3}
+  - {fileID: 8812975950963853024, guid: 55d1879a240404c4ba791ebb88efbb89, type: 3}
+  statusEffects: []

@@ -27,7 +27,6 @@ public class infoPageScript : canvasGroupRenderer
 
     [SerializeField] Transform effectsList;
     [SerializeField] GameObject[] effectsPrefabs;
-    [SerializeField] GameObject scrollBar;
     List<GameObject> listOfEffects = new List<GameObject>();
 
     [SerializeField] List<moveContent> moveContentList = new List<moveContent>();
@@ -97,25 +96,27 @@ public class infoPageScript : canvasGroupRenderer
         }
         listOfEffects.Clear();
 
-        for(int i = 0; i < mon.hasStatus.Length; i++)
+        if(mon.statusEffects.Count <= 0)
         {
-            if (mon.hasStatus[i])
-            {
-                GameObject effect = Instantiate(effectsPrefabs[i], effectsList);
-                effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = mon.GetStatusCounter(i) + "";
-                listOfEffects.Add(effect);
-            }
+            return;
         }
 
-        if(listOfEffects.Count > 4)
+        foreach(statusEffectUI status in mon.statusEffects)
         {
-            RectTransform rect = effectsList.GetComponent<RectTransform>();
+            GameObject effect = Instantiate(effectsPrefabs[status.GetIndex()], effectsList);
+            effect.GetComponent<Image>().sprite = status.GetStatusSprite();
+            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = status.GetCounter() + "";
+            listOfEffects.Add(effect);
+        }
+
+        RectTransform rect = effectsList.GetComponent<RectTransform>();
+        if (listOfEffects.Count > 4)
+        {
             rect.sizeDelta = new Vector2(rect.sizeDelta.x, listOfEffects.Count * 58.75f);
-            scrollBar.SetActive(true);
         }
         else
         {
-            scrollBar.SetActive(false);
+            rect.sizeDelta = new Vector2(rect.sizeDelta.x, 235);
         }
     }
 

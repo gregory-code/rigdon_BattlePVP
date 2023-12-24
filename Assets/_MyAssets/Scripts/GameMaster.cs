@@ -114,7 +114,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < enemyTeam.Length; i++)
         {
-            if (enemyTeam[i].hasStatus[0] == true && enemyTeam[i].GetCurrentHealth() > 0)
+            if (enemyTeam[i].GetStatus(0) != null && enemyTeam[i].GetCurrentHealth() > 0)
             {
                 enemyIndexes[i] = enemyTeam[i].teamIndex;
             }
@@ -146,7 +146,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
                 return newMonster.AddComponent<minfurAlly>();
         }
 
-        return newMonster.AddComponent<draticAlly>();
+        return newMonster.AddComponent<lusseliaAlly>();
     }
 
     [Header("Turn Order")]
@@ -325,17 +325,27 @@ public class GameMaster : MonoBehaviourPunCallbacks
         return false;
     }
 
-
-
-    public void MoveMonster(bool bMine, int teamIndex, bool goHome, Vector3 location)
+    public void UsedAction(bool bMine, int teamIndex, bool isAttack)
     {
-        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, goHome, location.x, location.y);
+        this.photonView.RPC("UsedActionRPC", RpcTarget.AllBuffered, bMine, teamIndex, isAttack);
     }
 
     [PunRPC]
-    void MoveMonsterRPC(bool bMine, int teamIndex, bool goHome, float desiredLocationX, float desiredLocationY)
+    void UsedActionRPC(bool bMine, int teamIndex, bool isAttack)
     {
-        GetSpecificMonster(bMine, teamIndex).MovePosition(goHome, desiredLocationX, desiredLocationY);
+        GetSpecificMonster(bMine, teamIndex).UsedAction(isAttack);
+    }
+
+    public void MoveMonster(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex)
+    {
+        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, goHome, bMine2, targetIndex);
+    }
+
+    [PunRPC]
+    void MoveMonsterRPC(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex)
+    {
+        Vector3 pos = GetSpecificMonster(bMine2, targetIndex).spawnLocation;
+        GetSpecificMonster(bMine, teamIndex).MovePosition(goHome, pos.x, pos.y);
     }
 
     public void AnimateMonster(bool bMine, int teamIndex, string animName)
@@ -360,26 +370,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
         GetSpecificMonster(bMine2, targetTeamIndex).ChangeHealth(healthChange, bMine, userTeamIndex);
     }
 
-    public void ApplyStatus(int statusIndex, bool bMine, int TargetIndex, int statusCounter)
+    public void ApplyStatus(int statusIndex, bool bMine, int TargetIndex, int counter, int power)
     {
-        this.photonView.RPC("ApplyStatusRPC", RpcTarget.AllBuffered, statusIndex, bMine, TargetIndex, statusCounter);
+        this.photonView.RPC("ApplyStatusRPC", RpcTarget.AllBuffered, statusIndex, bMine, TargetIndex, counter, power);
     }
 
     [PunRPC]
-    void ApplyStatusRPC(int statusIndex, bool bMine, int TargetIndex, int statusCounter)
+    void ApplyStatusRPC(int statusIndex, bool bMine, int TargetIndex, int counter, int power)
     {
-        GetSpecificMonster(bMine, TargetIndex).ApplyStatus(statusIndex, statusPrefabs[statusIndex], statusCounter);
-    }
-
-    public void ApplyActionBasedStatus(int actionStatusIndex, bool bMine, int TargetIndex, int actionCounter, int power)
-    {
-        this.photonView.RPC("ApplyActionBasedStatusRPC", RpcTarget.AllBuffered, actionStatusIndex, bMine, TargetIndex, actionCounter, power);
-    }
-
-    [PunRPC]
-    void ApplyActionBasedStatusRPC(int actionStatusIndex, bool bMine, int TargetIndex, int actionCounter, int power)
-    {
-        //GetSpecificMonster(bMine, TargetIndex).ApplyActionBasedStatus();
+        GetSpecificMonster(bMine, TargetIndex).ApplyStatus(statusIndex, statusPrefabs[statusIndex], counter, power);
     }
 
     public void AttackAgain(bool bMine, int TargetIndex, int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
