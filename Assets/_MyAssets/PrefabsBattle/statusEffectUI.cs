@@ -103,12 +103,42 @@ public class statusEffectUI : MonoBehaviour
             counter = Mathf.RoundToInt(newBubbleValue);
         }
 
-        if(statusIndex == 0 || statusIndex == 2)
+        if(statusIndex == 0 || statusIndex == 2 || statusIndex == 8)
         {
             counter--;
         }
 
+        if (statusIndex == 7 && gameMaster.activeMonsters[0] == myMonster)
+        {
+            counter--;
+            bool isMine = gameMaster.IsItMyTurn();
+            myMonster.ChangeHealth(GetBurnDamage(), !isMine, usingMonster.teamIndex);
+        }
+
         UpdateStatusCounter(counter);
+    }
+
+    public bool TickCounter()
+    {
+        counter--;
+        if(counter == 0)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int GetBurnDamage()
+    {
+        float burnDamage = (myMonster.GetMaxHealth() * 0.35f) * -1f;
+        burnDamage += myMonster.GetCurrentStrength();
+        int damage = Mathf.RoundToInt(burnDamage);
+        if(power == 1)
+        {
+            damage -= usingMonster.GetHalfStrength();
+        }
+        return damage;
     }
 
     public void DelcaringDamage(int finalCalculations, bool bMine2, int userIndex, bool willKill)
@@ -129,14 +159,14 @@ public class statusEffectUI : MonoBehaviour
 
     public void StatusGotReapplied(int newCounter, int power)
     {
-        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2)
+        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 7)
         {
             UpdateStatusCounter(counter + newCounter);
         }
 
-        if(statusIndex == 3 || statusIndex == 4)
+        if(statusIndex == 3 || statusIndex == 4) // stats for cuddle and best friends
         {
-            // do a thing here
+            UpdateStatusCounter(counter + newCounter);
         }
     }
 
@@ -200,6 +230,6 @@ public class statusEffectUI : MonoBehaviour
     public void UpdateStatusCounter(int newCounter)
     {
         this.counter = newCounter;
-        activeCounterText.text = (newCounter == 99) ? "" : $"{newCounter}";
+        activeCounterText.text = (newCounter >= 99) ? "" : $"{newCounter}";
     }
 }

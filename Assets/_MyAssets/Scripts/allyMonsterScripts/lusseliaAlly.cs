@@ -81,7 +81,26 @@ public class lusseliaAlly : monsterAlly
     {
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack1");
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
+
+        int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
+        attack1 = GetMultiplierDamage(attack1);
+
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 7, false, targetIndex, true, 0);
+
+        gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
+        yield return new WaitForSeconds(0.2f);
+        targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
+        yield return new WaitForSeconds(0.25f);
+        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1); // - for damage
+
+        int shouldAddBurnDamage = 0;
+        if (GetMyMonster().GetPassiveID() == 2)
+            shouldAddBurnDamage = 1;
+
+        gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 7, false, targetIndex, GetMoveDamage(0, 1), shouldAddBurnDamage);
+
+        yield return new WaitForSeconds(0.8f);
 
         FinishMove(consumeTurn, true);
     }
@@ -90,7 +109,28 @@ public class lusseliaAlly : monsterAlly
     {
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack2");
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.3f);
+
+        int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
+        attack1 = GetMultiplierDamage(attack1);
+
+        monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
+        for (int i = 0; i < 3; i++)
+        {
+            if (enemyTeam[i].GetCurrentHealth() > 0)
+            {
+                targetIndex = i;
+                gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 9, false, targetIndex, true, 1);
+                yield return new WaitForSeconds(1.2f);
+                gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1); // - for damage
+
+                int shouldAddBurnDamage = 0;
+                if (GetMyMonster().GetPassiveID() == 2)
+                    shouldAddBurnDamage = 1;
+
+                gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 7, false, targetIndex, 1, shouldAddBurnDamage);
+            }
+        }
 
         FinishMove(consumeTurn, true);
     }
@@ -113,6 +153,8 @@ public class lusseliaAlly : monsterAlly
             {
                 gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 1, true, i, shieldStrength, 0);
 
+                if (GetMyMonster().GetPassiveID() == 1)
+                    gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 8, true, i, 200, 0);
             }
         }
 
@@ -126,6 +168,22 @@ public class lusseliaAlly : monsterAlly
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability2");
 
         yield return new WaitForSeconds(0.3f);
+
+        int healMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 0);
+        float heal = GetTargetedMonster().GetMaxHealth() * (1f * healMultiplier / 100f);
+        int finalHeal = Mathf.RoundToInt(heal);
+        finalHeal = GetMultiplierDamage(finalHeal);
+
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 8, true, GetTargetedMonster().teamIndex, false, 0);
+
+        yield return new WaitForSeconds(0.4f);
+
+        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, true, GetTargetedMonster().teamIndex, finalHeal);
+
+        if (GetMyMonster().GetPassiveID() == 1)
+            gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 8, true, GetTargetedMonster().teamIndex, 200, 0);
+
+        yield return new WaitForSeconds(0.8f);
 
         FinishMove(true, false);
     }

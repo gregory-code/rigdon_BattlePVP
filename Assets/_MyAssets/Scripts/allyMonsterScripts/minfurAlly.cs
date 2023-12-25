@@ -34,7 +34,7 @@ public class minfurAlly : monsterAlly
         {
             if(GetMyMonster().TryConsumeStrawberry() == true)
             {
-                Debug.Log("You get a strawberry mr " + recivingMon.teamIndex);
+                Debug.Log("You get a strawberry Mr. " + recivingMon.teamIndex);
                 StartCoroutine(GiveStrawberryWait(recivingMon));
             }
         }
@@ -44,7 +44,7 @@ public class minfurAlly : monsterAlly
     {
         gameMaster.AnimateMonster(false, GetMyMonster().teamIndex, "ability1");
         yield return new WaitForSeconds(0.3f);
-        gameMaster.ShootProjectile(false, GetMyMonster().teamIndex, 6, false, recivingMon.teamIndex);
+        gameMaster.ShootProjectile(false, GetMyMonster().teamIndex, 6, false, recivingMon.teamIndex, false, 0);
         yield return new WaitForSeconds(0.4f);
         int heal = GetMyMonster().GetCurrentMagic() + GetMoveDamage(5, 0);
         recivingMon.ChangeHealth(heal, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
@@ -112,14 +112,14 @@ public class minfurAlly : monsterAlly
         int attack = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
         attack = GetMultiplierDamage(attack);
 
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 3, false, targetIndex);
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 3, false, targetIndex, false, 0);
         gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 3, false, targetIndex, GetMoveDamage(0, 1), -attack);
 
         yield return new WaitForSeconds(0.5f);
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(false, 1, 2, 4);
+            YoinkStatuses(false, 1, 2, 4, 8);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -131,7 +131,7 @@ public class minfurAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private void YoinkStatuses(bool isAlly, int status, int status2, int status3)
+    private void YoinkStatuses(bool isAlly, int status, int status2, int status3, int status4)
     {
         if (GetTargetedMonster().statusEffects.Count <= 0)
             return;
@@ -140,7 +140,7 @@ public class minfurAlly : monsterAlly
 
         foreach (statusEffectUI effect in GetTargetedMonster().statusEffects)
         {
-            if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3) // add more of these as they get added
+            if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3 || effect.GetIndex() == status4) // add more of these as they get added
             {
                 listOfIndexesToSteal.Add(effect.GetIndex());
             }
@@ -161,7 +161,7 @@ public class minfurAlly : monsterAlly
     private IEnumerator FluffyRoll(int targetIndex, bool consumeTurn)
     {
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack2");
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 5, false, targetIndex);
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 5, false, targetIndex, false, 0);
         gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, false, targetIndex);
 
         int attack = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
@@ -176,7 +176,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(false, 1, 2, 4);
+            YoinkStatuses(false, 1, 2, 4, 8);
         }
 
         gameMaster.AdjustTurnOrder(false, targetIndex, false, true);
@@ -201,7 +201,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(true, 0, 3, 7);
+            YoinkStatuses(true, 0, 3, 7, -1);
         }
 
         monster[] myteam = gameMaster.GetMonstersTeam(GetMyMonster());
@@ -248,11 +248,11 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 4, true, GetTargetedMonster().teamIndex);
+        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 4, true, GetTargetedMonster().teamIndex, false, 0);
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(true, 0, 3, 7);
+            YoinkStatuses(true, 0, 3, 7, -1);
         }
 
         yield return new WaitForSeconds(0.5f);

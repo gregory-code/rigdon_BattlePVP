@@ -99,6 +99,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: fd55428641d52e64bb91f8dd9fd4cfa7, type: 3}
   - {fileID: 21300000, guid: 92cf1721bebf041418df1eab09dbe109, type: 3}
   - {fileID: 0}
+  - {fileID: 21300000, guid: 2858fd571e491e241b67245e0763c1be, type: 3}
+  - {fileID: 21300000, guid: 89efc6666372fd14a9fd66afacf7e854, type: 3}
   activeCounterText: {fileID: 7223047464945705902}
 --- !u!95 &3372933081414182728
 Animator:

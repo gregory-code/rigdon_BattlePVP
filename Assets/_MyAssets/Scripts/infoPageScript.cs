@@ -105,7 +105,11 @@ public class infoPageScript : canvasGroupRenderer
         {
             GameObject effect = Instantiate(effectsPrefabs[status.GetIndex()], effectsList);
             effect.GetComponent<Image>().sprite = status.GetComponent<Image>().sprite;
-            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() == 99) ? "" : status.GetCounter() + "";
+            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() >= 99) ? "" : status.GetCounter() + "";
+            if(status.GetIndex() == 7)
+            {
+                effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetBurnDamage() + "";
+            }
             listOfEffects.Add(effect);
         }
 

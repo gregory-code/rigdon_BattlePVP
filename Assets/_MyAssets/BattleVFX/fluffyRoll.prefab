@@ -4782,5 +4782,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitEffect: {fileID: 153256, guid: d8d01522a759a654a8c3be15349ddb23, type: 3}
-  speed: 0.7
+  speed: 0.05
   target: {fileID: 0}

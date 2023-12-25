@@ -203,6 +203,19 @@ public class monster : ScriptableObject
         onDeclaredDamage?.Invoke(theoreticalHealth, bMine2, userIndex, died);
     }
 
+    private void HealBurn()
+    {
+        statusEffectUI burnStatus = GetStatus(7);
+        if (burnStatus != null)
+        {
+            if (burnStatus.TickCounter() == true)
+            {
+                onProcStatus?.Invoke(true, 7, true);
+                DestroyStatus(7);
+            }
+        }
+    }
+
     public void ChangeHealth(int change, bool bMine, int userIndex) // for who did the attack
     {
         if (change == 0)
@@ -215,6 +228,7 @@ public class monster : ScriptableObject
             if (currentHP >= maxHP)
                 currentHP = maxHP;
 
+            HealBurn();
             onDamagePopup?.Invoke(change, false);
             onHealed?.Invoke(change, bMine, userIndex);
             return;
@@ -276,6 +290,16 @@ public class monster : ScriptableObject
         }
 
         return damage;
+    }
+
+    public int GetHalfStrength()
+    {
+        int strength = GetCurrentStrength();
+
+        float cutInHalf = strength / 2;
+        strength = Mathf.RoundToInt(cutInHalf);
+
+        return strength;
     }
 
     public delegate void OnAnimPlayed(string animName);
@@ -351,6 +375,14 @@ public class monster : ScriptableObject
     {
         statusEffectUI status = GetStatus(statusIndex);
 
+        statusEffectUI onHitShield = GetStatus(8);
+        if(onHitShield != null)
+        {
+            onProcStatus?.Invoke(true, 8, true);
+            DestroyStatus(8);
+            return;
+        }
+
         if(status == null)
         {
             statusEffectUI newUI = Instantiate(statusEffectPrefab, effectsList);
@@ -379,12 +411,12 @@ public class monster : ScriptableObject
         onAttackAgain?.Invoke(percentageMultiplier, bMine2, TargetOfTargetIndex);
     }
 
-    public delegate void OnProjectileShot(projectileScript projectilePrefab, Transform target);
+    public delegate void OnProjectileShot(projectileScript projectilePrefab, Transform target, bool uniqueSpawn, Transform whichSpawn);
     public event OnProjectileShot onProjectileShot;
 
-    public void ShootProjectile(projectileScript projectilePrefab, Transform target)
+    public void ShootProjectile(projectileScript projectilePrefab, Transform target, bool uniqueSpawn, Transform whichSpawn)
     {
-        onProjectileShot?.Invoke(projectilePrefab, target);
+        onProjectileShot?.Invoke(projectilePrefab, target, uniqueSpawn, whichSpawn);
     }
 
     public delegate void OnNextTurn();
@@ -402,14 +434,17 @@ public class monster : ScriptableObject
         foreach( statusEffectUI status in statusEffects)
         {
             status.NextTurn();
-            if(status.GetCounter() <= 0)
+
+            if (currentHP <= 0)
+                return;
+
+            if (status.GetCounter() <= 0)
             {
                 bool shouldProcStatus = true;
 
                 if (status.GetIndex() == 0 || status.GetIndex() == 1)
                     shouldProcStatus = false;
 
-                Debug.Log("Proc a status from turn end: ID is " + status.GetIndex());
                 onProcStatus?.Invoke(true, status.GetIndex(), shouldProcStatus);
 
                 listOfIndexesToDelete.Add(status.GetIndex());

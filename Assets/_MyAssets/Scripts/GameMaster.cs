@@ -17,6 +17,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     [SerializeField] Transform[] playerSpawns;
     [SerializeField] Transform[] enemySpawns;
+    [SerializeField] Transform[] uniqueLocations;
 
     [SerializeField] GameObject monsterPrefab;
 
@@ -224,6 +225,16 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void removeFromMonsterBase(monsterBase toRemove)
     {
+        StartCoroutine(removeFromBaseWait(toRemove));
+    }
+
+    private IEnumerator removeFromBaseWait(monsterBase toRemove)
+    {
+        while(waitingQueue == true)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
         for (int i = 0; i < activeMonsters.Count; ++i)
         {
             if (toRemove.GetMyMonster() == activeMonsters[i])
@@ -282,8 +293,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
         StartCoroutine(ExecuteNextTurn());
     }
 
+    private bool waitingQueue;
     private IEnumerator ExecuteNextTurn()
     {
+        while(waitingQueue == true)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
         if (IsGameOver() == true)
         {
 
@@ -311,10 +328,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         selectNew();
 
-        foreach(monster mon in activeMonsters)
+        waitingQueue = true;
+
+        foreach (monster mon in activeMonsters)
         {
             mon.NextTurn();
         }
+
+        waitingQueue = false;
 
         yield return new WaitForEndOfFrame();
     }
@@ -484,16 +505,20 @@ public class GameMaster : MonoBehaviourPunCallbacks
         }
     }
 
-    public void ShootProjectile(bool bMine, int userTeamIndex, int projectileIndex, bool bMine2, int TargetIndex)
+    public void ShootProjectile(bool bMine, int userTeamIndex, int projectileIndex, bool bMine2, int TargetIndex, bool uniqueSpawn, int whichSpawn)
     {
-        this.photonView.RPC("ShootProjectileRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, projectileIndex, bMine2, TargetIndex);
+        this.photonView.RPC("ShootProjectileRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, projectileIndex, bMine2, TargetIndex, uniqueSpawn, whichSpawn);
     }
 
     [PunRPC]
-    void ShootProjectileRPC(bool bMine, int teamIndex, int projectileIndex, bool bMine2, int TargetIndex)
+    void ShootProjectileRPC(bool bMine, int teamIndex, int projectileIndex, bool bMine2, int TargetIndex, bool uniqueSpawn, int whichSpawn)
     {
         Transform target = GetSpecificMonster(bMine2, TargetIndex).myBase.transform;
-        GetSpecificMonster(bMine, teamIndex).ShootProjectile(projectilePrefabs[projectileIndex], target);
+        if(whichSpawn == 1 && myTurn == false)
+        {
+            whichSpawn++;
+        }
+        GetSpecificMonster(bMine, teamIndex).ShootProjectile(projectilePrefabs[projectileIndex], target, uniqueSpawn, uniqueLocations[whichSpawn]);
     }
 
     #endregion

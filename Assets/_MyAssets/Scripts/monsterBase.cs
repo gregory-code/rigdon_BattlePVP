@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
-using static monster;
+using System.ComponentModel;
 
 public class monsterBase : MonoBehaviour
 {
@@ -149,8 +149,6 @@ public class monsterBase : MonoBehaviour
 
         if (died)
         {
-            monsterAnimator.SetTrigger("dead");
-            gameMaster.removeFromMonsterBase(this);
             StartCoroutine(destroyMyself());
             return;
         }
@@ -246,9 +244,15 @@ public class monsterBase : MonoBehaviour
         }
     }
 
-    private void ShootProjectile(projectileScript projectilePrefab, Transform target)
+    private void ShootProjectile(projectileScript projectilePrefab, Transform target, bool uniqueSpawn, Transform spawn)
     {
-        projectileScript newProjectile = Instantiate(projectilePrefab, attackPoint);
+        Transform spawnPoint = attackPoint;
+        if(uniqueSpawn)
+        {
+            spawnPoint = spawn;
+        }
+
+        projectileScript newProjectile = Instantiate(projectilePrefab, spawnPoint);
         newProjectile.Init(target);
     }
 
@@ -260,6 +264,17 @@ public class monsterBase : MonoBehaviour
 
     private IEnumerator destroyMyself()
     {
+        monsterAnimator.SetTrigger("dead");
+        
+        if (gameMaster.activeMonsters[0] == GetMyMonster() && gameMaster.IsItMyTurn())
+        {
+            gameMaster.NextTurn();
+        }
+
+        yield return new WaitForSeconds(0.3f);
+
+        gameMaster.removeFromMonsterBase(this);
+
         health.color = new Color(0, 0, 0, 0);
         tempHealth.color = new Color(0, 0, 0, 0);
         nameText.text = "";
@@ -275,9 +290,27 @@ public class monsterBase : MonoBehaviour
         {
             foreach (int index in listOfIndexesToDelete)
             {
-                GetMyMonster().GetStatus(index).GettingRemoved();
-                GetMyMonster().DestroyStatus(index);
-
+                if(index == 5)
+                {
+                    foreach(monster mon in gameMaster.GetMonstersTeam(GetMyMonster()))
+                    {
+                        if(mon.GetStatus(index) != null)
+                        {
+                            mon.GetStatus(index).GettingRemoved();
+                            mon.DestroyStatus(index);
+                        }
+                        else if(mon.GetStatus(index + 1) != null)
+                        {
+                            mon.GetStatus(index + 1).GettingRemoved();
+                            mon.DestroyStatus(index + 1);
+                        }
+                    }
+                }
+                else
+                {
+                    GetMyMonster().GetStatus(index).GettingRemoved();
+                    GetMyMonster().DestroyStatus(index);
+                }
             }
         }
         GetMyMonster().statusEffects.Clear();
