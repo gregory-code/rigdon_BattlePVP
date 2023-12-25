@@ -22,7 +22,7 @@ public class draticAlly : monsterAlly
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
 
-    private void TookDamage(int change, bool died, bool bMine, int userIndex)
+    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
     {
         if (GetMyMonster().GetPassiveID() == 2) // index for cloud legend
         {
@@ -91,13 +91,14 @@ public class draticAlly : monsterAlly
 
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack1");
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.55f);
         gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 2, false, targetIndex);
 
-        yield return new WaitForSeconds(0.45f);
         gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
+
+        yield return new WaitForSeconds(0.40f);
         gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
 
         if (GetMyMonster().GetPassiveID() == 1)
@@ -108,26 +109,30 @@ public class draticAlly : monsterAlly
         int nextTarget = gameMaster.GetRandomEnemyIndex(targetIndex, -1);
         if(nextTarget != 5)
         {
-            gameMaster.ShootProjectile(false, targetIndex, 2, false, nextTarget);
-
             gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, nextTarget, -attack2);
             yield return new WaitForSeconds(0.2f);
             nextTarget = gameMaster.GetRedirectedIndex(nextTarget);
+
+            gameMaster.ShootProjectile(false, targetIndex, 2, false, nextTarget);
+
+            yield return new WaitForSeconds(0.1f);
+
             gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, nextTarget, -attack2);
 
             if (GetMyMonster().GetPassiveID() == 1)
                 gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, nextTarget, 4, 0);
 
-            yield return new WaitForSeconds(0.1f);
-
             int finalTarget = gameMaster.GetRandomEnemyIndex(targetIndex, nextTarget);
             if (finalTarget != 5)
             {
-                gameMaster.ShootProjectile(false, nextTarget, 2, false, finalTarget);
-
                 gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, finalTarget, -attack3);
                 yield return new WaitForSeconds(0.2f);
                 finalTarget = gameMaster.GetRedirectedIndex(finalTarget);
+
+                gameMaster.ShootProjectile(false, nextTarget, 2, false, finalTarget);
+
+                yield return new WaitForSeconds(0.1f);
+
                 gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, finalTarget, -attack3);
 
                 if (GetMyMonster().GetPassiveID() == 1)
@@ -135,7 +140,7 @@ public class draticAlly : monsterAlly
             }
         }
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.8f);
 
         FinishMove(consumeTurn, true);
     }
@@ -153,10 +158,10 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.3f);
         gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 0, false, targetIndex);
 
-        yield return new WaitForSeconds(0.3f);
         gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
+        yield return new WaitForSeconds(0.3f);
         gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1); // - for damage
 
         yield return new WaitForSeconds(0.1f);
@@ -164,20 +169,20 @@ public class draticAlly : monsterAlly
         if (GetMyMonster().GetPassiveID() == 1)
             gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, targetIndex, 4, 0);
 
-        yield return new WaitForSeconds(0.4f);
         gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 1, false, targetIndex);
 
-        yield return new WaitForSeconds(0.25f);
         gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack2);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
+
+        yield return new WaitForSeconds(0.25f);
         gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack2); // - for damage
 
-        yield return new WaitForSeconds(0.6f);
 
         if (GetMyMonster().GetPassiveID() == 1)
             gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, targetIndex, 4, 0);
 
+        yield return new WaitForSeconds(0.8f);
 
         FinishMove(consumeTurn, true);
     }

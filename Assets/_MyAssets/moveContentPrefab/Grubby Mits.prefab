@@ -410,8 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: When Minfur targets, steal enemy buffs, duplicate ally buffs for itself,
-    and steal allied debuffs
+  m_text: When Minfur targets, steal enemy buffs and steal allied debuffs to put
+    on itself instead
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,

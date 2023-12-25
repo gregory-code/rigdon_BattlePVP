@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEditor;
 using UnityEngine;
 
@@ -87,6 +86,23 @@ public class monster : ScriptableObject
     public void SetEffectsList(Transform list) { effectsList = list; }
     public void SetStatusEffectPrefab(statusEffectUI prefab) { statusEffectPrefab = prefab; }
 
+    private int strawberries = 5;
+    public bool TryConsumeStrawberry()
+    {
+        if (strawberries > 0)
+        {
+            strawberries--;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void AddStrawberries()
+    {
+        strawberries += 3;
+    }
+
     public int[] GetGrowths()
     {
         int[] growths = new int[4];
@@ -152,7 +168,7 @@ public class monster : ScriptableObject
         }
     }
 
-    public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex);
+    public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon);
     public event OnTakeDamage onTakeDamage;
 
     public delegate void OnDamagePopup(int change, bool shielededAttack);
@@ -192,6 +208,18 @@ public class monster : ScriptableObject
         if (change == 0)
             return;
 
+        if(change > 0)
+        {
+            currentHP += change;
+
+            if (currentHP >= maxHP)
+                currentHP = maxHP;
+
+            onDamagePopup?.Invoke(change, false);
+            onHealed?.Invoke(change, bMine, userIndex);
+            return;
+        }
+
         bool died = false;
 
         change = CalculateConductive(change, true);
@@ -223,24 +251,14 @@ public class monster : ScriptableObject
 
         currentHP += change;
 
-        if (currentHP >= maxHP) 
-            currentHP = maxHP;
-
         if (currentHP <= 0)
         {
             currentHP = 0;
             died = true;
         }
 
-        if(change < 0)
-        {
-            onTakeDamage?.Invoke(change, died, bMine, userIndex);
-            onDamagePopup?.Invoke(change, false);
-        }
-        else if(change > 0)
-        {
-            onHealed?.Invoke(change, bMine, userIndex);
-        }
+        onTakeDamage?.Invoke(change, died, bMine, userIndex, this);
+        onDamagePopup?.Invoke(change, false);
     }
 
     private int CalculateConductive(int damage, bool triggerProc)
@@ -322,6 +340,11 @@ public class monster : ScriptableObject
     {
         Destroy(GetStatus(statusIndex).gameObject);
         statusEffects.Remove(GetStatus(statusIndex));
+
+        if(statusIndex == 2)
+        {
+            onRemoveTaunt?.Invoke();
+        }
     }
 
     public void ApplyStatus(int statusIndex, GameObject statusPrefab, int counter, int power, bool bMine, int userIndex)
@@ -398,10 +421,6 @@ public class monster : ScriptableObject
             foreach (int index in listOfIndexesToDelete)
             {
                 DestroyStatus(index);
-                if(index == 2)
-                {
-                    onRemoveTaunt?.Invoke();
-                }
             }
         }
 

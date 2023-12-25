@@ -20,6 +20,7 @@ MonoBehaviour:
   teamIndex: 0
   myBase: {fileID: 0}
   spawnLocation: {x: 0, y: 0, z: 0}
+  attackPoint: {x: 0, y: 0, z: 0}
   isTargetable: 1
   stages:
   - {fileID: 21300000, guid: f050d222c00f65642a60b2d40d956eaf, type: 3}
@@ -35,7 +36,7 @@ MonoBehaviour:
   initial_HP: 24
   initial_Strength: 3
   initial_Magic: 2
-  initial_Speed: 6
+  initial_Speed: 8
   moveContents:
   - {fileID: 2915941332720301111, guid: 0bdd18bea5cef7b4699bfe672db546de, type: 3}
   - {fileID: -1379904485023640471, guid: 1d84ffa9fed2ef14d800a5ef31a24fa1, type: 3}

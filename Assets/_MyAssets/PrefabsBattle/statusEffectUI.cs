@@ -123,7 +123,7 @@ public class statusEffectUI : MonoBehaviour
 
     public IEnumerator goBack()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.7f);
         gameMaster.MoveMonster(false, myMonster.teamIndex, true, true, myMonster.teamIndex);
     }
 

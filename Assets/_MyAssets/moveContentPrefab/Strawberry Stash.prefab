@@ -275,7 +275,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Acorn Stash
+  m_text: Strawberry Stash
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -410,7 +410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'When an ally takes damge, give them an acorn healing
+  m_text: 'When an ally takes damge, give them a strawberry heal
 
     (Start 5) (Gain
     3 after each battle)'
@@ -494,7 +494,7 @@ GameObject:
   - component: {fileID: 2533241208719198176}
   - component: {fileID: 8812975950963853024}
   m_Layer: 5
-  m_Name: Acorn Stash
+  m_Name: Strawberry Stash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -550,7 +550,7 @@ MonoBehaviour:
   usesStatModifier: 010000
   isPerecentage: 000000
   percentageStatMultiplier: 0
-  scaleNums1: 020000000200000002000000
+  scaleNums1: 020000000300000003000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0

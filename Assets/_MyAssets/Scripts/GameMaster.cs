@@ -253,6 +253,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     [Header("Commands")]
     [SerializeField] bool myTurn;
+    public bool IsItMyTurn() { return myTurn; }
 
     private monster GetSpecificMonster(bool bMine, int teamIndex) // bMine will be the same for both players RPC call
     {
@@ -450,6 +451,37 @@ public class GameMaster : MonoBehaviourPunCallbacks
     void AttackAgainRPC(bool bMine, int TargetIndex, int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
     {
         GetSpecificMonster(bMine, TargetIndex).AttackAgain(percentageMultiplier, bMine2, TargetOfTargetIndex);
+    }
+
+    public void AdjustTurnOrder(bool bMine, int TargetIndex, bool goFirst, bool goLast)
+    {
+        this.photonView.RPC("AdjustTurnOrderRPC", RpcTarget.AllBuffered, bMine, TargetIndex, goFirst, goLast);
+    }
+
+    [PunRPC]
+    void AdjustTurnOrderRPC(bool bMine, int TargetIndex, bool goFirst, bool goLast)
+    {
+        monster target = GetSpecificMonster(bMine, TargetIndex);
+
+        for(int i = 0; i < activeMonsters.Count; i++)
+        {
+            if(activeMonsters[i] == target)
+            {
+                activeMonsters.Remove(activeMonsters[i]);
+                monsterTurnList[i].Discard();
+                monsterTurnList.RemoveAt(i);
+            }
+        }
+
+        if(goFirst)
+        {
+
+        }
+        else if(goLast)
+        {
+            activeMonsters.Add(target);
+            addTurn(target);
+        }
     }
 
     public void ShootProjectile(bool bMine, int userTeamIndex, int projectileIndex, bool bMine2, int TargetIndex)

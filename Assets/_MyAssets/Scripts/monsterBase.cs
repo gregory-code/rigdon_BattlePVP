@@ -71,6 +71,7 @@ public class monsterBase : MonoBehaviour
         }
 
         myMonster.onTakeDamage += takeDamage;
+        myMonster.onHealed += healHealth;
         myMonster.onAnimPlayed += playAnimation;
         myMonster.onProjectileShot += ShootProjectile;
         myMonster.onApplyStatus += applyStatus;
@@ -137,10 +138,14 @@ public class monsterBase : MonoBehaviour
         monsterAnimator.SetTrigger(animName);
     }
 
-    private void takeDamage(int change, bool died, bool bMine, int userIndex)
+    private void healHealth(int change, bool bMine, int userIndex)
     {
-        healthText.text = myMonster.GetCurrentHealth() + "";
-        healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
+        SetHealthText();
+    }
+
+    private void takeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
+    {
+        SetHealthText();
 
         if (died)
         {
@@ -151,6 +156,15 @@ public class monsterBase : MonoBehaviour
         }
 
         monsterAnimator.SetTrigger("damaged");
+    }
+
+    private void SetHealthText()
+    {
+        healthText.text = myMonster.GetCurrentHealth() + "";
+        healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
+
+        if (myMonster.getHealthPercentage() >= 0.2f)
+            healthText.color = new Vector4(229, 66, 66, 255);
     }
 
     GameObject[] statusPrefabs = new GameObject[12];

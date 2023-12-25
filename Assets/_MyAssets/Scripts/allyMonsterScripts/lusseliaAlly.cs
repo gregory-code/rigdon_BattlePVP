@@ -23,7 +23,7 @@ public class lusseliaAlly : monsterAlly
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
 
-    private void TookDamage(int change, bool died, bool bMine, int userIndex)
+    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
     {
         if (GetMyMonster().GetPassiveID() == 2) // index for cloud legend
         {
