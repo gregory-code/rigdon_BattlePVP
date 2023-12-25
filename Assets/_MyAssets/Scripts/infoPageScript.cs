@@ -81,7 +81,7 @@ public class infoPageScript : canvasGroupRenderer
         newAbility.transform.localPosition = Vector3.zero;
         moveContentList.Add(newAbility);
 
-        moveContent newPassive = Instantiate(contents[mon.GetAbilityID() + 3], passiveParent);
+        moveContent newPassive = Instantiate(contents[mon.GetPassiveID() + 3], passiveParent);
         newPassive.transform.localPosition = Vector3.zero;
         moveContentList.Add(newPassive);
 
@@ -104,8 +104,8 @@ public class infoPageScript : canvasGroupRenderer
         foreach(statusEffectUI status in mon.statusEffects)
         {
             GameObject effect = Instantiate(effectsPrefabs[status.GetIndex()], effectsList);
-            effect.GetComponent<Image>().sprite = status.GetStatusSprite();
-            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = status.GetCounter() + "";
+            effect.GetComponent<Image>().sprite = status.GetComponent<Image>().sprite;
+            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() == 99) ? "" : status.GetCounter() + "";
             listOfEffects.Add(effect);
         }
 

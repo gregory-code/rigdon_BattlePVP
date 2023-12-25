@@ -22,6 +22,7 @@ public class monster : ScriptableObject
     public int teamIndex;
     public monsterBase myBase;
     public Vector3 spawnLocation;
+    public Vector3 attackPoint;
     public bool isTargetable = true;
     public Sprite[] stages = new Sprite[3];
     public Sprite[] stagesIcons = new Sprite[3];
@@ -160,6 +161,32 @@ public class monster : ScriptableObject
     public delegate void OnHealed(int change, bool bMine, int userIndex);
     public event OnHealed onHealed;
 
+    public delegate void OnDeclaredDamage(int finalCalculations, bool bMine2, int userIndex, bool willKill);
+    public event OnDeclaredDamage onDeclaredDamage;
+
+    public void DelcaringDamage(int theoreticalDamage, bool bMine2, int userIndex)
+    {
+        bool died = false;
+
+        theoreticalDamage = CalculateConductive(theoreticalDamage, false);
+
+        statusEffectUI bubbleStatus = GetStatus(1);
+        int bubbleHealth = 0;
+        if (bubbleStatus != null)
+            bubbleHealth = bubbleStatus.GetCounter();
+
+        int theoreticalHealth = currentHP + bubbleHealth;
+
+        theoreticalHealth += theoreticalDamage;
+
+        if (theoreticalHealth <= 0)
+        {
+            died = true;
+        }
+
+        onDeclaredDamage?.Invoke(theoreticalHealth, bMine2, userIndex, died);
+    }
+
     public void ChangeHealth(int change, bool bMine, int userIndex) // for who did the attack
     {
         if (change == 0)
@@ -167,12 +194,7 @@ public class monster : ScriptableObject
 
         bool died = false;
 
-        if (GetStatus(0) != null) // conductive
-        {
-            float conductiveDamage = (change * 0.5f) + change;
-            change = Mathf.RoundToInt(conductiveDamage);
-            onProcStatus?.Invoke(true, 0, true);
-        }
+        change = CalculateConductive(change, true);
 
         statusEffectUI bubbleStatus = GetStatus(1);
         if (bubbleStatus != null && bubbleStatus.GetCounter() > 0) // bubble
@@ -193,6 +215,7 @@ public class monster : ScriptableObject
             else
             {
                 onProcStatus?.Invoke(true, 1, true);
+                DestroyStatus(1);
                 change += bubbleAmount;
                 onDamagePopup?.Invoke(-bubbleAmount, true);
             }
@@ -218,6 +241,23 @@ public class monster : ScriptableObject
         {
             onHealed?.Invoke(change, bMine, userIndex);
         }
+    }
+
+    private int CalculateConductive(int damage, bool triggerProc)
+    {
+        if (GetStatus(0) != null) // conductive
+        {
+            float conductiveDamage = (damage * 0.5f) + damage;
+            damage = Mathf.RoundToInt(conductiveDamage);
+
+            if(triggerProc)
+            {
+                onProcStatus?.Invoke(true, 0, true);
+                DestroyStatus(0);
+            }
+        }
+
+        return damage;
     }
 
     public delegate void OnAnimPlayed(string animName);
@@ -278,14 +318,20 @@ public class monster : ScriptableObject
         onProcStatus?.Invoke(shouldDestroy, statusIndex, triggerProc);
     }
 
-    public void ApplyStatus(int statusIndex, GameObject statusPrefab, int counter, int power)
+    public void DestroyStatus(int statusIndex)
+    {
+        Destroy(GetStatus(statusIndex).gameObject);
+        statusEffects.Remove(GetStatus(statusIndex));
+    }
+
+    public void ApplyStatus(int statusIndex, GameObject statusPrefab, int counter, int power, bool bMine, int userIndex)
     {
         statusEffectUI status = GetStatus(statusIndex);
 
         if(status == null)
         {
             statusEffectUI newUI = Instantiate(statusEffectPrefab, effectsList);
-            newUI.SetStatusIndex(statusIndex, counter, power, this);
+            newUI.SetStatusIndex(statusIndex, counter, power, this, bMine, userIndex, myBase.gameMaster);
             statusEffects.Add(newUI);
 
             onApplyStatus?.Invoke(statusIndex, statusPrefab);
@@ -294,6 +340,12 @@ public class monster : ScriptableObject
         {
             status.StatusGotReapplied(counter, power);
         }
+    }
+
+    public void RemoveStatus(int statusIndex, bool bMine2, int TargetIndex)
+    {
+        procStatus(true, statusIndex, true);
+        DestroyStatus(statusIndex);
     }
 
     public delegate void OnAttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex);
@@ -326,9 +378,17 @@ public class monster : ScriptableObject
         List<int> listOfIndexesToDelete = new List<int>();
         foreach( statusEffectUI status in statusEffects)
         {
-            if(status.NextTurnVanish() == true)
+            status.NextTurn();
+            if(status.GetCounter() <= 0)
             {
-                onProcStatus?.Invoke(true, status.GetIndex(), true);
+                bool shouldProcStatus = true;
+
+                if (status.GetIndex() == 0 || status.GetIndex() == 1)
+                    shouldProcStatus = false;
+
+                Debug.Log("Proc a status from turn end: ID is " + status.GetIndex());
+                onProcStatus?.Invoke(true, status.GetIndex(), shouldProcStatus);
+
                 listOfIndexesToDelete.Add(status.GetIndex());
             }
         }
@@ -337,8 +397,7 @@ public class monster : ScriptableObject
         {
             foreach (int index in listOfIndexesToDelete)
             {
-                Destroy(GetStatus(index).gameObject);
-                statusEffects.Remove(GetStatus(index));
+                DestroyStatus(index);
                 if(index == 2)
                 {
                     onRemoveTaunt?.Invoke();

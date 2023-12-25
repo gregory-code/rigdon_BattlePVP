@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static monsterAlly;
 
 public class lusseliaAlly : monsterAlly
 {
@@ -97,6 +98,23 @@ public class lusseliaAlly : monsterAlly
     private IEnumerator LunarBlanket()
     {
         gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability1");
+
+        yield return new WaitForSeconds(0.3f);
+        int shieldStrength = (GetMyMonster().GetCurrentMagic() + GetMoveDamage(2, 0));
+        shieldStrength = GetMultiplierDamage(shieldStrength);
+
+        float newBubbleBuffer = (shieldStrength * 1.1f) + 1.05f;
+        shieldStrength = Mathf.RoundToInt(newBubbleBuffer);
+
+        monster[] myteam = gameMaster.GetMonstersTeam(GetMyMonster());
+        for (int i = 0; i < 3; i++)
+        {
+            if (myteam[i].GetCurrentHealth() > 0)
+            {
+                gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 1, true, i, shieldStrength, 0);
+
+            }
+        }
 
         yield return new WaitForSeconds(0.3f);
 

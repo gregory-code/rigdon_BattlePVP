@@ -27,6 +27,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     public Vector3 touchedPos;
     public bool bRendering;
     public bool waitingForAction;
+    public int redirectedIndex = 5;
 
     [Header("Effects")]
     [SerializeField] damagePopScript damagePop;
@@ -105,6 +106,17 @@ public class GameMaster : MonoBehaviourPunCallbacks
         }
 
         return randomIndex;
+    }
+
+    public int GetRedirectedIndex(int index)
+    {
+        if(redirectedIndex != 5)
+        {
+            index = redirectedIndex;
+            redirectedIndex = 5;
+        }
+
+        return index;
     }
 
     public int GetRandomConductiveEnemyIndex()
@@ -210,7 +222,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
         selectParticles = newSelect.gameObject;
     }
 
-    public void removeFromCritterBase(monsterBase toRemove)
+    public void removeFromMonsterBase(monsterBase toRemove)
     {
         for (int i = 0; i < activeMonsters.Count; ++i)
         {
@@ -347,6 +359,27 @@ public class GameMaster : MonoBehaviourPunCallbacks
     void MoveMonsterRPC(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex)
     {
         Vector3 pos = GetSpecificMonster(bMine2, targetIndex).spawnLocation;
+
+        if (bMine && bMine2 == false)
+        {
+            pos.x -= 3;
+        }
+
+        if (bMine && bMine2)
+        {
+            pos.x += 3;
+        }
+
+        if (bMine == false && bMine2)
+        {
+            pos.x += 3;
+        }
+
+        if (bMine == false && bMine2 == false)
+        {
+            pos.x -= 3;
+        }
+
         GetSpecificMonster(bMine, teamIndex).MovePosition(goHome, pos.x, pos.y);
     }
 
@@ -369,19 +402,43 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [PunRPC]
     void ChangeMonsterHealthRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
     {
-        Debug.Log($"Changing target {targetTeamIndex} by {healthChange}");
         GetSpecificMonster(bMine2, targetTeamIndex).ChangeHealth(healthChange, bMine, userTeamIndex);
     }
 
-    public void ApplyStatus(int statusIndex, bool bMine, int TargetIndex, int counter, int power)
+    public void DeclaringDamage(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
     {
-        this.photonView.RPC("ApplyStatusRPC", RpcTarget.AllBuffered, statusIndex, bMine, TargetIndex, counter, power);
+        this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, bMine2, targetTeamIndex, healthChange);
     }
 
     [PunRPC]
-    void ApplyStatusRPC(int statusIndex, bool bMine, int TargetIndex, int counter, int power)
+    void DeclaringDamageRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
     {
-        GetSpecificMonster(bMine, TargetIndex).ApplyStatus(statusIndex, statusPrefabs[statusIndex], counter, power);
+        GetSpecificMonster(bMine2, targetTeamIndex).DelcaringDamage(healthChange, bMine, userTeamIndex);
+    }
+
+    public void ApplyStatus(bool bMine, int userIndex, int statusIndex, bool bMine2, int TargetIndex, int counter, int power)
+    {
+        this.photonView.RPC("ApplyStatusRPC", RpcTarget.AllBuffered, bMine, userIndex, statusIndex, bMine2, TargetIndex, counter, power);
+    }
+
+    [PunRPC]
+    void ApplyStatusRPC(bool bMine, int userIndex, int statusIndex, bool bMine2, int TargetIndex, int counter, int power)
+    {
+        if (GetSpecificMonster(bMine2, TargetIndex).GetCurrentHealth() <= 0)
+            return;
+
+        GetSpecificMonster(bMine2, TargetIndex).ApplyStatus(statusIndex, statusPrefabs[statusIndex], counter, power, bMine, userIndex);
+    }
+
+    public void RemoveStatus(bool bMine, int userIndex, int statusIndex, bool bMine2, int TargetIndex)
+    {
+        this.photonView.RPC("RemoveStatusRPC", RpcTarget.AllBuffered, bMine, userIndex, statusIndex, bMine2, TargetIndex);
+    }
+
+    [PunRPC]
+    void RemoveStatusRPC(bool bMine, int userIndex, int statusIndex, bool bMine2, int TargetIndex)
+    {
+        GetSpecificMonster(bMine2, TargetIndex).RemoveStatus(statusIndex, bMine, userIndex);
     }
 
     public void AttackAgain(bool bMine, int TargetIndex, int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)

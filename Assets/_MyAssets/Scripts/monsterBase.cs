@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
-using System;
+using static monster;
 
 public class monsterBase : MonoBehaviour
 {
@@ -27,6 +27,7 @@ public class monsterBase : MonoBehaviour
     private Transform HUD;
     private Animator monsterAnimator;
     private Transform attackPoint;
+    private Transform effectSpawn;
     private damagePopScript damagePop;
 
     private Transform spawnLocation;
@@ -54,6 +55,8 @@ public class monsterBase : MonoBehaviour
 
         monsterDependecy dependecies = GetComponent<monsterDependecy>();
         GrabDependecies(dependecies);
+
+        this.myMonster.attackPoint = attackPoint.position;
 
         int stage = myMonster.GetSpriteIndexFromLevel();
         monsterSprite.sprite = myMonster.stages[stage];
@@ -92,6 +95,7 @@ public class monsterBase : MonoBehaviour
         attackPoint = dependecy.GetAttackPoint();
         statusProcPrefabs = dependecy.GetStatusPrefabs();
         tempHealth = dependecy.GetTempHealth();
+        effectSpawn = dependecy.GetEffectSpawn();
 
         myMonster.SetEffectsList(dependecy.GetEffectsList());
         myMonster.SetStatusEffectPrefab(dependecy.GetStatusEffectPrefab());
@@ -141,7 +145,8 @@ public class monsterBase : MonoBehaviour
         if (died)
         {
             monsterAnimator.SetTrigger("dead");
-            gameMaster.removeFromCritterBase(this);
+            gameMaster.removeFromMonsterBase(this);
+            StartCoroutine(destroyMyself());
             return;
         }
 
@@ -153,7 +158,7 @@ public class monsterBase : MonoBehaviour
 
     private void applyStatus(int whichStatus, GameObject statusPrefab)
     {
-        statusPrefabs[whichStatus] = Instantiate(statusPrefab, transform);
+        statusPrefabs[whichStatus] = Instantiate(statusPrefab, effectSpawn);
         statusPrefabs[whichStatus].transform.localPosition = Vector3.one;
 
         if(whichStatus == 2)
@@ -237,51 +242,55 @@ public class monsterBase : MonoBehaviour
     {
         damagePopScript popUp = Instantiate(damagePop, transform.position, transform.rotation);
         popUp.Init(change, shieldedAttack);
-
-        /*GameObject hitParticles = Instantiate(hitParticleEffect); //rotate it here
-        hitParticles.transform.SetParent(transform);
-        hitParticles.transform.localScale = new Vector3(1, 1, 1);
-        hitParticles.transform.localPosition = Vector3.zero;
-        hitParticles.transform.rotation = (bFriendly) ? Quaternion.Euler(0, 0, 90) : Quaternion.Euler(0, 0, -90);
-        ParticleSystem hit = hitParticles.GetComponent<ParticleSystem>();
-        ParticleSystem.MainModule mainModule;
-        mainModule = hit.main;
-        mainModule.maxParticles = (Mathf.Abs(change));
-        mainModule.startColor = new Color(myCritter.matchingColor.r, myCritter.matchingColor.g, myCritter.matchingColor.b, 255);
-        StartCoroutine(hitDelay(popUp, hitParticles));*/
     }
 
-    /*private IEnumerator hitDelay(GameObject hitPopup, GameObject hitPrefab)
+    private IEnumerator destroyMyself()
     {
-        yield return new WaitForSeconds(.43f);
-        // hit animation
-
-        yield return new WaitForSeconds(.30f);
-        if (myCritter.getHealthPercentage() == 0 && bShattered == false)
-        {
-            //death animation
-            bShattered = true;
-            float force = (float)Random.Range(-0.05f, 0.05f);
-            gameObject.transform.Find("healthBar").transform.GetChild(0).gameObject.SetActive(false);
-            explodeHealthBar(force);
-            BattleMaster.removeFromCritterBase(this);
-            GetComponent<Animator>().SetTrigger("die");
-            Destroy(this, 0.6f);
-            StartCoroutine(explodeDelay());
-        }
-
-        Destroy(hitPopup);
-        Destroy(hitPrefab);
-    }
-
-    private IEnumerator explodeDelay()
-    {
-        yield return new WaitForSeconds(.4f);
+        health.color = new Color(0, 0, 0, 0);
+        tempHealth.color = new Color(0, 0, 0, 0);
         nameText.text = "";
         healthText.text = "";
-        float force = (float)Random.Range(10f, 15f);
+
+        List<int> listOfIndexesToDelete = new List<int>();
+        foreach (statusEffectUI status in GetMyMonster().statusEffects)
+        {
+            listOfIndexesToDelete.Add(status.GetIndex());
+        }
+
+        if (listOfIndexesToDelete.Count > 0)
+        {
+            foreach (int index in listOfIndexesToDelete)
+            {
+                GetMyMonster().GetStatus(index).GettingRemoved();
+                GetMyMonster().DestroyStatus(index);
+
+            }
+        }
+        GetMyMonster().statusEffects.Clear();
+
+        yield return new WaitForSeconds(0.35f);
+        float force = (float)Random.Range(-0.1f, 0.1f);
         explodeHealthBar(force);
-    }*/
+
+        yield return new WaitForSeconds(1f);
+        force = (float)Random.Range(10f, 15f);
+        explodeHealthBar(force);
+
+        Destroy(this, 0.5f);
+    }
+
+    public void explodeHealthBar(float force)
+    {
+        foreach (Transform child in gameObject.transform.Find("HUD").transform.Find("healthBar").transform)
+        {
+            Rigidbody2D childRB = child.GetComponent<Rigidbody2D>();
+
+            Vector2 direction = new Vector2((float)Random.Range(-500, 500), (float)Random.Range(-500, 500));
+
+            childRB.gravityScale = 0f;
+            childRB.AddForce(direction * force);
+        }
+    }
 
     public int GetMoveDamage(int moveContentID, int moveScaleID)
     {
@@ -357,7 +366,7 @@ public class monsterBase : MonoBehaviour
         }
     }
 
-    private IEnumerator loadInfoScreen()
+    public IEnumerator loadInfoScreen()
     {
         yield return new WaitForSeconds(1);
 

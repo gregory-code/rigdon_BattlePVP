@@ -11,6 +11,7 @@ public class monsterDependecy : MonoBehaviour
     [SerializeField] SpriteRenderer monsterSprite;
     [SerializeField] Image health;
     [SerializeField] Image tempHealth;
+    [SerializeField] Transform effectSpawn;
     [SerializeField] TextMeshProUGUI healthText;
     [SerializeField] TextMeshProUGUI nameText;
     [SerializeField] Transform HUD;
@@ -91,5 +92,10 @@ public class monsterDependecy : MonoBehaviour
     public statusEffectUI GetStatusEffectPrefab()
     {
         return statusEffectPrefab;
+    }
+
+    public Transform GetEffectSpawn()
+    {
+        return effectSpawn;
     }
 }

@@ -29,7 +29,10 @@ public class monsterAlly : monsterBase
 
     private void openInfo()
     {
-        lineRenderState(false);
+        if(gameMaster.inInfoScreen)
+        {
+            lineRenderState(false);
+        }
     }
 
     public void OnMouseDown()

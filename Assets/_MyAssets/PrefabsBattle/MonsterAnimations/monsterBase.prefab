@@ -3982,7 +3982,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5283204708080974220}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4079,6 +4079,7 @@ MonoBehaviour:
   monsterSprite: {fileID: 700833843920739829}
   health: {fileID: 7521692821910306715}
   tempHealth: {fileID: 4109197034467512828}
+  effectSpawn: {fileID: 2232901553370399243}
   healthText: {fileID: 7199117059744671487}
   nameText: {fileID: 7268639206598556515}
   HUD: {fileID: 6451772780149271512}
@@ -4109,6 +4110,8 @@ MonoBehaviour:
   - {fileID: 153256, guid: b056e3fe90727c54192ced1b360380d0, type: 3}
   - {fileID: 3758703766934008911, guid: 6103590a89fb3a340ac6b495f8044769, type: 3}
   - {fileID: 6579453261124972213, guid: 48b84ca0b0824f040a354eec785236e4, type: 3}
+  - {fileID: 154672, guid: 413a0058aedf83f48b14aba1e9757a89, type: 3}
+  - {fileID: 154672, guid: 413a0058aedf83f48b14aba1e9757a89, type: 3}
 --- !u!1 &5297733555498542932
 GameObject:
   m_ObjectHideFlags: 0
