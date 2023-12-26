@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -37,7 +38,7 @@ public class monsterAlly : monsterBase
 
     public void OnMouseDown()
     {
-        if (gameMaster.inInfoScreen)
+        if (gameMaster.inInfoScreen || gameMaster.movingToNewGame)
             return;
 
         if (gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().bMine)
@@ -56,12 +57,12 @@ public class monsterAlly : monsterBase
             return;
         }
 
-        if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true)
+        if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true && gameMaster.movingToNewGame == false)
         {
             GetMyMonster().canAct = false;
             onAttack?.Invoke(GetMyMonster().GetAttackID(), GetTargetedMonster().teamIndex, true);
         }
-        if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true)
+        if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true && gameMaster.movingToNewGame == false)
         {
             GetMyMonster().canAct = false;
             onAbility?.Invoke(GetMyMonster().GetAbilityID());

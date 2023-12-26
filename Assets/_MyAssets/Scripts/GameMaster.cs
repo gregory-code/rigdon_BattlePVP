@@ -21,6 +21,8 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     [SerializeField] GameObject monsterPrefab;
 
+    [SerializeField] List<GameObject> monsterBasesToDeleteLater = new List<GameObject>();
+
     [Header("Targeting")]
     public monsterBase selectedMonster;
     public monsterBase targetedMonster;
@@ -29,6 +31,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     public bool bRendering;
     public bool waitingForAction;
     public int redirectedIndex = 5;
+    public int estimatedDamage;
 
     [Header("Effects")]
     [SerializeField] damagePopScript damagePop;
@@ -37,6 +40,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void StartFight()
     {
+        movingToNewGame = false;
         spawnTeams();
         sortBySpeed();
         selectNew();
@@ -54,10 +58,12 @@ public class GameMaster : MonoBehaviourPunCallbacks
             GameObject newAlly = Instantiate(monsterPrefab, playerSpawns[i]);
             monsterAlly allyScript = AddMonsterScript(gameMenu.GetMyTeam()[i].GetMonsterID(), newAlly);
             allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera, damagePop, playerSpawns[i]);
+            monsterBasesToDeleteLater.Add(newAlly);
 
             GameObject newEnemy = Instantiate(monsterPrefab, enemySpawns[i]);
             monsterBase enemyScript = AddMonsterScript(gameMenu.GetEnemyTeam()[i].GetMonsterID(), newEnemy);
             enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera, damagePop, enemySpawns[i]);
+            monsterBasesToDeleteLater.Add(newEnemy);
         }
     }
 
@@ -169,6 +175,8 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [SerializeField] monsterTurnScript monsterTurnPrefab;
     [SerializeField] selectParticleScript selectParticlesPrefab;
     GameObject selectParticles;
+
+    public bool movingToNewGame;
 
     private List<monsterTurnScript> monsterTurnList = new List<monsterTurnScript>();
 
@@ -293,17 +301,34 @@ public class GameMaster : MonoBehaviourPunCallbacks
         StartCoroutine(ExecuteNextTurn());
     }
 
+    private void ClearField()
+    {
+        foreach(monster mon in activeMonsters)
+        {
+            mon.RemoveConnections();
+        }
+        activeMonsters.Clear();
+
+        foreach(GameObject mon in monsterBasesToDeleteLater)
+        {
+            Destroy(mon);
+        }
+        monsterBasesToDeleteLater.Clear();
+
+
+        foreach (monsterTurnScript turn in monsterTurnList)
+        {
+            Destroy(turn.gameObject);
+        }
+        monsterTurnList.Clear();
+    }
+
     private bool waitingQueue;
     private IEnumerator ExecuteNextTurn()
     {
-        while(waitingQueue == true)
+        while (waitingQueue == true)
         {
             yield return new WaitForEndOfFrame();
-        }
-
-        if (IsGameOver() == true)
-        {
-
         }
 
         monster finishedMonster = activeMonsters[0];
@@ -326,7 +351,6 @@ public class GameMaster : MonoBehaviourPunCallbacks
             }
         }
 
-        selectNew();
 
         waitingQueue = true;
 
@@ -335,9 +359,21 @@ public class GameMaster : MonoBehaviourPunCallbacks
             mon.NextTurn();
         }
 
+        selectNew();
         waitingQueue = false;
 
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(0.5f);
+
+        if (IsGameOver() == true && movingToNewGame == false)
+        {
+            movingToNewGame = true;
+
+            yield return new WaitForSeconds(4f);
+
+            waitingQueue = false;
+            ClearField();
+            gameMenu.StartIntermission();
+        }
     }
 
     private bool IsGameOver()
@@ -416,15 +452,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
         GetSpecificMonster(bMine, teamIndex).PlayAnimation(animName);
     }
 
-    public void ChangeMonsterHealth(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
+    public void ChangeMonsterHealth(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange, bool isAttack)
     {
-        this.photonView.RPC("ChangeMonsterHealthRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, bMine2, targetTeamIndex, healthChange);
+        this.photonView.RPC("ChangeMonsterHealthRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, bMine2, targetTeamIndex, healthChange, isAttack);
     }
 
     [PunRPC]
-    void ChangeMonsterHealthRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
+    void ChangeMonsterHealthRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange, bool isAttack)
     {
-        GetSpecificMonster(bMine2, targetTeamIndex).ChangeHealth(healthChange, bMine, userTeamIndex);
+        GetSpecificMonster(bMine2, targetTeamIndex).ChangeHealth(healthChange, bMine, userTeamIndex, isAttack);
     }
 
     public void DeclaringDamage(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)

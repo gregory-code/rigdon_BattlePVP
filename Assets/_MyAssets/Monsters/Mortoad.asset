@@ -20,6 +20,7 @@ MonoBehaviour:
   teamIndex: 0
   myBase: {fileID: 0}
   spawnLocation: {x: 0, y: 0, z: 0}
+  attackPoint: {x: 0, y: 0, z: 0}
   isTargetable: 1
   stages:
   - {fileID: 21300000, guid: 09236341847b6e7478809484fed4f51b, type: 3}

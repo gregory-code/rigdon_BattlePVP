@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
@@ -11,11 +12,26 @@ public class minfurAlly : monsterAlly
         onAttack += UseAttack;
         onAbility += UseAbility;
         GetMyMonster().onAttackAgain += AttackAgain;
+        GetMyMonster().onRemoveConnections += RemoveConnections;
 
         monster[] monsters = gameMaster.GetMonstersTeam(GetMyMonster());
         foreach(monster mon in monsters)
         {
             mon.onTakeDamage += TookDamage;
+        }
+    }
+
+    private void RemoveConnections()
+    {
+        onAttack -= UseAttack;
+        onAbility -= UseAbility;
+        GetMyMonster().onAttackAgain -= AttackAgain;
+        GetMyMonster().onRemoveConnections -= RemoveConnections;
+
+        monster[] monsters = gameMaster.GetMonstersTeam(GetMyMonster());
+        foreach (monster mon in monsters)
+        {
+            mon.onTakeDamage -= TookDamage;
         }
     }
 
@@ -30,7 +46,7 @@ public class minfurAlly : monsterAlly
 
     private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
     {
-        if (GetMyMonster().GetPassiveID() == 2) // index for acron
+        if (GetMyMonster().GetPassiveID() == 2 && !gameMaster.IsItMyTurn()) // index for acron
         {
             if(GetMyMonster().TryConsumeStrawberry() == true)
             {
@@ -42,12 +58,12 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator GiveStrawberryWait(monster recivingMon)
     {
-        gameMaster.AnimateMonster(false, GetMyMonster().teamIndex, "ability1");
-        yield return new WaitForSeconds(0.3f);
-        gameMaster.ShootProjectile(false, GetMyMonster().teamIndex, 6, false, recivingMon.teamIndex, false, 0);
-        yield return new WaitForSeconds(0.4f);
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability1");
+        yield return new WaitForSeconds(0.1f);
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 6, gameMaster.IsItMyTurn(), recivingMon.teamIndex, false, 0);
+        yield return new WaitForSeconds(0.2f);
         int heal = GetMyMonster().GetCurrentMagic() + GetMoveDamage(5, 0);
-        recivingMon.ChangeHealth(heal, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
+        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, gameMaster.IsItMyTurn(), recivingMon.teamIndex, heal, false);
 
     }
 
@@ -104,16 +120,16 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator Cuddle(int targetIndex, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack1");
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, false, targetIndex);
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack1");
+        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, false, !gameMaster.IsItMyTurn(), targetIndex);
 
         yield return new WaitForSeconds(0.83f);
 
         int attack = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
         attack = GetMultiplierDamage(attack);
 
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 3, false, targetIndex, false, 0);
-        gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 3, false, targetIndex, GetMoveDamage(0, 1), -attack);
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 3, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
+        gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 3, !gameMaster.IsItMyTurn(), targetIndex, GetMoveDamage(0, 1), -attack);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -124,7 +140,7 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, true, GetMyMonster().teamIndex);
+        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, true, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -151,8 +167,8 @@ public class minfurAlly : monsterAlly
             foreach (int index in listOfIndexesToSteal)
             {
                 statusEffectUI stolenStatus = GetTargetedMonster().GetStatus(index);
-                gameMaster.RemoveStatus(true, GetMyMonster().teamIndex, index, isAlly, GetTargetedMonster().teamIndex);
-                gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, index, true, GetMyMonster().teamIndex, stolenStatus.GetCounter(), stolenStatus.GetPower());
+                gameMaster.RemoveStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, index, isAlly, GetTargetedMonster().teamIndex);
+                gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, index, true, GetMyMonster().teamIndex, stolenStatus.GetCounter(), stolenStatus.GetPower());
 
             }
         }
@@ -160,39 +176,39 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator FluffyRoll(int targetIndex, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack2");
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 5, false, targetIndex, false, 0);
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, false, targetIndex);
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack2");
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 5, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
+        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, false, !gameMaster.IsItMyTurn(), targetIndex);
 
         int attack = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
         attack = GetMultiplierDamage(attack);
 
-        gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack);
         yield return new WaitForSeconds(0.1f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
         yield return new WaitForSeconds(0.2f);
-        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack);
+        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack, true);
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
             YoinkStatuses(false, 1, 2, 4, 8);
         }
 
-        gameMaster.AdjustTurnOrder(false, targetIndex, false, true);
+        gameMaster.AdjustTurnOrder(!gameMaster.IsItMyTurn(), targetIndex, false, true);
 
         yield return new WaitForSeconds(1.15f);
 
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, true, GetMyMonster().teamIndex);
+        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, true, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
 
-
+        yield return new WaitForSeconds(0.3f);
 
         FinishMove(consumeTurn, true);
     }
 
     private IEnumerator Yippers()
     {
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability1");
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability1");
 
         yield return new WaitForSeconds(0.3f);
 
@@ -211,12 +227,12 @@ public class minfurAlly : monsterAlly
             {
                 if (myteam[i].teamIndex == GetMyMonster().teamIndex)
                 {
-                    gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 4, true, i, (GetMoveDamage(2, 1) + 1), attack);
+                    gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 4, gameMaster.IsItMyTurn(), i, (GetMoveDamage(2, 1) + 1), attack);
                 }
                 else
                 {
-                    gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 4, true, i, GetMoveDamage(2, 1), attack);
-                    gameMaster.AnimateMonster(true, i, "idle");
+                    gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 4, gameMaster.IsItMyTurn(), i, GetMoveDamage(2, 1), attack);
+                    gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), i, "idle");
                 }
             }
         }
@@ -228,27 +244,27 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator BestFriends()
     {
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability2");
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, false, true, GetTargetedMonster().teamIndex);
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability2");
+        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, false, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex);
 
         statusEffectUI minfurfriendStatus = GetMyMonster().GetStatus(6);
         if (minfurfriendStatus != null)
         {
-            gameMaster.RemoveStatus(true, GetMyMonster().teamIndex, 6, true, GetMyMonster().teamIndex);
+            gameMaster.RemoveStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 6, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
             
             foreach(monster ally in gameMaster.GetMonstersTeam(GetMyMonster()))
             {
                 statusEffectUI bestFriend = ally.GetStatus(5);
                 if(bestFriend != null)
                 {
-                    gameMaster.RemoveStatus(true, GetMyMonster().teamIndex, 5, true, ally.teamIndex);
+                    gameMaster.RemoveStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 5, gameMaster.IsItMyTurn(), ally.teamIndex);
                 }
             }
         }
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 4, true, GetTargetedMonster().teamIndex, false, 0);
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 4, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, false, 0);
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
@@ -257,12 +273,12 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 5, true, GetTargetedMonster().teamIndex, 99, 0);
-        gameMaster.ApplyStatus(true, GetTargetedMonster().teamIndex, 6, true, GetMyMonster().teamIndex, 99, 0);
+        gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 5, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, 99, 0);
+        gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, 6, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 99, 0);
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.MoveMonster(true, GetMyMonster().teamIndex, true, true, GetMyMonster().teamIndex);
+        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, true, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
 
         FinishMove(true, false);
     }

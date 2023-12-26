@@ -168,6 +168,14 @@ public class monster : ScriptableObject
         }
     }
 
+    public delegate void OnRemoveConnections();
+    public event OnRemoveConnections onRemoveConnections;
+
+    public void RemoveConnections()
+    {
+        onRemoveConnections?.Invoke();
+    }
+
     public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon);
     public event OnTakeDamage onTakeDamage;
 
@@ -200,6 +208,8 @@ public class monster : ScriptableObject
             died = true;
         }
 
+        myBase.gameMaster.estimatedDamage = theoreticalDamage;
+
         onDeclaredDamage?.Invoke(theoreticalHealth, bMine2, userIndex, died);
     }
 
@@ -216,12 +226,14 @@ public class monster : ScriptableObject
         }
     }
 
-    public void ChangeHealth(int change, bool bMine, int userIndex) // for who did the attack
+    private bool SkipConductive;
+    public void SetSkipConductive() { SkipConductive = true; }
+    public void ChangeHealth(int change, bool bMine, int userIndex, bool isAttack) // for who did the attack
     {
         if (change == 0)
             return;
 
-        if(change > 0)
+        if(change > 0 && isAttack == false)
         {
             currentHP += change;
 
@@ -236,7 +248,13 @@ public class monster : ScriptableObject
 
         bool died = false;
 
-        change = CalculateConductive(change, true);
+        if(SkipConductive == false)
+            change = CalculateConductive(change, true);
+
+        SkipConductive = false;
+
+        if (change >= 0 && isAttack == true)
+            return;
 
         statusEffectUI bubbleStatus = GetStatus(1);
         if (bubbleStatus != null && bubbleStatus.GetCounter() > 0) // bubble
@@ -493,6 +511,8 @@ public class monster : ScriptableObject
 
     public void SetInitialStats()
     {
+        statusEffects.Clear();
+
         level = 1;
 
         maxHP = initial_HP;
@@ -508,29 +528,25 @@ public class monster : ScriptableObject
         currentSpeed = initial_Speed;
     }
 
-    public void LevelUp()
+    public void SetLevel(int level)
     {
-        level++;
+        SetInitialStats(); // Initialize Level 1
+        this.level = level;
+        level--;
 
         maxHP += (growthHP + 3);
         currentHP += (growthHP + 3);
 
-        baseStrength += (growthStrength + 1) / 2;
-        currentStrength += (growthStrength + 1) / 2;
+        float strengthToAdd = ((growthStrength + 0.99f) / 2 * level);
+        baseStrength += Mathf.RoundToInt(strengthToAdd);
+        currentStrength += Mathf.RoundToInt(strengthToAdd);
 
-        baseMagic += (growthMagic + 1) / 2;
-        currentMagic += (growthMagic + 1) / 2;
+        float MagicToAdd = ((growthMagic + 0.99f) / 2 * level);
+        baseMagic += Mathf.RoundToInt(MagicToAdd);
+        currentMagic += Mathf.RoundToInt(MagicToAdd);
 
-        baseSpeed += (growthSpeed + 1) / 2;
-        currentSpeed += (growthSpeed + 1) / 2;
-    }
-
-    public void SetLevel(int level)
-    {
-        SetInitialStats(); // Initialize Level 1
-        for (int i = 0; i < level; i++)
-        {
-            LevelUp();
-        }
+        float speedToAdd = ((growthSpeed + 0.99f) / 2 * level);
+        baseSpeed += Mathf.RoundToInt(speedToAdd);
+        currentSpeed += Mathf.RoundToInt(speedToAdd);
     }
 }

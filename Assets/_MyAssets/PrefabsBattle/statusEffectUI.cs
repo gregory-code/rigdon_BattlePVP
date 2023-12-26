@@ -111,8 +111,8 @@ public class statusEffectUI : MonoBehaviour
         if (statusIndex == 7 && gameMaster.activeMonsters[0] == myMonster)
         {
             counter--;
-            bool isMine = gameMaster.IsItMyTurn();
-            myMonster.ChangeHealth(GetBurnDamage(), !isMine, usingMonster.teamIndex);
+            myMonster.SetSkipConductive();
+            myMonster.ChangeHealth(GetBurnDamage(), !gameMaster.IsItMyTurn(), usingMonster.teamIndex, true);
         }
 
         UpdateStatusCounter(counter);
@@ -146,7 +146,7 @@ public class statusEffectUI : MonoBehaviour
         if(willKill)
         {
             gameMaster.redirectedIndex = myMonster.teamIndex;
-            gameMaster.MoveMonster(false, myMonster.teamIndex, false, false, usingMonster.teamIndex);
+            myMonster.MovePosition(false, usingMonster.attackPoint.x, usingMonster.attackPoint.y);
             StartCoroutine(goBack());
         }
     }
@@ -154,7 +154,7 @@ public class statusEffectUI : MonoBehaviour
     public IEnumerator goBack()
     {
         yield return new WaitForSeconds(0.7f);
-        gameMaster.MoveMonster(false, myMonster.teamIndex, true, true, myMonster.teamIndex);
+        myMonster.MovePosition(true, 0, 0);
     }
 
     public void StatusGotReapplied(int newCounter, int power)

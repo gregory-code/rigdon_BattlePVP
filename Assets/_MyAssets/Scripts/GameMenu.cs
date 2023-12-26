@@ -1,6 +1,5 @@
 using Firebase.Database;
 using Photon.Pun;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,10 +16,21 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] Image rightCurtain;
     [SerializeField] Image leftCurtain;
     [SerializeField] TextMeshProUGUI myTitle;
+    [SerializeField] TextMeshProUGUI myTeamTitle;
     [SerializeField] TextMeshProUGUI enemyTitle;
+    [SerializeField] TextMeshProUGUI enemyTeamTitle;
     [SerializeField] GameObject allMenus;
     [SerializeField] GameObject menuChecks;
     bool showCurtain;
+
+    [SerializeField] Image[] myImages;
+    [SerializeField] TextMeshProUGUI[] myLevels;
+
+    [SerializeField] Image[] enemyImages;
+    [SerializeField] TextMeshProUGUI[] enemyLevels;
+
+    string myTeamName;
+    string enemyTeamName;
 
 
     [Header("Player Data")]
@@ -92,16 +102,22 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         gotEnemyTeam = false;
 
         myTeamPrefs = battleMenuScript.GetMonsterPrefsFromSelectedTeam();
+        string myTeamname = battleMenuScript.GetSelectedTeamName();
+        myTeamName = myTeamname;
 
         yield return StartCoroutine(GetUsernames());
         
         yield return new WaitForSeconds(0.5f);
 
-        yield return StartCoroutine(SendMyTeamPrefs());
+        yield return StartCoroutine(SendMyTeamPrefs(myTeamname));
 
         yield return StartCoroutine(CreateTeams());
 
         yield return new WaitForSeconds(0.5f);
+
+        SetGameMenu();
+
+        yield return new WaitForSeconds(1f);
 
         allMenus.SetActive(false);
         showCurtain = false;
@@ -112,6 +128,51 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         gameMaster.StartFight();
 
         SetCanvasGroup(false);
+    }
+
+    private void SetGameMenu()
+    {
+        myTeamTitle.text = myTeamName;
+        enemyTeamTitle.text = enemyTeamName;
+
+        for (int i = 0; i < 3; i++)
+        {
+            monster myNewMon = GetMyTeam()[i];
+            myImages[i].sprite = myNewMon.stages[myNewMon.GetSpriteIndexFromLevel()];
+            myLevels[i].text = "Lvl " + myNewMon.GetLevel();
+
+            monster enemyNewMon = GetEnemyTeam()[i];
+            enemyImages[i].sprite = enemyNewMon.stages[enemyNewMon.GetSpriteIndexFromLevel()];
+            enemyLevels[i].text = "Lvl " + enemyNewMon.GetLevel();
+        }
+    }
+
+    public void StartIntermission()
+    {
+        StartCoroutine(Intermission());
+    }
+
+    private IEnumerator Intermission()
+    {
+        SetCanvasGroup(true);
+        showCurtain = true;
+
+        yield return new WaitForSeconds(0.5f);
+
+        for(int i = 0; i < 3; i++)
+        {
+            player1Team[i].SetLevel(player1Team[i].GetLevel() + 1);
+            player2Team[i].SetLevel(player2Team[i].GetLevel() + 1);
+        }
+
+        SetGameMenu();
+
+        yield return new WaitForSeconds(2f);
+
+        gameMaster.StartFight();
+
+        SetCanvasGroup(false);
+        showCurtain = false;
     }
 
     private IEnumerator GetUsernames()
@@ -134,7 +195,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         enemyTitle.text = enemyUsername;
     }
 
-    private IEnumerator SendMyTeamPrefs()
+    private IEnumerator SendMyTeamPrefs(string teamNickName)
     {
         string[] myPref = new string[3];
         string[] nickname = new string[3];
@@ -144,7 +205,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             nickname[i] = myTeamPrefs[i].monsterNickname;
         }
 
-        this.photonView.RPC("GetEnemyMonsterRPC", RpcTarget.OthersBuffered, myPref, nickname); // First person to search is player 2
+        this.photonView.RPC("GetEnemyMonsterRPC", RpcTarget.OthersBuffered, myPref, nickname, teamNickName); // First person to search is player 2
 
         while(gotEnemyTeam == false)
         {
@@ -183,8 +244,10 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     }
 
     [PunRPC]
-    void GetEnemyMonsterRPC(string[] enemys, string[] nicknames)
+    void GetEnemyMonsterRPC(string[] enemys, string[] nicknames, string teamName)
     {
+        enemyTeamName = teamName;
+
         for(int i = 0; i < enemys.Length; i++)
         {
             enemyTeamPrefs[i].DeseralizePref(enemys[i]);

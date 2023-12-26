@@ -79,6 +79,7 @@ public class monsterBase : MonoBehaviour
         myMonster.onDamagePopup += damagePopup;
         myMonster.onMovePosition += movePosition;
         myMonster.onRemoveTaunt += RemoveTaunt;
+        myMonster.onRemoveConnections += RemoveConnections;
 
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
@@ -323,7 +324,23 @@ public class monsterBase : MonoBehaviour
         force = (float)Random.Range(10f, 15f);
         explodeHealthBar(force);
 
-        Destroy(this, 0.5f);
+        GetMyMonster().RemoveConnections();
+
+        Destroy(this.gameObject, 0.5f);
+    }
+
+    private void RemoveConnections()
+    {
+        myMonster.onTakeDamage -= takeDamage;
+        myMonster.onHealed -= healHealth;
+        myMonster.onAnimPlayed -= playAnimation;
+        myMonster.onProjectileShot -= ShootProjectile;
+        myMonster.onApplyStatus -= applyStatus;
+        myMonster.onProcStatus -= procStatus;
+        myMonster.onDamagePopup -= damagePopup;
+        myMonster.onMovePosition -= movePosition;
+        myMonster.onRemoveTaunt -= RemoveTaunt;
+        myMonster.onRemoveConnections -= RemoveConnections;
     }
 
     public void explodeHealthBar(float force)

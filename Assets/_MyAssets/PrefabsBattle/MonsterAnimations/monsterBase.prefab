@@ -4102,8 +4102,36 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
-  midMonsterControllers: []
-  finalMonsterControllers: []
+  midMonsterControllers:
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 30fc6ca4fb46da04e846e907b733512f, type: 2}
+  - {fileID: 9100000, guid: c3092009389cbe34e9b54c8eb76ef1e4, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  finalMonsterControllers:
+  - {fileID: 9100000, guid: e570a0f7d44679142b9047fce9b6f431, type: 2}
+  - {fileID: 9100000, guid: e570a0f7d44679142b9047fce9b6f431, type: 2}
+  - {fileID: 9100000, guid: e570a0f7d44679142b9047fce9b6f431, type: 2}
+  - {fileID: 9100000, guid: e570a0f7d44679142b9047fce9b6f431, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 30fc6ca4fb46da04e846e907b733512f, type: 2}
+  - {fileID: 9100000, guid: c3092009389cbe34e9b54c8eb76ef1e4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   statusProcPrefabs:
   - {fileID: 166006, guid: a2e78dba7d7f8f34e9be44acb8469dc2, type: 3}
   - {fileID: 177804, guid: 7568214281a1fb443bc81a02ed35c3a6, type: 3}

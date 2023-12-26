@@ -151,6 +151,11 @@ public class battleMenu : MonoBehaviour, IDataPersistence
         return monsters;
     }
 
+    public string GetSelectedTeamName()
+    {
+        return teamSelects[selectedTeam].GetTeamName();
+    }
+
     public void FindRandomMatch()
     {
         openTeamOptions = false;

@@ -1,7 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static monsterAlly;
 
 public class draticAlly : monsterAlly
 {
@@ -11,6 +11,16 @@ public class draticAlly : monsterAlly
         onAbility += UseAbility;
         GetMyMonster().onAttackAgain += AttackAgain;
         GetMyMonster().onTakeDamage += TookDamage;
+        GetMyMonster().onRemoveConnections += RemoveConnections;
+    }
+
+    private void RemoveConnections()
+    {
+        onAttack -= UseAttack;
+        onAbility -= UseAbility;
+        GetMyMonster().onAttackAgain -= AttackAgain;
+        GetMyMonster().onTakeDamage -= TookDamage;
+        GetMyMonster().onRemoveConnections -= RemoveConnections;
     }
 
     private void AttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
@@ -26,7 +36,7 @@ public class draticAlly : monsterAlly
     {
         if (GetMyMonster().GetPassiveID() == 2 && gameMaster.IsItMyTurn()) // index for cloud legend
         {
-            gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, bMine, userIndex, 4, 0); // index 0  for conductive status
+            gameMaster.ApplyStatus(!gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, gameMaster.IsItMyTurn(), userIndex, 4, 0); // index 0  for conductive status
         }
     }
 
@@ -89,54 +99,54 @@ public class draticAlly : monsterAlly
         int attack3 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 2);
         attack3 = GetMultiplierDamage(attack3);
 
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack1");
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack1");
 
         yield return new WaitForSeconds(0.55f);
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 2, false, targetIndex, false, 0);
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 2, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
 
-        gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
         yield return new WaitForSeconds(0.40f);
-        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
+        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, true);
 
-        if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, targetIndex, 4, 0);
+        if (GetMyMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
+            gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), targetIndex, 4, 0);
 
         yield return new WaitForSeconds(0.1f);
 
         int nextTarget = gameMaster.GetRandomEnemyIndex(targetIndex, -1);
         if(nextTarget != 5)
         {
-            gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, nextTarget, -attack2);
+            gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), nextTarget, -attack2);
             yield return new WaitForSeconds(0.2f);
             nextTarget = gameMaster.GetRedirectedIndex(nextTarget);
 
-            gameMaster.ShootProjectile(false, targetIndex, 2, false, nextTarget, false, 0);
+            gameMaster.ShootProjectile(!gameMaster.IsItMyTurn(), targetIndex, 2, !gameMaster.IsItMyTurn(), nextTarget, false, 0);
 
             yield return new WaitForSeconds(0.1f);
 
-            gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, nextTarget, -attack2);
+            gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), nextTarget, -attack2, true);
 
-            if (GetMyMonster().GetPassiveID() == 1)
-                gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, nextTarget, 4, 0);
+            if (GetMyMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
+                gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), nextTarget, 4, 0);
 
             int finalTarget = gameMaster.GetRandomEnemyIndex(targetIndex, nextTarget);
             if (finalTarget != 5)
             {
-                gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, finalTarget, -attack3);
+                gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), finalTarget, -attack3);
                 yield return new WaitForSeconds(0.2f);
                 finalTarget = gameMaster.GetRedirectedIndex(finalTarget);
 
-                gameMaster.ShootProjectile(false, nextTarget, 2, false, finalTarget, false, 0);
+                gameMaster.ShootProjectile(!gameMaster.IsItMyTurn(), nextTarget, 2, !gameMaster.IsItMyTurn(), finalTarget, false, 0);
 
                 yield return new WaitForSeconds(0.1f);
 
-                gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, finalTarget, -attack3);
+                gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), finalTarget, -attack3, true);
 
-                if (GetMyMonster().GetPassiveID() == 1)
-                    gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, finalTarget, 4, 0);
+                if (GetMyMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
+                    gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), finalTarget, 4, 0);
             }
         }
 
@@ -153,34 +163,34 @@ public class draticAlly : monsterAlly
         int attack2 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1,1);
         attack2 = GetMultiplierDamage(attack2);
 
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "attack2");
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack2");
 
         yield return new WaitForSeconds(0.3f);
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 0, false, targetIndex, false, 0);
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
 
-        gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack1);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
         yield return new WaitForSeconds(0.3f);
-        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack1); // - for damage
+        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, true); // - for damage
 
         yield return new WaitForSeconds(0.1f);
 
-        if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, targetIndex, 4, 0);
+        if (GetMyMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
+            gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), targetIndex, 4, 0);
 
-        gameMaster.ShootProjectile(true, GetMyMonster().teamIndex, 1, false, targetIndex, false, 0);
+        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 1, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
 
-        gameMaster.DeclaringDamage(true, GetMyMonster().teamIndex, false, targetIndex, -attack2);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack2);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
         yield return new WaitForSeconds(0.25f);
-        gameMaster.ChangeMonsterHealth(true, GetMyMonster().teamIndex, false, targetIndex, -attack2); // - for damage
+        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack2, true); // - for damage
 
 
-        if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 0, false, targetIndex, 4, 0);
+        if (GetMyMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
+            gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), targetIndex, 4, 0);
 
         yield return new WaitForSeconds(0.8f);
 
@@ -189,7 +199,7 @@ public class draticAlly : monsterAlly
 
     private IEnumerator LightningRound()
     {
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability1");
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability1");
         
         yield return new WaitForSeconds(0.3f);
         
@@ -200,7 +210,7 @@ public class draticAlly : monsterAlly
 
         int abilityMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
 
-        gameMaster.AttackAgain(true, GetTargetedMonster().teamIndex, abilityMultiplier, false, randomTarget);
+        gameMaster.AttackAgain(gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, abilityMultiplier, !gameMaster.IsItMyTurn(), randomTarget);
 
         gameMaster.waitingForAction = true;
         while(gameMaster.waitingForAction == true)
@@ -213,7 +223,7 @@ public class draticAlly : monsterAlly
 
     private IEnumerator EyeOfTheStorm()
     {
-        gameMaster.AnimateMonster(true, GetMyMonster().teamIndex, "ability2");
+        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability2");
         yield return new WaitForSeconds(0.3f);
         int shieldMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 1);
         float shieldStrength = GetTargetedMonster().GetMaxHealth() * (1f * shieldMultiplier / 100f);
@@ -223,8 +233,8 @@ public class draticAlly : monsterAlly
         float newBubbleBuffer = (shield * 1.1f) + 1.05f;
         shield = Mathf.RoundToInt(newBubbleBuffer);
 
-        gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 1, true, GetTargetedMonster().teamIndex, shield, 0);
-        gameMaster.ApplyStatus(true, GetMyMonster().teamIndex, 2, true, GetTargetedMonster().teamIndex, (GetMoveDamage(3, 0) + 1), 0); // I think however many turns +1 since NextTurn();
+        gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 1, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, shield, 0);
+        gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 2, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, (GetMoveDamage(3, 0) + 1), 0); // I think however many turns +1 since NextTurn();
 
         yield return new WaitForSeconds(0.3f);
 
