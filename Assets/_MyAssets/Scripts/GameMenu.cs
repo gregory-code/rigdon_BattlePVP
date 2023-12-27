@@ -23,11 +23,22 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] GameObject menuChecks;
     bool showCurtain;
 
+    [SerializeField] private expHolder[] expHolders;
+
     [SerializeField] Image[] myImages;
     [SerializeField] TextMeshProUGUI[] myLevels;
+    [SerializeField] Image[] myLevelBars;
+    [SerializeField] Transform[] myExpLists;
 
     [SerializeField] Image[] enemyImages;
+    [SerializeField] Image[] enemyLevelBars;
     [SerializeField] TextMeshProUGUI[] enemyLevels;
+    [SerializeField] Transform[] enemyExpLists;
+
+    [SerializeField] Transform expTitleList;
+    [SerializeField] TextMeshProUGUI expEntry;
+
+    List<TextMeshProUGUI> allText = new List<TextMeshProUGUI>();
 
     string myTeamName;
     string enemyTeamName;
@@ -147,32 +158,125 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
     }
 
+    private IEnumerator EndOfMatchResults()
+    {
+        monster[] myTeam = GetMyTeam();
+        monster[] enemyTeam = GetEnemyTeam();
+
+        int expLength = myTeam[0].GetExpHolders().Count;
+
+        for (int i = 0; i < expLength; i++)
+        {
+            if(ShouldPostIt(i))
+            {
+                AddExpText(expTitleList, myTeam[0].GetExpHold(i).GetTitle());
+
+                for(int x = 0; x < 3; x++)
+                {
+                    yield return AddExp(myExpLists[x], myTeam[x], i, myLevels[x], myLevelBars[x], myImages[x]);
+                }
+
+                for (int x = 0; x < 3; x++)
+                {
+                    yield return AddExp(enemyExpLists[x], enemyTeam[x], i, enemyLevels[x], enemyLevelBars[x], enemyImages[x]);
+                }
+            }
+        }
+    }
+
+    private IEnumerator AddExp(Transform list, monster mon, int expIndex, TextMeshProUGUI levelText, Image levelBar, Image monsterImage)
+    {
+        AddExpText(list, mon.GetExpHold(expIndex).GetExpText());
+        float exp = mon.GetExpHold(expIndex).ExplenishExp();
+        while (exp > 0)
+        {
+            yield return new WaitForEndOfFrame();
+            bool levelUp = mon.TryLevelUp();
+            levelBar.fillAmount = mon.GetLevelPercentage();
+            exp--;
+
+            if (levelUp)
+            {
+                levelText.text = "Lvl " + mon.GetLevel();
+                monsterImage.sprite = mon.stages[mon.GetSpriteIndexFromLevel()];
+                levelBar.fillAmount = 0;
+
+            }
+        }
+    }
+
+    private void AddExpText(Transform list, string text)
+    {
+        TextMeshProUGUI newTitle = Instantiate(expEntry, list);
+        newTitle.text = text;
+        allText.Add(newTitle);
+    }
+
+    private bool ShouldPostIt(int whichHold)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (GetMyTeam()[i].GetExpHold(whichHold).GetExp() > 0)
+            {
+                return true;
+            }
+
+            if (GetEnemyTeam()[i].GetExpHold(whichHold).GetExp() > 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void StartIntermission()
     {
         StartCoroutine(Intermission());
     }
 
+
+    bool waitingForEnemy;
     private IEnumerator Intermission()
     {
         SetCanvasGroup(true);
         showCurtain = true;
+        waitingForEnemy = true;
+
+        CleanUp();
 
         yield return new WaitForSeconds(0.5f);
 
-        for(int i = 0; i < 3; i++)
+        yield return StartCoroutine(EndOfMatchResults());
+
+        yield return new WaitForSeconds(5f);
+
+        this.photonView.RPC("ReadyToContinueRPC", RpcTarget.OthersBuffered); // First person to search is player 2
+
+        while (waitingForEnemy == true)
         {
-            player1Team[i].SetLevel(player1Team[i].GetLevel() + 1);
-            player2Team[i].SetLevel(player2Team[i].GetLevel() + 1);
+            yield return new WaitForEndOfFrame();
         }
-
-        SetGameMenu();
-
-        yield return new WaitForSeconds(2f);
 
         gameMaster.StartFight();
 
         SetCanvasGroup(false);
         showCurtain = false;
+    }
+
+    private void CleanUp()
+    {
+        foreach (TextMeshProUGUI text in allText)
+        {
+            Destroy(text.gameObject);
+        }
+        allText.Clear();
+
+        GameObject[] leftoverEffects = GameObject.FindGameObjectsWithTag("effect");
+        foreach(GameObject effect in leftoverEffects)
+        {
+            Destroy(effect);
+        }
     }
 
     private IEnumerator GetUsernames()
@@ -228,6 +332,14 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             newEnemy.SetFromPref(enemyTeamPrefs[i]);
             newEnemy.teamIndex = i;
 
+            for (int x = 0; x < expHolders.Length; x++)
+            {
+                expHolder newHolder1 = Instantiate(expHolders[x]);
+                expHolder newHolder2 = Instantiate(expHolders[x]);
+                newAlly.SetExpHolder(newHolder1);
+                newEnemy.SetExpHolder(newHolder2);
+            }
+
             if (bIsPlayer1)
             {
                 player1Team[i] = newAlly;
@@ -255,6 +367,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
 
         gotEnemyTeam = true;
+    }
+
+    [PunRPC]
+    void ReadyToContinueRPC()
+    {
+        waitingForEnemy = false;
     }
 
     public IEnumerator LoadData(DataSnapshot data)

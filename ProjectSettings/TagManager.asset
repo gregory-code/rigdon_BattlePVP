@@ -15,6 +15,7 @@ TagManager:
   - HoloRect
   - FullCircle
   - HoloCircle
+  - effect
   layers:
   - Default
   - TransparentFX

@@ -29,16 +29,18 @@ public class lusseliaAlly : monsterAlly
         if (GetMyMonster().bMine == false)
             return;
 
+        while (attackMultiplier > 100)
+        {
+            attackMultiplier--;
+            percentageMultiplier++;
+        }
         attackMultiplier = percentageMultiplier;
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
 
     private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
     {
-        if (GetMyMonster().GetPassiveID() == 2) // index for cloud legend
-        {
 
-        }
     }
 
     private void UseAttack(int attackID, int targetIndex, bool consumeTurn)
@@ -75,18 +77,6 @@ public class lusseliaAlly : monsterAlly
         }
     }
 
-    private void FinishMove(bool consumeTurn, bool isAttack)
-    {
-        attackMultiplier = 100;
-        gameMaster.waitingForAction = false;
-
-        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
-        
-        if (consumeTurn == true)
-            gameMaster.NextTurn();
-        
-    }
-
     private IEnumerator Starfall(int targetIndex, bool consumeTurn)
     {
         gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack1");
@@ -98,7 +88,7 @@ public class lusseliaAlly : monsterAlly
 
         gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 7, !gameMaster.IsItMyTurn(), targetIndex, true, 0);
 
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
         yield return new WaitForSeconds(0.25f);
@@ -132,7 +122,7 @@ public class lusseliaAlly : monsterAlly
             {
                 targetIndex = i;
                 gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 9, !gameMaster.IsItMyTurn(), targetIndex, true, 1);
-                gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1);
+                gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
                 yield return new WaitForSeconds(1.2f);
                 gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, true); // - for damage
 

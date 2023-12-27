@@ -38,8 +38,13 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [SerializeField] projectileScript[] projectilePrefabs;
     [SerializeField] GameObject[] statusPrefabs;
 
+    public GameObject regularDeath;
+    public GameObject grimmetalDeath;
+    public bool bRegularDeath = true;
+
     public void StartFight()
     {
+        bRegularDeath = true;
         movingToNewGame = false;
         spawnTeams();
         sortBySpeed();
@@ -159,6 +164,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
         {
             case 2:
                 return newMonster.AddComponent<draticAlly>();
+
+            case 4:
+                return newMonster.AddComponent<grimmetalAlly>();
 
             case 8:
                 return newMonster.AddComponent<lusseliaAlly>();
@@ -463,15 +471,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
         GetSpecificMonster(bMine2, targetTeamIndex).ChangeHealth(healthChange, bMine, userTeamIndex, isAttack);
     }
 
-    public void DeclaringDamage(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
+    public void DeclaringDamage(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange, bool destroyShields)
     {
-        this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, bMine2, targetTeamIndex, healthChange);
+        this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, bMine, userTeamIndex, bMine2, targetTeamIndex, healthChange, destroyShields);
     }
 
     [PunRPC]
-    void DeclaringDamageRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange)
+    void DeclaringDamageRPC(bool bMine, int userTeamIndex, bool bMine2, int targetTeamIndex, int healthChange, bool destroyShields)
     {
-        GetSpecificMonster(bMine2, targetTeamIndex).DelcaringDamage(healthChange, bMine, userTeamIndex);
+        GetSpecificMonster(bMine2, targetTeamIndex).DelcaringDamage(healthChange, bMine, userTeamIndex, destroyShields);
     }
 
     public void ApplyStatus(bool bMine, int userIndex, int statusIndex, bool bMine2, int TargetIndex, int counter, int power)
@@ -508,6 +516,21 @@ public class GameMaster : MonoBehaviourPunCallbacks
     void AttackAgainRPC(bool bMine, int TargetIndex, int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
     {
         GetSpecificMonster(bMine, TargetIndex).AttackAgain(percentageMultiplier, bMine2, TargetOfTargetIndex);
+    }
+
+    public delegate void OnMonsterDied(monster whoDied);
+    public event OnMonsterDied onMonsterDied;
+
+    public void GiveKillExp(bool bMine, int TargetIndex)
+    {
+        this.photonView.RPC("GiveKillExpRPC", RpcTarget.AllBuffered, bMine, TargetIndex);
+    }
+
+    [PunRPC]
+    void GiveKillExpRPC(bool bMine, int TargetIndex)
+    {
+        onMonsterDied?.Invoke(GetSpecificMonster(bMine, TargetIndex));
+        GetSpecificMonster(bMine, TargetIndex).GetExpHold(1).GainExp();
     }
 
     public void AdjustTurnOrder(bool bMine, int TargetIndex, bool goFirst, bool goLast)

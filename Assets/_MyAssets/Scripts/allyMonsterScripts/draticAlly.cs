@@ -28,6 +28,11 @@ public class draticAlly : monsterAlly
         if (GetMyMonster().bMine == false)
             return;
 
+        while(attackMultiplier > 100)
+        {
+            attackMultiplier--;
+            percentageMultiplier++;
+        }
         attackMultiplier = percentageMultiplier;
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
@@ -74,20 +79,6 @@ public class draticAlly : monsterAlly
         }
     }
 
-    private void FinishMove(bool consumeTurn, bool isAttack)
-    {
-        attackMultiplier = 100;
-        gameMaster.waitingForAction = false;
-
-        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
-        
-        if (consumeTurn == true)
-        {
-            gameMaster.NextTurn();
-        }
-        
-    }
-
     private IEnumerator RingingThunder(int targetIndex, bool consumeTurn)
     {
         int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0,0); // consider reducing by a % that would be hype
@@ -104,7 +95,7 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.55f);
         gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 2, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
 
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
@@ -119,7 +110,7 @@ public class draticAlly : monsterAlly
         int nextTarget = gameMaster.GetRandomEnemyIndex(targetIndex, -1);
         if(nextTarget != 5)
         {
-            gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), nextTarget, -attack2);
+            gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), nextTarget, -attack2, destroyShields);
             yield return new WaitForSeconds(0.2f);
             nextTarget = gameMaster.GetRedirectedIndex(nextTarget);
 
@@ -135,7 +126,7 @@ public class draticAlly : monsterAlly
             int finalTarget = gameMaster.GetRandomEnemyIndex(targetIndex, nextTarget);
             if (finalTarget != 5)
             {
-                gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), finalTarget, -attack3);
+                gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), finalTarget, -attack3, destroyShields);
                 yield return new WaitForSeconds(0.2f);
                 finalTarget = gameMaster.GetRedirectedIndex(finalTarget);
 
@@ -168,7 +159,7 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.3f);
         gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 0, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
 
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
         yield return new WaitForSeconds(0.3f);
@@ -181,7 +172,7 @@ public class draticAlly : monsterAlly
 
         gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 1, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
 
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack2);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack2, destroyShields);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 

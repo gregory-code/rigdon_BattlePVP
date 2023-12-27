@@ -40,6 +40,11 @@ public class minfurAlly : monsterAlly
         if (GetMyMonster().bMine == false)
             return;
 
+        while (attackMultiplier > 100)
+        {
+            attackMultiplier--;
+            percentageMultiplier++;
+        }
         attackMultiplier = percentageMultiplier;
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
@@ -62,7 +67,7 @@ public class minfurAlly : monsterAlly
         yield return new WaitForSeconds(0.1f);
         gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 6, gameMaster.IsItMyTurn(), recivingMon.teamIndex, false, 0);
         yield return new WaitForSeconds(0.2f);
-        int heal = GetMyMonster().GetCurrentMagic() + GetMoveDamage(5, 0);
+        int heal = GetMyMonster().GetBaseMagic() + GetMoveDamage(5, 0);
         gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, gameMaster.IsItMyTurn(), recivingMon.teamIndex, heal, false);
 
     }
@@ -106,18 +111,6 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private void FinishMove(bool consumeTurn, bool isAttack)
-    {
-        attackMultiplier = 100;
-        gameMaster.waitingForAction = false;
-
-        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
-        
-        if (consumeTurn == true)
-            gameMaster.NextTurn();
-        
-    }
-
     private IEnumerator Cuddle(int targetIndex, bool consumeTurn)
     {
         gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack1");
@@ -135,7 +128,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(false, 1, 2, 4, 8);
+            YoinkStatuses(false, 1, 2, 4, 8, 9);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -147,7 +140,7 @@ public class minfurAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private void YoinkStatuses(bool isAlly, int status, int status2, int status3, int status4)
+    private void YoinkStatuses(bool isAlly, int status, int status2, int status3, int status4, int status5)
     {
         if (GetTargetedMonster().statusEffects.Count <= 0)
             return;
@@ -183,7 +176,7 @@ public class minfurAlly : monsterAlly
         int attack = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
         attack = GetMultiplierDamage(attack);
 
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack);
+        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack, destroyShields);
         yield return new WaitForSeconds(0.1f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
@@ -192,7 +185,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(false, 1, 2, 4, 8);
+            YoinkStatuses(false, 1, 2, 4, 8, 9);
         }
 
         gameMaster.AdjustTurnOrder(!gameMaster.IsItMyTurn(), targetIndex, false, true);
@@ -217,7 +210,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(true, 0, 3, 7, -1);
+            YoinkStatuses(true, 0, 3, 7, -1, -1);
         }
 
         monster[] myteam = gameMaster.GetMonstersTeam(GetMyMonster());
@@ -268,7 +261,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMyMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(true, 0, 3, 7, -1);
+            YoinkStatuses(true, 0, 3, 7, -1, -1);
         }
 
         yield return new WaitForSeconds(0.5f);

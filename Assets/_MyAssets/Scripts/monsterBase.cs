@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
-using System.ComponentModel;
+using static monsterAlly;
 
 public class monsterBase : MonoBehaviour
 {
@@ -34,6 +34,7 @@ public class monsterBase : MonoBehaviour
     private Vector3 lerpLocation;
 
     public int attackMultiplier = 100;
+    public bool destroyShields = false;
 
     public delegate void OnOpenInfo();
     public event OnOpenInfo onOpenInfo;
@@ -51,6 +52,7 @@ public class monsterBase : MonoBehaviour
         lerpLocation.x = spawnLocation.transform.position.x;
         lerpLocation.y = spawnLocation.transform.position.y;
 
+        myMonster.GetExpHold(0).GainExp();
         myMonster.myBase = this;
 
         monsterDependecy dependecies = GetComponent<monsterDependecy>();
@@ -326,7 +328,11 @@ public class monsterBase : MonoBehaviour
 
         GetMyMonster().RemoveConnections();
 
-        Destroy(this.gameObject, 0.5f);
+        GameObject deathEffect = (gameMaster.bRegularDeath) ? gameMaster.regularDeath : gameMaster.grimmetalDeath ;
+        GameObject deathSmoke = Instantiate(deathEffect);
+        deathSmoke.transform.position = monsterSprite.transform.position;
+
+        Destroy(this.gameObject, 1f);
     }
 
     private void RemoveConnections()
@@ -377,6 +383,45 @@ public class monsterBase : MonoBehaviour
     {
         moveContent[] moves = GetMyMonster().GetMoveContents();
         return moves[whichMove];
+    }
+
+    public void FinishMove(bool consumeTurn, bool isAttack)
+    {
+        StartCoroutine(FinishAllyMove(consumeTurn, isAttack));
+    }
+
+    private IEnumerator FinishAllyMove(bool consumeTurn, bool isAttack)
+    {
+        if (isAttack)
+        {
+            CheckForSteelYourself();
+
+            yield return new WaitForSeconds(0.2f);
+
+            attackMultiplier = 100;
+            destroyShields = false;
+        }
+
+        gameMaster.waitingForAction = false;
+
+        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
+
+        if (consumeTurn == true)
+        {
+            gameMaster.NextTurn();
+        }
+    }
+
+    private void CheckForSteelYourself()
+    {
+        if (GetMyMonster().statusEffects.Count > 0)
+        {
+            statusEffectUI steelYourself = GetMyMonster().GetStatus(9);
+            if(steelYourself != null && gameMaster.IsItMyTurn())
+            {
+                gameMaster.RemoveStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 9, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
+            }
+        }
     }
 
     public void OnMouseOver()

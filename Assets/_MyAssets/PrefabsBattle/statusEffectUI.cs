@@ -20,6 +20,8 @@ public class statusEffectUI : MonoBehaviour
     private int counter;
     private int power;
 
+    bool alreadyRemoved = false;
+
     private int secondaryPower;
 
     public void SetStatusIndex(int statusIndex, int counter, int power, monster myMonster, bool bmine, int userIndex, GameMaster gameMaster)
@@ -40,34 +42,45 @@ public class statusEffectUI : MonoBehaviour
         myMonster.onUsedAction += UsedAction;
         UpdateStatusCounter(counter);
 
-        if(statusIndex == 3)
+        switch(statusIndex)
         {
-            StatChange(0, power);
+            case 3:
+                StatChange(0, power);
+                break;
+
+            case 4:
+                StatChange(0, power);
+                StatChange(1, power);
+                break;
+
+            case 5:
+                EstablishBestFriends();
+                break;
+
+            case 9:
+                power -= 100;
+                myMonster.myBase.attackMultiplier += power;
+                myMonster.myBase.destroyShields = true;
+                break;
+        }
+    }
+
+    private void EstablishBestFriends()
+    {
+        this.power = usingMonster.GetCurrentStrength();
+        secondaryPower = usingMonster.GetCurrentMagic();
+
+        if (usingMonster.GetSpriteIndexFromLevel() == 0)
+        {
+            float cutInHalf = this.power / 2f;
+            this.power = Mathf.RoundToInt(cutInHalf);
+
+            float cutInHalf2 = secondaryPower / 2f;
+            secondaryPower = Mathf.RoundToInt(cutInHalf2);
         }
 
-        if (statusIndex == 4)
-        {
-            StatChange(0, power);
-            StatChange(1, power);
-        }
-
-        if(statusIndex == 5)
-        {
-            this.power = usingMonster.GetCurrentStrength();
-            secondaryPower = usingMonster.GetCurrentMagic();
-
-            if (usingMonster.GetSpriteIndexFromLevel() == 0)
-            {
-                float cutInHalf = this.power / 2f;
-                this.power = Mathf.RoundToInt(cutInHalf);
-
-                float cutInHalf2 = secondaryPower / 2f;
-                secondaryPower = Mathf.RoundToInt(cutInHalf2);
-            }
-
-            StatChange(0, this.power);
-            StatChange(1, secondaryPower);
-        }
+        StatChange(0, this.power);
+        StatChange(1, secondaryPower);
     }
 
     public monster GetUsingMonster()
@@ -185,27 +198,36 @@ public class statusEffectUI : MonoBehaviour
 
     public void GettingRemoved()
     {
-        if (statusIndex == 3)
-        {
-            StatChange(0, -power);
-        }
+        if (alreadyRemoved)
+            return;
 
-        if (statusIndex == 4)
-        {
-            StatChange(0, -power);
-            StatChange(1, -power);
-        }
+        alreadyRemoved = true;
 
-        if(statusIndex == 5)
+        switch(statusIndex)
         {
-            usingMonster.onDeclaredDamage -= DelcaringDamage;
-            StatChange(0, -power);
-            StatChange(1, -power);
-        }
+            case 3:
+                StatChange(0, -power);
+                break;
 
-        if(statusIndex == 6)
-        {
-            usingMonster.onDeclaredDamage -= DelcaringDamage;
+            case 4:
+                StatChange(0, -power);
+                StatChange(1, -power);
+                break;
+
+            case 5:
+                usingMonster.onDeclaredDamage -= DelcaringDamage;
+                StatChange(0, -power);
+                StatChange(1, -power);
+                break;
+
+            case 6:
+                usingMonster.onDeclaredDamage -= DelcaringDamage;
+                break;
+
+            case 9: // add extra logic if another multipler attack gets added
+                myMonster.myBase.attackMultiplier -= power;
+                myMonster.myBase.destroyShields = false;
+                break;
         }
     }
 

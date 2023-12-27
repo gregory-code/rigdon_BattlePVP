@@ -29,7 +29,31 @@ public class monster : ScriptableObject
     public Color matchingColor;
 
     [Header("Stats")]
-    [SerializeField] private int level;
+    private int level;
+    private int exp = 0;
+    private List<expHolder> expHolders = new List<expHolder>();
+
+    public float GetLevelPercentage()
+    {
+        return (exp * 1f) / 100f;
+    }
+
+    public bool TryLevelUp()
+    {
+        exp++;
+        if(exp >= 100)
+        {
+            strawberries += 3;
+            exp = 0;
+            SetLevel(level + 1);
+            return true;
+        }
+        return false;
+    }
+
+    private int hpDamageCap = int.MinValue;
+    public void SetDamageCap(int cap) { hpDamageCap = cap; }
+
     [SerializeField] private int initial_HP;
     private int maxHP;
     private int currentHP;
@@ -85,6 +109,11 @@ public class monster : ScriptableObject
 
     public void SetEffectsList(Transform list) { effectsList = list; }
     public void SetStatusEffectPrefab(statusEffectUI prefab) { statusEffectPrefab = prefab; }
+
+    public void SetExpHolder(expHolder holder) { expHolders.Add(holder); }
+    public List<expHolder> GetExpHolders() { return expHolders; }
+    public expHolder GetExpHold(int which) { return expHolders[which]; }
+
 
     private int strawberries = 5;
     public bool TryConsumeStrawberry()
@@ -188,11 +217,32 @@ public class monster : ScriptableObject
     public delegate void OnDeclaredDamage(int finalCalculations, bool bMine2, int userIndex, bool willKill);
     public event OnDeclaredDamage onDeclaredDamage;
 
-    public void DelcaringDamage(int theoreticalDamage, bool bMine2, int userIndex)
+    public void DelcaringDamage(int theoreticalDamage, bool bMine2, int userIndex, bool destroyShields)
     {
         bool died = false;
 
+        if(destroyShields)
+        {
+            if(statusEffects.Count > 0)
+            {
+                statusEffectUI bubble = GetStatus(1);
+                statusEffectUI spellShield = GetStatus(8);
+                if(bubble != null)
+                {
+                    onProcStatus?.Invoke(true, 1, true);
+                    DestroyStatus(1);
+                }
+                if(spellShield != null)
+                {
+                    onProcStatus?.Invoke(true, 8, true);
+                    DestroyStatus(8);
+                }
+            }
+        }
+
         theoreticalDamage = CalculateConductive(theoreticalDamage, false);
+
+        theoreticalDamage = DamageCap(theoreticalDamage);
 
         statusEffectUI bubbleStatus = GetStatus(1);
         int bubbleHealth = 0;
@@ -230,7 +280,7 @@ public class monster : ScriptableObject
     public void SetSkipConductive() { SkipConductive = true; }
     public void ChangeHealth(int change, bool bMine, int userIndex, bool isAttack) // for who did the attack
     {
-        if (change == 0)
+        if (change == 0 || currentHP <= 0)
             return;
 
         if(change > 0 && isAttack == false)
@@ -243,7 +293,7 @@ public class monster : ScriptableObject
             HealBurn();
             onDamagePopup?.Invoke(change, false);
             onHealed?.Invoke(change, bMine, userIndex);
-            return;
+            return; // it's a heal
         }
 
         bool died = false;
@@ -255,6 +305,8 @@ public class monster : ScriptableObject
 
         if (change >= 0 && isAttack == true)
             return;
+
+        change = DamageCap(change);
 
         statusEffectUI bubbleStatus = GetStatus(1);
         if (bubbleStatus != null && bubbleStatus.GetCounter() > 0) // bubble
@@ -287,10 +339,21 @@ public class monster : ScriptableObject
         {
             currentHP = 0;
             died = true;
+
+            if (myBase.gameMaster.IsItMyTurn())
+                myBase.gameMaster.GiveKillExp(bMine, userIndex);
         }
 
         onTakeDamage?.Invoke(change, died, bMine, userIndex, this);
         onDamagePopup?.Invoke(change, false);
+    }
+
+    private int DamageCap(int incomingDamage)
+    {
+        if (incomingDamage <= hpDamageCap)
+            incomingDamage = hpDamageCap;
+
+        return incomingDamage;
     }
 
     private int CalculateConductive(int damage, bool triggerProc)
@@ -534,8 +597,8 @@ public class monster : ScriptableObject
         this.level = level;
         level--;
 
-        maxHP += (growthHP + 3);
-        currentHP += (growthHP + 3);
+        maxHP += (growthHP + 3) * level;
+        currentHP += (growthHP + 3) * level;
 
         float strengthToAdd = ((growthStrength + 0.99f) / 2 * level);
         baseStrength += Mathf.RoundToInt(strengthToAdd);
