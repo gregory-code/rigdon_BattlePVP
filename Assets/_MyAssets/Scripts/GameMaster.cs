@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class GameMaster : MonoBehaviourPunCallbacks
 {
@@ -87,6 +88,28 @@ public class GameMaster : MonoBehaviourPunCallbacks
         }
 
         return myTeam;
+    }
+
+    public monster GetMonster(monster reference, bool bMine, int index)
+    {
+
+        monster[] myTeam = gameMenu.GetMyTeam();
+        monster[] enemyTeam = gameMenu.GetEnemyTeam();
+
+        for (int i = 0; i < myTeam.Length; i++)
+        {
+            if (myTeam[i] == reference)
+            {
+                return myTeam[index];
+            }
+
+            if (enemyTeam[i] == reference)
+            {
+                return enemyTeam[index];
+            }
+        }
+
+        return myTeam[index];
     }
 
     public int GetRandomEnemyIndex(int indexToExclude, int otherIndexToExlude)
@@ -190,11 +213,19 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public List<monster> activeMonsters = new List<monster>();
 
-    private void addTurn(monster newMonster)
+    private void addTurn(monster newMonster, bool insertFirst)
     {
         monsterTurnScript newMonsterTurn = Instantiate(monsterTurnPrefab, monsterTurnParent);
         newMonsterTurn.Init(newMonster.bMine, newMonster.stagesIcons[newMonster.GetSpriteIndexFromLevel()]);
-        monsterTurnList.Add(newMonsterTurn);
+
+        if(insertFirst)
+        {
+            monsterTurnList.Insert(0, newMonsterTurn);
+        }
+        else
+        {
+            monsterTurnList.Add(newMonsterTurn);
+        }
     }
 
     private void deleteTurn(int where)
@@ -219,7 +250,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         foreach (monster mon in activeMonsters)
         {
-            addTurn(mon);
+            addTurn(mon, false);
         }
     }
 
@@ -332,6 +363,8 @@ public class GameMaster : MonoBehaviourPunCallbacks
     }
 
     private bool waitingQueue;
+    private bool addToFront;
+    private monster monsterToAdd;
     private IEnumerator ExecuteNextTurn()
     {
         while (waitingQueue == true)
@@ -347,14 +380,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
             if (gameMenu.GetMyTeam()[i] == finishedMonster)
             {
                 activeMonsters.Add(gameMenu.GetMyTeam()[i]);
-                addTurn(gameMenu.GetMyTeam()[i]);
+                addTurn(gameMenu.GetMyTeam()[i], false);
                 break;
             }
 
             if (gameMenu.GetEnemyTeam()[i] == finishedMonster)
             {
                 activeMonsters.Add(gameMenu.GetEnemyTeam()[i]);
-                addTurn(gameMenu.GetEnemyTeam()[i]);
+                addTurn(gameMenu.GetEnemyTeam()[i], false);
                 break;
             }
         }
@@ -364,6 +397,13 @@ public class GameMaster : MonoBehaviourPunCallbacks
         foreach (monster mon in activeMonsters)
         {
             mon.NextTurn();
+        }
+
+        if(addToFront)
+        {
+            activeMonsters.Insert(0, monsterToAdd);
+            addTurn(monsterToAdd, true);
+            addToFront = false;
         }
 
         selectNew();
@@ -415,15 +455,28 @@ public class GameMaster : MonoBehaviourPunCallbacks
         GetSpecificMonster(bMine, teamIndex).UsedAction(isAttack);
     }
 
-    public void MoveMonster(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex)
+    public void MoveMonster(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex, bool uniquePos, int whichPos)
     {
-        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, goHome, bMine2, targetIndex);
+        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, bMine, teamIndex, goHome, bMine2, targetIndex, uniquePos, whichPos);
     }
 
     [PunRPC]
-    void MoveMonsterRPC(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex)
+    void MoveMonsterRPC(bool bMine, int teamIndex, bool goHome, bool bMine2, int targetIndex, bool uniquePos, int whichPos)
     {
-        Vector3 pos = GetSpecificMonster(bMine2, targetIndex).spawnLocation;
+        if (uniquePos == true && whichPos == 1)
+        {
+            if(myTurn == true && !bMine)
+            {
+                whichPos++;
+            }
+
+            if(myTurn == false && bMine)
+            {
+                whichPos++;
+            }
+        }
+
+        Vector3 pos = (uniquePos) ? uniqueLocations[whichPos].position : GetSpecificMonster(bMine2, targetIndex).spawnLocation;
 
         if (bMine && bMine2 == false)
         {
@@ -554,12 +607,13 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         if(goFirst)
         {
-
+            addToFront = true;
+            monsterToAdd = target;
         }
         else if(goLast)
         {
             activeMonsters.Add(target);
-            addTurn(target);
+            addTurn(target, false);
         }
     }
 

@@ -102,6 +102,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2858fd571e491e241b67245e0763c1be, type: 3}
   - {fileID: 21300000, guid: 89efc6666372fd14a9fd66afacf7e854, type: 3}
   - {fileID: 21300000, guid: 176ffa8e173413f439ab6bd9d2039dd6, type: 3}
+  - {fileID: 21300000, guid: d20a58de480c5f64c9ae5550c250e6ac, type: 3}
   activeCounterText: {fileID: 7223047464945705902}
 --- !u!95 &3372933081414182728
 Animator:

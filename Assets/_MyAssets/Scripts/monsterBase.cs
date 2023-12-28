@@ -176,7 +176,7 @@ public class monsterBase : MonoBehaviour
         statusPrefabs[whichStatus] = Instantiate(statusPrefab, effectSpawn);
         statusPrefabs[whichStatus].transform.localPosition = Vector3.one;
 
-        if(whichStatus == 2)
+        if(whichStatus == 2 || whichStatus == 10)
             SetTaunt();
     }
 
@@ -209,7 +209,7 @@ public class monsterBase : MonoBehaviour
         monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
         for (int i = 0; i < myTeam.Length; i++)
         {
-            if(myTeam[i].GetStatus(2) == null)
+            if(myTeam[i].GetStatus(2) == null && myTeam[i].GetStatus(10) == null)
             {
                 myTeam[i].isTargetable = false;
             }
@@ -229,7 +229,7 @@ public class monsterBase : MonoBehaviour
         bool someoneIsTaunting = false;
         for (int i = 0; i < myTeam.Length; i++)
         {
-            if (myTeam[i].GetStatus(2) != null)
+            if (myTeam[i].GetStatus(2) != null && myTeam[i].GetStatus(10) == null)
             {
                 someoneIsTaunting = true;
             }
@@ -269,7 +269,7 @@ public class monsterBase : MonoBehaviour
     {
         monsterAnimator.SetTrigger("dead");
         
-        if (gameMaster.activeMonsters[0] == GetMyMonster() && gameMaster.IsItMyTurn())
+        if (gameMaster.activeMonsters[0] == GetMyMonster() && isMine())
         {
             gameMaster.NextTurn();
         }
@@ -412,14 +412,19 @@ public class monsterBase : MonoBehaviour
         }
     }
 
+    public bool isMine()
+    {
+        return gameMaster.IsItMyTurn();
+    }
+
     private void CheckForSteelYourself()
     {
         if (GetMyMonster().statusEffects.Count > 0)
         {
             statusEffectUI steelYourself = GetMyMonster().GetStatus(9);
-            if(steelYourself != null && gameMaster.IsItMyTurn())
+            if(steelYourself != null && isMine())
             {
-                gameMaster.RemoveStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 9, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
+                gameMaster.RemoveStatus(isMine(), GetMyMonster().teamIndex, 9, isMine(), GetMyMonster().teamIndex);
             }
         }
     }

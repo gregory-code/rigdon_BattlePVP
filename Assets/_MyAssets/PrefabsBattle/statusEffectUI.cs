@@ -14,9 +14,6 @@ public class statusEffectUI : MonoBehaviour
     private monster myMonster;
     private monster usingMonster;
     private int usingMonsterTeamIndex;
-    private float usingMonsterAttackPointX;
-    private float usingMonsterAttackPointY;
-    private int usingMonsterHalfStrength;
 
     private GameMaster gameMaster;
 
@@ -30,7 +27,7 @@ public class statusEffectUI : MonoBehaviour
 
     public void SetStatusIndex(int statusIndex, int counter, int power, monster myMonster, bool bmine, int userIndex, GameMaster gameMaster)
     {
-        usingMonster = gameMaster.GetMonstersTeam(myMonster)[userIndex]; // this will always grab mine not the enemeis
+        usingMonster = gameMaster.GetMonster(myMonster, bmine, userIndex);
 
         statusImage.sprite = statusSprites[statusIndex];
         if(statusIndex == 5 || statusIndex == 6)
@@ -40,9 +37,6 @@ public class statusEffectUI : MonoBehaviour
         }
 
         usingMonsterTeamIndex = usingMonster.teamIndex;
-        usingMonsterAttackPointX = usingMonster.attackPoint.x;
-        usingMonsterAttackPointY = usingMonster.attackPoint.y;
-        usingMonsterHalfStrength = usingMonster.GetHalfStrength();
 
 
         this.gameMaster = gameMaster;
@@ -126,7 +120,7 @@ public class statusEffectUI : MonoBehaviour
             counter = Mathf.RoundToInt(newBubbleValue);
         }
 
-        if(statusIndex == 0 || statusIndex == 2 || statusIndex == 8)
+        if(statusIndex == 0 || statusIndex == 2 || statusIndex == 10)
         {
             counter--;
         }
@@ -173,7 +167,7 @@ public class statusEffectUI : MonoBehaviour
         if(willKill)
         {
             gameMaster.redirectedIndex = myMonster.teamIndex;
-            myMonster.MovePosition(false, usingMonsterAttackPointX, usingMonsterAttackPointY);
+            myMonster.MovePosition(false, usingMonster.attackPoint.x, usingMonster.attackPoint.y);
             StartCoroutine(goBack());
         }
     }
@@ -242,6 +236,18 @@ public class statusEffectUI : MonoBehaviour
                 power -= 100;
                 myMonster.myBase.attackMultiplier -= power;
                 myMonster.myBase.destroyShields = false;
+                break;
+
+            case 10:
+                monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (myTeam[i].GetCurrentHealth() > 0)
+                    {
+                        myTeam[i].MovePosition(true, 0, 0);
+                    }
+                }
                 break;
         }
     }

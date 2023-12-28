@@ -9856,6 +9856,7 @@ MonoBehaviour:
   - {fileID: 8224381415989937120, guid: 640614f3416fa084d93e9b21aeb96470, type: 3}
   - {fileID: 189378, guid: 351af065b7d39704bba8fa204705caaa, type: 3}
   - {fileID: 143098, guid: 8bfcb670fdbe69049ba78f18c342a9bf, type: 3}
+  - {fileID: 1895138145459492, guid: 3c4269bcc0828c547ac6babe3283b4d6, type: 3}
   regularDeath: {fileID: 173590, guid: 9199f48996e301e408b14a54449d591a, type: 3}
   grimmetalDeath: {fileID: 1221293952758510, guid: cf2871a4bbfb7f64d8172bf9429514d1,
     type: 3}
@@ -21547,6 +21548,7 @@ MonoBehaviour:
   - {fileID: 6070293028441550235, guid: 6fd93dd6b1cf36d4eb14df4fb2b98d90, type: 3}
   - {fileID: 6070293028441550235, guid: 7817ce968f6a5434c889acb7fa9644a9, type: 3}
   - {fileID: 4328858284941032501, guid: fdfd9141c82ced94a88a6b51c3eaa976, type: 3}
+  - {fileID: 4328858284941032501, guid: d9473fcd033451142aeca6938f56ac3b, type: 3}
   moveContentList: []
 --- !u!114 &957664542
 MonoBehaviour:
@@ -28595,7 +28597,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 184.2, y: 0.6}
+  m_AnchoredPosition: {x: 200, y: 0.6}
   m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1258162481
@@ -43961,7 +43963,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -184.2, y: 0.6}
+  m_AnchoredPosition: {x: -200.1, y: 0.6}
   m_SizeDelta: {x: 10, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1835099545

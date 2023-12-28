@@ -76,7 +76,7 @@ public class grimmetalAlly : monsterAlly
                 break;
 
             case 2:
-                StartCoroutine(NotYet(targetIndex, consumeTurn));
+                StartCoroutine(Duel(targetIndex, consumeTurn));
                 break;
         }
     }
@@ -100,8 +100,8 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator Cleave(int targetIndex, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack1");
-        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, false, !gameMaster.IsItMyTurn(), targetIndex);
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "attack1");
+        gameMaster.MoveMonster(isMine(), GetMyMonster().teamIndex, false, !isMine(), targetIndex, false, 0);
 
         int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
         int extraDamage = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 1);
@@ -111,24 +111,68 @@ public class grimmetalAlly : monsterAlly
 
 
         yield return new WaitForSeconds(1f);
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
+        gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
-        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 10, !gameMaster.IsItMyTurn(), targetIndex, false, 0);
+        gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 10, !isMine(), targetIndex, false, 0);
         yield return new WaitForSeconds(0.1f);
-        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, true);
+        gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true);
 
         yield return new WaitForSeconds(0.4f);
-        gameMaster.MoveMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, true, gameMaster.IsItMyTurn(), GetMyMonster().teamIndex);
+        gameMaster.MoveMonster(isMine(), GetMyMonster().teamIndex, true, isMine(), GetMyMonster().teamIndex, false, 0);
         yield return new WaitForSeconds(0.4f);
 
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator NotYet(int targetIndex, bool consumeTurn)
+    private IEnumerator Duel(int targetIndex, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack2");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "attack2");
+
+        yield return new WaitForSeconds(0.5f);
+
+        monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
+        monster[] myTeam = gameMaster.GetMonstersTeam(GetMyMonster());
+
+        gameMaster.MoveMonster(isMine(), GetMyMonster().teamIndex, false, isMine(), myTeam[1].teamIndex, false, 0);
+        gameMaster.MoveMonster(!isMine(), targetIndex, false, !isMine(), enemyTeam[1].teamIndex, false, 0);
+
+        gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 10, !isMine(), targetIndex, 1, 0);
+        gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 10, isMine(), GetMyMonster().teamIndex, 2, 0);
+
+        gameMaster.AdjustTurnOrder(!isMine(), targetIndex, true, false);
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (enemyTeam[i].GetCurrentHealth() > 0)
+            {
+                if (enemyTeam[i] != GetTargetedMonster())
+                {
+                    gameMaster.MoveMonster(!isMine(), enemyTeam[i].teamIndex, false, !isMine(), enemyTeam[i].teamIndex, true, 1);
+                }
+            }
+
+            if (myTeam[i].GetCurrentHealth() > 0)
+            {
+                if (myTeam[i] != GetMyMonster())
+                {
+                    gameMaster.MoveMonster(isMine(), myTeam[i].teamIndex, false, isMine(), myTeam[i].teamIndex, true, 1);
+                }
+            }
+        }
+
+        int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
+        attack1 = GetMultiplierDamage(attack1);
+
+        yield return new WaitForSeconds(0.5f);
+
+        gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
+        yield return new WaitForSeconds(0.25f);
+        targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
+
+        gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 10, !isMine(), targetIndex, false, 0);
+        gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true);
 
         yield return new WaitForSeconds(0.8f);
 
@@ -137,12 +181,12 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator SteelYourself()
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability1");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "ability1");
 
         yield return new WaitForSeconds(0.5f);
 
         int attackMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
-        gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 9, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, 200, attackMultiplier);
+        gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 9, isMine(), GetTargetedMonster().teamIndex, 200, attackMultiplier);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -151,7 +195,7 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator AlmostThere()
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability2");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "ability2");
         yield return new WaitForSeconds(0.3f);
 
         yield return new WaitForSeconds(0.3f);

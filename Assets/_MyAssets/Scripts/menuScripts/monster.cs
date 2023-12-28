@@ -347,7 +347,7 @@ public class monster : ScriptableObject
             currentHP = 0;
             died = true;
 
-            if (myBase.gameMaster.IsItMyTurn())
+            if (myBase.isMine())
             {
                 if (BurnDamage == false)
                 {
@@ -460,7 +460,7 @@ public class monster : ScriptableObject
         Destroy(GetStatus(statusIndex).gameObject);
         statusEffects.Remove(GetStatus(statusIndex));
 
-        if(statusIndex == 2)
+        if(statusIndex == 2 || statusIndex == 10)
         {
             onRemoveTaunt?.Invoke();
         }

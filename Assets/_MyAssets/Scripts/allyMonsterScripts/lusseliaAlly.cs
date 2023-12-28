@@ -79,27 +79,27 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator Starfall(int targetIndex, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack1");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "attack1");
 
         yield return new WaitForSeconds(0.2f);
 
         int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
         attack1 = GetMultiplierDamage(attack1);
 
-        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 7, !gameMaster.IsItMyTurn(), targetIndex, true, 0);
+        gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 7, !isMine(), targetIndex, true, 0);
 
-        gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
+        gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
         yield return new WaitForSeconds(0.25f);
-        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, true); // - for damage
+        gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true); // - for damage
 
         int shouldAddBurnDamage = 0;
         if (GetMyMonster().GetPassiveID() == 2)
             shouldAddBurnDamage = 1;
 
         if (gameMaster.estimatedDamage < 0)
-            gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 7, !gameMaster.IsItMyTurn(), targetIndex, GetMoveDamage(0, 1), shouldAddBurnDamage);
+            gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 7, !isMine(), targetIndex, GetMoveDamage(0, 1), shouldAddBurnDamage);
 
         yield return new WaitForSeconds(0.8f);
 
@@ -108,7 +108,7 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator SolarWave(int targetIndex, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "attack2");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "attack2");
 
         yield return new WaitForSeconds(0.3f);
 
@@ -121,17 +121,17 @@ public class lusseliaAlly : monsterAlly
             if (enemyTeam[i].GetCurrentHealth() > 0)
             {
                 targetIndex = i;
-                gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 9, !gameMaster.IsItMyTurn(), targetIndex, true, 1);
-                gameMaster.DeclaringDamage(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, destroyShields);
+                gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 9, !isMine(), targetIndex, true, 1);
+                gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
                 yield return new WaitForSeconds(1.2f);
-                gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, !gameMaster.IsItMyTurn(), targetIndex, -attack1, true); // - for damage
+                gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true); // - for damage
 
                 int shouldAddBurnDamage = 0;
                 if (GetMyMonster().GetPassiveID() == 2)
                     shouldAddBurnDamage = 1;
 
                 if (gameMaster.estimatedDamage < 0)
-                    gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 7, !gameMaster.IsItMyTurn(), targetIndex, 1, shouldAddBurnDamage);
+                    gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 7, !isMine(), targetIndex, 1, shouldAddBurnDamage);
             }
         }
 
@@ -142,7 +142,7 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator LunarBlanket()
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability1");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "ability1");
 
         yield return new WaitForSeconds(0.3f);
         int shieldStrength = (GetMyMonster().GetCurrentMagic() + GetMoveDamage(2, 0));
@@ -156,10 +156,10 @@ public class lusseliaAlly : monsterAlly
         {
             if (myteam[i].GetCurrentHealth() > 0)
             {
-                gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 1, gameMaster.IsItMyTurn(), i, shieldStrength, 0);
+                gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 1, isMine(), i, shieldStrength, 0);
 
                 if (GetMyMonster().GetPassiveID() == 1)
-                    gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 8, gameMaster.IsItMyTurn(), i, 200, 0);
+                    gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 8, isMine(), i, 200, 0);
             }
         }
 
@@ -170,7 +170,7 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator Moonlight()
     {
-        gameMaster.AnimateMonster(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, "ability2");
+        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "ability2");
 
         yield return new WaitForSeconds(0.3f);
 
@@ -179,14 +179,14 @@ public class lusseliaAlly : monsterAlly
         int finalHeal = Mathf.RoundToInt(heal);
         finalHeal = GetMultiplierDamage(finalHeal);
 
-        gameMaster.ShootProjectile(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 8, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, false, 0);
+        gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 8, isMine(), GetTargetedMonster().teamIndex, false, 0);
 
         yield return new WaitForSeconds(0.4f);
 
-        gameMaster.ChangeMonsterHealth(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, finalHeal, false);
+        gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, isMine(), GetTargetedMonster().teamIndex, finalHeal, false);
 
         if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(gameMaster.IsItMyTurn(), GetMyMonster().teamIndex, 8, gameMaster.IsItMyTurn(), GetTargetedMonster().teamIndex, 200, 0);
+            gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 8, isMine(), GetTargetedMonster().teamIndex, 200, 0);
 
         yield return new WaitForSeconds(0.8f);
 

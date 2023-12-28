@@ -110,6 +110,10 @@ public class infoPageScript : canvasGroupRenderer
             {
                 effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetBurnDamage() + "";
             }
+            if (status.GetIndex() == 9)
+            {
+                effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "%";
+            }
             listOfEffects.Add(effect);
         }
 
