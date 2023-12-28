@@ -43,11 +43,13 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     string myTeamName;
     string enemyTeamName;
 
+    private List<string> battlePlayList = new List<string>();
 
     [Header("Player Data")]
     [SerializeField] private string player1_ID; // just for testing of course
     [SerializeField] private string player2_ID;
     [SerializeField] private bool bIsPlayer1;
+    bool gameIsActive;
 
     string myUsername;
     string enemyUsername;
@@ -96,6 +98,33 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         myGroup.interactable = state;
         myGroup.blocksRaycasts = state;
+    }
+
+    public void GetBattlePlayList(List<string> battlPlayList)
+    {
+        battlePlayList = battlPlayList;
+        StartCoroutine(PlayTheMusic());
+    }
+
+    private IEnumerator PlayTheMusic()
+    {
+        gameIsActive = true;
+
+        if(battlePlayList.Count > 0)
+        {
+            int randomIndex = Random.Range(0, battlePlayList.Count);
+            jukeBox.PlaySong(battlePlayList[randomIndex]);
+
+            while (gameIsActive)
+            {
+                if (jukeBox.IsSongPlaying() == false)
+                {
+                    randomIndex = Random.Range(0, battlePlayList.Count);
+                    jukeBox.PlaySong(battlePlayList[randomIndex]);
+                }
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
     }
 
     public void SetPlayerIDs(string ID_1, string ID_2)
@@ -249,14 +278,14 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return StartCoroutine(EndOfMatchResults());
 
-        yield return new WaitForSeconds(5f);
-
         this.photonView.RPC("ReadyToContinueRPC", RpcTarget.OthersBuffered); // First person to search is player 2
 
         while (waitingForEnemy == true)
         {
             yield return new WaitForEndOfFrame();
         }
+
+        yield return new WaitForSeconds(8f);
 
         gameMaster.StartFight();
 

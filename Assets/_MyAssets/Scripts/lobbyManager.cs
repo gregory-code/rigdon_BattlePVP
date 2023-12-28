@@ -15,6 +15,7 @@ public class lobbyManager : MonoBehaviourPunCallbacks
 
     [SerializeField] FirebaseScript firebaseScript;
     [SerializeField] battleMenu battleMenuScript;
+    [SerializeField] editPlayLists playLists;
     [SerializeField] GameMenu gameMenu;
     
     string gameRoomID = "";
@@ -133,6 +134,7 @@ public class lobbyManager : MonoBehaviourPunCallbacks
             isLobbyRoom = true;
 
             List<string> playerIDs = gameRoomID.ToString().Split('õ').ToList();
+            gameMenu.GetBattlePlayList(playLists.battleSongs);
             gameMenu.SetPlayerIDs(playerIDs[0], playerIDs[1]);
             StartCoroutine(gameMenu.SetUpGame());
 

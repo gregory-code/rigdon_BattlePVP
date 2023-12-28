@@ -359,7 +359,6 @@ public class GameMaster : MonoBehaviourPunCallbacks
             }
         }
 
-
         waitingQueue = true;
 
         foreach (monster mon in activeMonsters)

@@ -53,6 +53,9 @@ public class minfurAlly : monsterAlly
     {
         if (GetMyMonster().GetPassiveID() == 2 && !gameMaster.IsItMyTurn()) // index for acron
         {
+            if (recivingMon.GetCurrentHealth() <= 0)
+                return;
+
             if(GetMyMonster().TryConsumeStrawberry() == true)
             {
                 Debug.Log("You get a strawberry Mr. " + recivingMon.teamIndex);
@@ -149,7 +152,7 @@ public class minfurAlly : monsterAlly
 
         foreach (statusEffectUI effect in GetTargetedMonster().statusEffects)
         {
-            if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3 || effect.GetIndex() == status4) // add more of these as they get added
+            if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3 || effect.GetIndex() == status4 || effect.GetIndex() == status5) // add more of these as they get added
             {
                 listOfIndexesToSteal.Add(effect.GetIndex());
             }

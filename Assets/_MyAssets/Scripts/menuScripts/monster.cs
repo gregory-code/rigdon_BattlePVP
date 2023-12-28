@@ -276,11 +276,12 @@ public class monster : ScriptableObject
         }
     }
 
-    private bool SkipConductive;
-    public void SetSkipConductive() { SkipConductive = true; }
+    private bool BurnDamage;
+    private bool destroyBubble = false;
+    public void SetBurnDamage() { BurnDamage = true; }
     public void ChangeHealth(int change, bool bMine, int userIndex, bool isAttack) // for who did the attack
     {
-        if (change == 0 || currentHP <= 0)
+        if (change == 0 || currentHP <= 0 || myBase.gameMaster.movingToNewGame == true)
             return;
 
         if(change > 0 && isAttack == false)
@@ -298,10 +299,8 @@ public class monster : ScriptableObject
 
         bool died = false;
 
-        if(SkipConductive == false)
+        if(BurnDamage == false)
             change = CalculateConductive(change, true);
-
-        SkipConductive = false;
 
         if (change >= 0 && isAttack == true)
             return;
@@ -326,12 +325,20 @@ public class monster : ScriptableObject
             }
             else
             {
-                onProcStatus?.Invoke(true, 1, true);
-                DestroyStatus(1);
+                if(BurnDamage == false)
+                {
+                    onProcStatus?.Invoke(true, 1, true);
+                    DestroyStatus(1);
+                }
+                else
+                {
+                    destroyBubble = true;
+                }
                 change += bubbleAmount;
                 onDamagePopup?.Invoke(-bubbleAmount, true);
             }
         }
+
 
         currentHP += change;
 
@@ -341,9 +348,16 @@ public class monster : ScriptableObject
             died = true;
 
             if (myBase.gameMaster.IsItMyTurn())
-                myBase.gameMaster.GiveKillExp(bMine, userIndex);
+            {
+                if (BurnDamage == false)
+                {
+                    myBase.gameMaster.GiveKillExp(bMine, userIndex);
+                }
+            }
         }
 
+        BurnDamage = false;
+        
         onTakeDamage?.Invoke(change, died, bMine, userIndex, this);
         onDamagePopup?.Invoke(change, false);
     }
@@ -459,9 +473,12 @@ public class monster : ScriptableObject
         statusEffectUI onHitShield = GetStatus(8);
         if(onHitShield != null)
         {
-            onProcStatus?.Invoke(true, 8, true);
-            DestroyStatus(8);
-            return;
+            if(statusIndex == 0 || statusIndex == 3 || statusIndex == 7)
+            {
+                onProcStatus?.Invoke(true, 8, true);
+                DestroyStatus(8);
+                return;
+            }
         }
 
         if(status == null)
@@ -505,6 +522,9 @@ public class monster : ScriptableObject
 
     public void NextTurn()
     {
+        if (myBase.gameMaster.movingToNewGame == true)
+            return;
+
         if(statusEffects.Count <= 0)
         {
             onNextTurn?.Invoke();
@@ -516,29 +536,43 @@ public class monster : ScriptableObject
         {
             status.NextTurn();
 
+            if (myBase.gameMaster.movingToNewGame == true)
+                return;
+
             if (currentHP <= 0)
                 return;
 
             if (status.GetCounter() <= 0)
             {
-                bool shouldProcStatus = true;
-
-                if (status.GetIndex() == 0 || status.GetIndex() == 1)
-                    shouldProcStatus = false;
-
-                onProcStatus?.Invoke(true, status.GetIndex(), shouldProcStatus);
-
                 listOfIndexesToDelete.Add(status.GetIndex());
             }
         }
 
-        if(listOfIndexesToDelete.Count > 0)
+        if (destroyBubble)
+        {
+            statusEffectUI bubble = GetStatus(1);
+            if(bubble != null)
+            {
+                procStatus(true, 1, true);
+                DestroyStatus(1);
+            }
+        }
+
+        if (listOfIndexesToDelete.Count > 0)
         {
             foreach (int index in listOfIndexesToDelete)
             {
+                bool shouldProcStatus = true;
+
+                if (index == 0 || index == 1)
+                    shouldProcStatus = false;
+
+                onProcStatus?.Invoke(true, index, shouldProcStatus);
                 DestroyStatus(index);
             }
         }
+
+        destroyBubble = false;
 
         onNextTurn?.Invoke();
     }
@@ -597,8 +631,9 @@ public class monster : ScriptableObject
         this.level = level;
         level--;
 
-        maxHP += (growthHP + 3) * level;
-        currentHP += (growthHP + 3) * level;
+        float hpToAdd = ((growthHP + 1f) * 2f * level);
+        maxHP += Mathf.RoundToInt(hpToAdd);
+        currentHP += Mathf.RoundToInt(hpToAdd);
 
         float strengthToAdd = ((growthStrength + 0.99f) / 2 * level);
         baseStrength += Mathf.RoundToInt(strengthToAdd);

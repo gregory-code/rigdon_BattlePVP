@@ -49,9 +49,12 @@ public class grimmetalAlly : monsterAlly
     {
         if(GetMyMonster().GetPassiveID() == 2)
         {
-            if (whoDied = GetMyMonster())
+            if(GetMyMonster().GetCurrentHealth() <= 0)
+            {
                 return;
+            }
 
+            GetMyMonster().PlayAnimation("idle");
             GetMyMonster().GetExpHold(2).GainExp();
         }
     }

@@ -6,6 +6,23 @@ public class StatComparer : IComparer<monster>
 {
     public int Compare(monster x, monster y)
     {
+        if (x.GetMonsterID() == y.GetMonsterID())
+        {
+            int randomSpeedTieWin = Random.Range(0, 2);
+            if(randomSpeedTieWin == 0)
+            {
+                x.ChangeCurrentStrength(-1);
+                x.ChangeCurrentStrength(1);
+                x.ChangeCurrentMagic(1);
+            }
+            else
+            {
+                y.ChangeCurrentStrength(-1);
+                y.ChangeCurrentStrength(1);
+                y.ChangeCurrentMagic(1);
+            }
+        }
+
         int speedComparison = y.GetCurrentSpeed().CompareTo(x.GetCurrentSpeed());
 
         // Check if there's a speed tie

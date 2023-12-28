@@ -29,7 +29,8 @@ public class notifScript : MonoBehaviour
 
         resetListeners();
 
-        if(bLeaveAutomatically) StartCoroutine(leaveAutomatically(notif));
+        if(bLeaveAutomatically) 
+            StartCoroutine(leaveAutomatically(notif));
     }
 
     public void removeNotif(int index)

@@ -13,6 +13,10 @@ public class statusEffectUI : MonoBehaviour
 
     private monster myMonster;
     private monster usingMonster;
+    private int usingMonsterTeamIndex;
+    private float usingMonsterAttackPointX;
+    private float usingMonsterAttackPointY;
+    private int usingMonsterHalfStrength;
 
     private GameMaster gameMaster;
 
@@ -34,6 +38,12 @@ public class statusEffectUI : MonoBehaviour
             usingMonster.onDeclaredDamage += DelcaringDamage;
             statusImage.sprite = usingMonster.stagesIcons[usingMonster.GetSpriteIndexFromLevel()];
         }
+
+        usingMonsterTeamIndex = usingMonster.teamIndex;
+        usingMonsterAttackPointX = usingMonster.attackPoint.x;
+        usingMonsterAttackPointY = usingMonster.attackPoint.y;
+        usingMonsterHalfStrength = usingMonster.GetHalfStrength();
+
 
         this.gameMaster = gameMaster;
         this.statusIndex = statusIndex;
@@ -124,8 +134,12 @@ public class statusEffectUI : MonoBehaviour
         if (statusIndex == 7 && gameMaster.activeMonsters[0] == myMonster)
         {
             counter--;
-            myMonster.SetSkipConductive();
-            myMonster.ChangeHealth(GetBurnDamage(), !gameMaster.IsItMyTurn(), usingMonster.teamIndex, true);
+            myMonster.SetBurnDamage();
+            myMonster.ChangeHealth(GetBurnDamage(), !gameMaster.IsItMyTurn(), usingMonsterTeamIndex, true);
+            if(myMonster.GetCurrentHealth() <= 0 && gameMaster.IsItMyTurn())
+            {
+                gameMaster.GiveKillExp(!gameMaster.IsItMyTurn(), usingMonsterTeamIndex);
+            }
         }
 
         UpdateStatusCounter(counter);
@@ -159,7 +173,7 @@ public class statusEffectUI : MonoBehaviour
         if(willKill)
         {
             gameMaster.redirectedIndex = myMonster.teamIndex;
-            myMonster.MovePosition(false, usingMonster.attackPoint.x, usingMonster.attackPoint.y);
+            myMonster.MovePosition(false, usingMonsterAttackPointX, usingMonsterAttackPointY);
             StartCoroutine(goBack());
         }
     }
@@ -225,6 +239,7 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case 9: // add extra logic if another multipler attack gets added
+                power -= 100;
                 myMonster.myBase.attackMultiplier -= power;
                 myMonster.myBase.destroyShields = false;
                 break;
