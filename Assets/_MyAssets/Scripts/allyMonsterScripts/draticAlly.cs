@@ -110,7 +110,7 @@ public class draticAlly : monsterAlly
 
         yield return new WaitForSeconds(0.1f);
 
-        monster nextTarget = gameMaster.GetRandomEnemy(target.GetIndex(), -1);
+        monster nextTarget = gameMaster.GetRandomEnemy(target.GetIndex(), -1, false);
         if(nextTarget != null)
         {
             gameMaster.DeclaringDamage(GetMonster(), nextTarget, -attack2, destroyShields);
@@ -126,7 +126,7 @@ public class draticAlly : monsterAlly
             if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
                 gameMaster.ApplyStatus(GetMonster(), nextTarget, 0, 4, 0);
 
-            monster finalTarget = gameMaster.GetRandomEnemy(target.GetIndex(), nextTarget.GetIndex());
+            monster finalTarget = gameMaster.GetRandomEnemy(target.GetIndex(), nextTarget.GetIndex(), false);
             if (finalTarget != null)
             {
                 gameMaster.DeclaringDamage(GetMonster(), finalTarget, -attack3, destroyShields);
@@ -200,7 +200,7 @@ public class draticAlly : monsterAlly
         monster randomTarget = gameMaster.GetRandomConductiveEnemy();
 
         if (randomTarget == null)
-            randomTarget = gameMaster.GetRandomEnemy(-1, -1);
+            randomTarget = gameMaster.GetRandomEnemy(-1, -1, false);
 
         int abilityMultiplier = (GetMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
 

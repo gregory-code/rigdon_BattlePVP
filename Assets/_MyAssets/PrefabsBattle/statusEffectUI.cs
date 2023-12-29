@@ -58,9 +58,9 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case 9:
-                //power -= 100;
-                //myMonster.myBase.attackMultiplier += power;
-                //myMonster.myBase.destroyShields = true;
+                this.power -= 100;
+                myMonster.ChangeAttackMultiplier(this.power);
+                myMonster.ApplyShieldBreak(true);
                 break;
         }
     }
@@ -108,33 +108,37 @@ public class statusEffectUI : MonoBehaviour
         return statusSprites[statusIndex];
     }
 
-    public void NextTurn()
+    public bool NextTurn()
     {
+        bool shouldDelete = false;
+
         if (statusIndex == 1) // 1 is bubble
         {
             float newBubbleValue = (counter * 0.9f) - 1;
             counter = Mathf.RoundToInt(newBubbleValue);
+            shouldDelete = (counter <= 0);
         }
 
         if(statusIndex == 0 || statusIndex == 2 || statusIndex == 10)
         {
-            counter--;
+            shouldDelete = TickCounter();
         }
 
         if (statusIndex == 7 && gameMaster.activeMonsters[0] == myMonster)
         {
-            counter--;
+            shouldDelete = TickCounter();
             myMonster.SetBurnDamage();
             myMonster.TakeDamage(usingMonster, GetBurnDamage());
         }
 
         UpdateStatusCounter(counter);
+        return shouldDelete;
     }
 
     public bool TickCounter()
     {
         counter--;
-        if(counter == 0)
+        if(counter <= 0)
         {
             return true;
         }
@@ -172,12 +176,7 @@ public class statusEffectUI : MonoBehaviour
 
     public void StatusGotReapplied(int newCounter, int power)
     {
-        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 7)
-        {
-            UpdateStatusCounter(counter + newCounter);
-        }
-
-        if(statusIndex == 3 || statusIndex == 4) // stats for cuddle and best friends
+        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 3 || statusIndex == 4 || statusIndex == 7)
         {
             UpdateStatusCounter(counter + newCounter);
         }
@@ -224,10 +223,9 @@ public class statusEffectUI : MonoBehaviour
                 usingMonster.onDeclaredDamage -= DelcaringDamage;
                 break;
 
-            case 9: // add extra logic if another multipler attack gets added
-                //power -= 100;
-                //myMonster.myBase.attackMultiplier -= power;
-                //myMonster.myBase.destroyShields = false;
+            case 9:
+                myMonster.ChangeAttackMultiplier(-power);
+                myMonster.ApplyShieldBreak(false);
                 break;
 
             case 10:

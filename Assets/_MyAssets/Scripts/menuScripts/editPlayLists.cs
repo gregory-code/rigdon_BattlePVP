@@ -32,9 +32,6 @@ public class editPlayLists : MonoBehaviour, IDataPersistence
 
     bool edittingMenuList;
 
-    [SerializeField] AudioMixerSnapshot Regular;
-    [SerializeField] AudioMixerSnapshot Muted;
-
     private void InitalizeMusic()
     {
         SwitchSeriesMusic(0);

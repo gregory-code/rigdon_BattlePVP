@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
@@ -44,6 +45,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     string enemyTeamName;
 
     private List<string> battlePlayList = new List<string>();
+    [SerializeField] AudioMixerSnapshot RegularSnapshot;
+    [SerializeField] AudioMixerSnapshot DecidingSnapshot;
 
     [Header("Player Data")]
     [SerializeField] private string player1_ID; // just for testing of course
@@ -133,6 +136,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         SetCanvasGroup(true);
         showCurtain = true;
+
+        SetFilter(false);
 
         gotEnemyTeam = false;
 
@@ -307,6 +312,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         showCurtain = true;
         waitingForEnemy = true;
 
+        SetFilter(false);
+
         CleanUp();
 
         yield return new WaitForSeconds(0.5f);
@@ -385,6 +392,18 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         battlePlayList = battlPlayList;
         StartCoroutine(PlayTheMusic());
+    }
+
+    public void SetFilter(bool regular)
+    {
+        if(regular)
+        {
+            RegularSnapshot.TransitionTo(0.5f);
+        }
+        else
+        {
+            DecidingSnapshot.TransitionTo(0.5f);
+        }
     }
 
     private IEnumerator PlayTheMusic()

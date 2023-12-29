@@ -80,6 +80,8 @@ public class monsterBase : MonoBehaviour
         myMonster.onDamagePopup += damagePopup;
         myMonster.onMovePosition += movePosition;
         myMonster.onRemoveTaunt += RemoveTaunt;
+        myMonster.onAttackBreaksShields += DestroyShields;
+        myMonster.onChangeAttackMultiplier += AttackMultiplier;
         myMonster.onRemoveConnections += RemoveConnections;
 
         nameText.text = myMonster.GetMonsterNickname();
@@ -102,6 +104,20 @@ public class monsterBase : MonoBehaviour
 
         myMonster.SetEffectsList(dependecy.GetEffectsList());
         myMonster.SetStatusEffectPrefab(dependecy.GetStatusEffectPrefab());
+    }
+
+    private void RemoveConnections()
+    {
+        myMonster.onTakeDamage -= takeDamage;
+        myMonster.onHealed -= healHealth;
+        myMonster.onAnimPlayed -= playAnimation;
+        myMonster.onProjectileShot -= ShootProjectile;
+        myMonster.onApplyStatus -= applyStatus;
+        myMonster.onProcStatus -= procStatus;
+        myMonster.onDamagePopup -= damagePopup;
+        myMonster.onMovePosition -= movePosition;
+        myMonster.onRemoveTaunt -= RemoveTaunt;
+        myMonster.onRemoveConnections -= RemoveConnections;
     }
 
     void Update()
@@ -132,7 +148,7 @@ public class monsterBase : MonoBehaviour
         monsterAnimator.SetTrigger(animName);
     }
 
-    private void healHealth(int change, bool bMine, int userIndex)
+    private void healHealth(monster recivingMon, monster usingMon, int heal)
     {
         SetHealthText();
     }
@@ -153,14 +169,13 @@ public class monsterBase : MonoBehaviour
     private void SetHealthText()
     {
         healthText.text = myMonster.GetCurrentHealth() + "";
-        healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
 
         if (myMonster.getHealthPercentage() >= 0.2f)
             healthText.color = new Vector4(229, 66, 66, 255);
     }
 
-    GameObject[] statusPrefabs = new GameObject[12];
-    GameObject[] statusProcPrefabs = new GameObject[12];
+    GameObject[] statusPrefabs = new GameObject[20];
+    GameObject[] statusProcPrefabs = new GameObject[20];
 
     private void applyStatus(int whichStatus, GameObject statusPrefab)
     {
@@ -197,18 +212,7 @@ public class monsterBase : MonoBehaviour
         if (myMonster.GetOwnership())
             return;
 
-        monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
-        for (int i = 0; i < myTeam.Length; i++)
-        {
-            if(myTeam[i].GetStatus(2) == null && myTeam[i].GetStatus(10) == null)
-            {
-                myTeam[i].isTargetable = false;
-            }
-            else
-            {
-                myTeam[i].isTargetable = true;
-            }
-        }
+        ApplyTargetable(gameMaster.GetMonstersTeam(myMonster));
     }
 
     private void RemoveTaunt()
@@ -216,25 +220,35 @@ public class monsterBase : MonoBehaviour
         if (myMonster.GetOwnership())
             return;
 
-        monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
-        bool someoneIsTaunting = false;
-        for (int i = 0; i < myTeam.Length; i++)
+        monster[] enemyTeam = gameMaster.GetMonstersTeam(myMonster);
+        for (int i = 0; i < enemyTeam.Length; i++)
         {
-            if (myTeam[i].GetStatus(2) != null && myTeam[i].GetStatus(10) == null)
+            statusEffectUI taunt = enemyTeam[i].GetStatus(2);
+            statusEffectUI duel = enemyTeam[i].GetStatus(10);
+            if (taunt != null || duel != null)
             {
-                someoneIsTaunting = true;
+                ApplyTargetable(enemyTeam);
+                return;
             }
-        }
 
-        if (someoneIsTaunting)
-        {
-            myMonster.isTargetable = false;
-            return;
+            enemyTeam[i].isTargetable = true;
         }
+    }
 
-        for (int i = 0; i < 3; i++)
+    private void ApplyTargetable(monster[] enemyTeam)
+    {
+        for (int i = 0; i < enemyTeam.Length; i++)
         {
-            myTeam[i].isTargetable = true;
+            statusEffectUI taunt = enemyTeam[i].GetStatus(2);
+            statusEffectUI duel = enemyTeam[i].GetStatus(10);
+            if (taunt == null && duel == null)
+            {
+                enemyTeam[i].isTargetable = false;
+            }
+            else
+            {
+                enemyTeam[i].isTargetable = true;
+            }
         }
     }
 
@@ -268,25 +282,39 @@ public class monsterBase : MonoBehaviour
         nameText.text = "";
         healthText.text = "";
 
-        List<int> listOfIndexesToDelete = new List<int>();
-        foreach (statusEffectUI status in myMonster.statusEffects)
+        List<int> listOfIndexes = GetMonster().GetStatusList();
+        if (listOfIndexes.Count > 0)
         {
-            listOfIndexesToDelete.Add(status.GetIndex());
-        }
-
-        if (listOfIndexesToDelete.Count > 0)
-        {
-            foreach (int index in listOfIndexesToDelete)
+            foreach (int index in listOfIndexes)
             {
                 switch(index)
                 {
                     default:
                         myMonster.GetStatus(index).GettingRemoved();
                         myMonster.DestroyStatus(index);
+
+                        if(index == 5)
+                        {
+                            foreach(monster ally in gameMaster.GetMonstersTeam(GetMonster()))
+                            {
+                                if(ally.GetStatusList().Count > 0)
+                                    ally.TryRemoveStatus(6, true);
+                            }
+                        }
+
+                        if (index == 6)
+                        {
+                            foreach (monster ally in gameMaster.GetMonstersTeam(GetMonster()))
+                            {
+                                if (ally.GetStatusList().Count > 0)
+                                    ally.TryRemoveStatus(5, true);
+                            }
+                        }
                         break; // maybe do some logic for best friends
                 }
             }
         }
+
         myMonster.statusEffects.Clear();
 
         yield return new WaitForSeconds(0.35f);
@@ -304,20 +332,6 @@ public class monsterBase : MonoBehaviour
         deathSmoke.transform.position = monsterSprite.transform.position;
 
         Destroy(this.gameObject, 1f);
-    }
-
-    private void RemoveConnections()
-    {
-        myMonster.onTakeDamage -= takeDamage;
-        myMonster.onHealed -= healHealth;
-        myMonster.onAnimPlayed -= playAnimation;
-        myMonster.onProjectileShot -= ShootProjectile;
-        myMonster.onApplyStatus -= applyStatus;
-        myMonster.onProcStatus -= procStatus;
-        myMonster.onDamagePopup -= damagePopup;
-        myMonster.onMovePosition -= movePosition;
-        myMonster.onRemoveTaunt -= RemoveTaunt;
-        myMonster.onRemoveConnections -= RemoveConnections;
     }
 
     public void explodeHealthBar(float force)
@@ -385,7 +399,7 @@ public class monsterBase : MonoBehaviour
 
     private void CheckForSteelYourself()
     {
-        if (myMonster.statusEffects.Count > 0)
+        if (myMonster.GetStatusList().Count > 0)
         {
             statusEffectUI steelYourself = myMonster.GetStatus(9);
             if(steelYourself != null && myMonster.GetOwnership())
@@ -393,6 +407,16 @@ public class monsterBase : MonoBehaviour
                 gameMaster.TryRemoveStatus(myMonster, 9);
             }
         }
+    }
+
+    private void AttackMultiplier(int attackMultiplier)
+    {
+        this.attackMultiplier += attackMultiplier;
+    }
+
+    private void DestroyShields(bool state)
+    {
+        destroyShields = state;
     }
 
     public void OnMouseOver()

@@ -393,7 +393,7 @@ public class teamBuilder : canvasGroupRenderer
         int level = this.level - 1;
 
         float statGrowth = currentTeam.GetMonsterPref(currentMonster).monsterValues[statIndex + 4];
-        float statToAdd = (statIndex == 0) ? ((statGrowth + 1f) * 2f * level) + 2 : ((statGrowth + 1) / 2 * level);
+        float statToAdd = (statIndex == 0) ? ((statGrowth + 1f) * 3f * level) + 2 : ((statGrowth + 1) / 2 * level);
         stats[statIndex] += (int)Mathf.Abs(statToAdd);
         statTexts[statIndex].text = stats[statIndex] + "";
 
@@ -404,11 +404,11 @@ public class teamBuilder : canvasGroupRenderer
 
         if(isSliderUpdate)
         {
-            statChange = (statIndex == 0) ? level * 2 : 0.5f * level;
+            statChange = (statIndex == 0) ? level * 3 : 0.5f * level;
         }
         else
         {
-            statChange = (statIndex == 0) ? (statGrowth + 1f) * 2f : (1 + statGrowth) / 2;
+            statChange = (statIndex == 0) ? (statGrowth + 1f) * 3f : (1 + statGrowth) / 2;
         }
 
         if (level < previousLevel) statChange *= -1f;

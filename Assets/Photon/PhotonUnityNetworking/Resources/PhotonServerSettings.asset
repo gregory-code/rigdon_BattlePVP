@@ -74,6 +74,7 @@ MonoBehaviour:
   - GiveKillExpRPC
   - DamageMonsterRPC
   - TryRemoveStatusRPC
+  - HealMonsterRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

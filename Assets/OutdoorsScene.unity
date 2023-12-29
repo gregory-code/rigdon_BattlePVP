@@ -9859,6 +9859,7 @@ MonoBehaviour:
   - {fileID: 189378, guid: 351af065b7d39704bba8fa204705caaa, type: 3}
   - {fileID: 143098, guid: 8bfcb670fdbe69049ba78f18c342a9bf, type: 3}
   - {fileID: 1895138145459492, guid: 3c4269bcc0828c547ac6babe3283b4d6, type: 3}
+  - {fileID: 135198, guid: e39ea200cc99b104ba149175814bd8f3, type: 3}
   regularDeath: {fileID: 173590, guid: 9199f48996e301e408b14a54449d591a, type: 3}
   grimmetalDeath: {fileID: 1221293952758510, guid: cf2871a4bbfb7f64d8172bf9429514d1,
     type: 3}
@@ -21550,6 +21551,7 @@ MonoBehaviour:
   - {fileID: 6070293028441550235, guid: 7817ce968f6a5434c889acb7fa9644a9, type: 3}
   - {fileID: 4328858284941032501, guid: fdfd9141c82ced94a88a6b51c3eaa976, type: 3}
   - {fileID: 4328858284941032501, guid: d9473fcd033451142aeca6938f56ac3b, type: 3}
+  - {fileID: 6070293028441550235, guid: 8275450482b3a1e49a80324683055a08, type: 3}
   moveContentList: []
 --- !u!114 &957664542
 MonoBehaviour:
@@ -48619,6 +48621,9 @@ MonoBehaviour:
   expTitleList: {fileID: 448737021}
   expEntry: {fileID: 8500689329729122767, guid: 3cf027308e54e534bad8f7aa826c4bba,
     type: 3}
+  RegularSnapshot: {fileID: 24500006, guid: b2ce0d4f61b79ef4a8549051e294e5bd, type: 2}
+  DecidingSnapshot: {fileID: -724055573300417451, guid: b2ce0d4f61b79ef4a8549051e294e5bd,
+    type: 2}
   player1_ID: 
   player2_ID: 
   bIsPlayer1: 0
@@ -48790,8 +48795,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 11fa68b07db636e4e81c32964d06c9d1, type: 2}
   - {fileID: 11400000, guid: bed58917a06a5174f8cce52f48836026, type: 2}
   - {fileID: 11400000, guid: 9b8bc01d02ae8244d833ddce1aae145c, type: 2}
-  Regular: {fileID: 0}
-  Muted: {fileID: 0}
 --- !u!1 &2036664302
 GameObject:
   m_ObjectHideFlags: 0
@@ -51059,7 +51062,8 @@ AudioSource:
   m_GameObject: {fileID: 2101436006}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -56095391949948656, guid: b2ce0d4f61b79ef4a8549051e294e5bd,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: 1d1f0096480c3ec4b99ff5dab1ab9fd6, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1

@@ -124,7 +124,7 @@ public class lusseliaAlly : monsterAlly
 
             target = enemyTeam[i];
             gameMaster.ShootProjectile(GetMonster(), target, 9, 3);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.4f);
             gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
             yield return new WaitForSeconds(0.2f);
             target = gameMaster.GetRedirectedMonster(target);
@@ -186,7 +186,7 @@ public class lusseliaAlly : monsterAlly
 
         yield return new WaitForSeconds(0.4f);
 
-        //gameMaster.ChangeMonsterHealth(isMine(), GetMonster().teamIndex, isMine(), GetTargetedMonster().teamIndex, finalHeal, false); heal it
+        gameMaster.HealMonster(GetMonster(), GetTargetedMonster(), finalHeal);
 
         if (GetMonster().GetPassiveID() == 1)
             gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 8, 200, 0);

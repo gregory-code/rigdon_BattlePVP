@@ -93,7 +93,7 @@ public class grimmetalAlly : monsterAlly
                 break;
 
             case 2:
-                StartCoroutine(AlmostThere());
+                StartCoroutine(MirrorArmor());
                 break;
         }
     }
@@ -198,12 +198,29 @@ public class grimmetalAlly : monsterAlly
         FinishMove(true, false);
     }
 
-    private IEnumerator AlmostThere()
+    private IEnumerator MirrorArmor()
     {
         gameMaster.AnimateMonster(GetMonster(), "ability2");
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.4f);
 
-        yield return new WaitForSeconds(0.3f);
+        int allyAmount = GetMoveDamage(3, 0);
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 11, 200, 0);
+
+        if(allyAmount >= 2)
+        {
+            monster targetAlly = gameMaster.GetRandomEnemy(-1, GetTargetedMonster().GetIndex(), true);
+            if(targetAlly != null)
+                gameMaster.ApplyStatus(GetMonster(), targetAlly, 11, 200, 0);
+
+            if (allyAmount >= 3)
+            {
+                monster finalAlly = gameMaster.GetRandomEnemy(targetAlly.GetIndex(), GetTargetedMonster().GetIndex(), true);
+                if (finalAlly != null)
+                    gameMaster.ApplyStatus(GetMonster(), finalAlly, 11, 200, 0);
+            }
+        }
+
+        yield return new WaitForSeconds(0.4f);
 
         FinishMove(true, false);
     }

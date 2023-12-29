@@ -157,12 +157,18 @@ public class GameMaster : MonoBehaviourPunCallbacks
         Vector3 location = new Vector3(0, -12, 0);
         newSelect.transform.localPosition = location;
 
+        gameMenu.SetFilter(!activeMonsters[0].GetOwnership());
         activeMonsters[0].SetAct(true);
 
         if(selectParticles != null)
             Destroy(selectParticles);
 
         selectParticles = newSelect.gameObject;
+    }
+
+    public void SetFilter(bool regular)
+    {
+        gameMenu.SetFilter(regular);
     }
 
     public void removeFromMonsterBase(monsterBase toRemove)
@@ -338,9 +344,13 @@ public class GameMaster : MonoBehaviourPunCallbacks
         return myTeam;
     }
 
-    public monster GetRandomEnemy(int indexToExclude, int otherIndexToExlude)
+    public monster GetRandomEnemy(int indexToExclude, int otherIndexToExlude, bool allyTeam)
     {
         monster[] enemyTeam = gameMenu.GetEnemyTeam();
+
+        if (allyTeam)
+            enemyTeam = gameMenu.GetMyTeam();
+
         int[] enemyIndexes = new int[3] { 0, 1, 2 };
 
         if (indexToExclude != -1)
@@ -487,6 +497,22 @@ public class GameMaster : MonoBehaviourPunCallbacks
         target.TakeDamage(GetMonster(isUsing, usingIndex), damage);
     }
 
+    public void HealMonster(monster usingMon, monster recivingMon, int heal)
+    {
+        this.photonView.RPC("HealMonsterRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), heal);
+    }
+
+    [PunRPC]
+    void HealMonsterRPC(bool isUsing, int usingIndex, bool isReciving, int recivingIndex, int heal)
+    {
+        monster target = (GetMonster(isReciving, recivingIndex));
+
+        if (target.isDead())
+            return;
+
+        target.HealHealth(GetMonster(isUsing, usingIndex), heal);
+    }
+
     public void DeclaringDamage(monster usingMon, monster recivingMon, int damage, bool destroyShields)
     {
         this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, destroyShields);
@@ -527,7 +553,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [PunRPC]
     void TryRemoveStatusRPC(bool isReciving, int recivingIndex, int statusIndex)
     {
-        GetMonster(isReciving, recivingIndex).TryRemoveStatus(statusIndex);
+        GetMonster(isReciving, recivingIndex).TryRemoveStatus(statusIndex, true);
     }
 
     public void AttackAgain(monster recivingMon, monster targetMon, int percentageMultiplier)
