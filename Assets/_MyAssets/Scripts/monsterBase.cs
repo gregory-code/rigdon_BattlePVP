@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
-using static monsterAlly;
 
 public class monsterBase : MonoBehaviour
 {
@@ -26,11 +25,10 @@ public class monsterBase : MonoBehaviour
     private TextMeshProUGUI nameText;
     private Transform HUD;
     private Animator monsterAnimator;
-    private Transform attackPoint;
     private Transform effectSpawn;
     private damagePopScript damagePop;
 
-    private Transform spawnLocation;
+    private Transform attackPoint;
     private Vector3 lerpLocation;
 
     public int attackMultiplier = 100;
@@ -47,26 +45,26 @@ public class monsterBase : MonoBehaviour
         this.greenLine = greenLine;
         this.renderCamera = renderCamera;
         this.damagePop = damagePop;
-        this.spawnLocation = spawnLocation;
-        this.myMonster.spawnLocation = spawnLocation.transform.position;
+        myMonster.spawnLocation = spawnLocation;
         lerpLocation.x = spawnLocation.transform.position.x;
         lerpLocation.y = spawnLocation.transform.position.y;
 
+        myMonster.gameMaster = gameMaster;
+        myMonster.ownerTransform = transform;
         myMonster.GetExpHold(0).GainExp();
         myMonster.GetExpHold(0).GainExp();
-        myMonster.myBase = this;
 
         monsterDependecy dependecies = GetComponent<monsterDependecy>();
         GrabDependecies(dependecies);
 
-        this.myMonster.attackPoint = attackPoint;
+        myMonster.attackPoint = this.attackPoint;
 
         int stage = myMonster.GetSpriteIndexFromLevel();
         monsterSprite.sprite = myMonster.stages[stage];
         if (myMonster.bFlipSprite[stage] == true)
             monsterSprite.flipX = !monsterSprite.flipX;
 
-        if(myMonster.isMine() == false)
+        if(myMonster.GetOwnership() == false)
         {
             Vector3 flipRotation = new Vector3(0, 180, 0);
             transform.localEulerAngles = flipRotation;
@@ -113,7 +111,7 @@ public class monsterBase : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
     }
 
-    public monster GetMyMonster()
+    public monster GetMonster()
     {
         return myMonster;
     }
@@ -123,18 +121,10 @@ public class monsterBase : MonoBehaviour
         bMouseOver = state;
     }
 
-    private void movePosition(bool goHome, float x, float y)
+    private void movePosition(float x, float y)
     {
-        if(goHome)
-        {
-            lerpLocation.x = spawnLocation.transform.position.x;
-            lerpLocation.y = spawnLocation.transform.position.y;
-            return;
-        }
-
         lerpLocation.x = x;
         lerpLocation.y = y;
-
     }
 
     private void playAnimation(string animName)
@@ -147,7 +137,7 @@ public class monsterBase : MonoBehaviour
         SetHealthText();
     }
 
-    private void takeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage)
+    private void takeDamage(monster recivingMon, monster usingMon, int change, bool died, bool burnDamage)
     {
         SetHealthText();
 
@@ -204,7 +194,7 @@ public class monsterBase : MonoBehaviour
 
     private void SetTaunt()
     {
-        if (myMonster.bMine)
+        if (myMonster.GetOwnership())
             return;
 
         monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
@@ -223,7 +213,7 @@ public class monsterBase : MonoBehaviour
 
     private void RemoveTaunt()
     {
-        if (myMonster.bMine)
+        if (myMonster.GetOwnership())
             return;
 
         monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
@@ -248,15 +238,9 @@ public class monsterBase : MonoBehaviour
         }
     }
 
-    private void ShootProjectile(projectileScript projectilePrefab, Transform target, bool uniqueSpawn, Transform spawn)
+    private void ShootProjectile(projectileScript projectilePrefab, Transform target, Transform whichSpawn)
     {
-        Transform spawnPoint = attackPoint;
-        if(uniqueSpawn)
-        {
-            spawnPoint = spawn;
-        }
-
-        projectileScript newProjectile = Instantiate(projectilePrefab, spawnPoint);
+        projectileScript newProjectile = Instantiate(projectilePrefab, whichSpawn);
         newProjectile.Init(target);
     }
 
@@ -270,7 +254,7 @@ public class monsterBase : MonoBehaviour
     {
         monsterAnimator.SetTrigger("dead");
         
-        if (gameMaster.activeMonsters[0] == GetMyMonster() && isMine())
+        if (gameMaster.activeMonsters[0] == myMonster && myMonster.GetOwnership())
         {
             gameMaster.NextTurn();
         }
@@ -285,7 +269,7 @@ public class monsterBase : MonoBehaviour
         healthText.text = "";
 
         List<int> listOfIndexesToDelete = new List<int>();
-        foreach (statusEffectUI status in GetMyMonster().statusEffects)
+        foreach (statusEffectUI status in myMonster.statusEffects)
         {
             listOfIndexesToDelete.Add(status.GetIndex());
         }
@@ -297,31 +281,13 @@ public class monsterBase : MonoBehaviour
                 switch(index)
                 {
                     default:
-                        GetMyMonster().GetStatus(index).GettingRemoved();
-                        GetMyMonster().DestroyStatus(index);
-                        break;
-
-                    case 5:
-                        monster ally = GetMyMonster().GetStatus(5).GetUsingMonster();
-                        ally.GetStatus(6).GettingRemoved();
-                        ally.DestroyStatus(6);
-
-                        GetMyMonster().GetStatus(5).GettingRemoved();
-                        GetMyMonster().DestroyStatus(5);
-                        break;
-
-                    case 6:
-                        monster ally2 = GetMyMonster().GetStatus(6).GetUsingMonster();
-                        ally2.GetStatus(5).GettingRemoved();
-                        ally2.DestroyStatus(5);
-
-                        GetMyMonster().GetStatus(6).GettingRemoved();
-                        GetMyMonster().DestroyStatus(6);
-                        break;
+                        myMonster.GetStatus(index).GettingRemoved();
+                        myMonster.DestroyStatus(index);
+                        break; // maybe do some logic for best friends
                 }
             }
         }
-        GetMyMonster().statusEffects.Clear();
+        myMonster.statusEffects.Clear();
 
         yield return new WaitForSeconds(0.35f);
         float force = (float)Random.Range(-0.1f, 0.1f);
@@ -331,7 +297,7 @@ public class monsterBase : MonoBehaviour
         force = (float)Random.Range(10f, 15f);
         explodeHealthBar(force);
 
-        GetMyMonster().RemoveConnections();
+        myMonster.RemoveConnections();
 
         GameObject deathEffect = (gameMaster.bRegularDeath) ? gameMaster.regularDeath : gameMaster.grimmetalDeath ;
         GameObject deathSmoke = Instantiate(deathEffect);
@@ -369,7 +335,7 @@ public class monsterBase : MonoBehaviour
 
     public int GetMoveDamage(int moveContentID, int moveScaleID)
     {
-        int tier = GetMyMonster().GetSpriteIndexFromLevel();
+        int tier = myMonster.GetSpriteIndexFromLevel();
         return GetCurrentMove(moveContentID).GetScaleValues(moveScaleID)[tier];
     }
 
@@ -381,12 +347,12 @@ public class monsterBase : MonoBehaviour
 
     public monster GetTargetedMonster()
     {
-        return gameMaster.targetedMonster.GetMyMonster();
+        return gameMaster.targetedMonster.myMonster;
     }
 
     public moveContent GetCurrentMove(int whichMove)
     {
-        moveContent[] moves = GetMyMonster().GetMoveContents();
+        moveContent[] moves = myMonster.GetMoveContents();
         return moves[whichMove];
     }
 
@@ -409,7 +375,7 @@ public class monsterBase : MonoBehaviour
 
         gameMaster.waitingForAction = false;
 
-        gameMaster.UsedAction(true, GetMyMonster().teamIndex, isAttack);
+        gameMaster.UsedAction(myMonster, isAttack);
 
         if (consumeTurn == true)
         {
@@ -417,19 +383,14 @@ public class monsterBase : MonoBehaviour
         }
     }
 
-    public bool isMine()
-    {
-        return gameMaster.IsItMyTurn();
-    }
-
     private void CheckForSteelYourself()
     {
-        if (GetMyMonster().statusEffects.Count > 0)
+        if (myMonster.statusEffects.Count > 0)
         {
-            statusEffectUI steelYourself = GetMyMonster().GetStatus(9);
-            if(steelYourself != null && isMine())
+            statusEffectUI steelYourself = myMonster.GetStatus(9);
+            if(steelYourself != null && myMonster.GetOwnership())
             {
-                gameMaster.RemoveStatus(isMine(), GetMyMonster().teamIndex, 9, isMine(), GetMyMonster().teamIndex);
+                gameMaster.TryRemoveStatus(myMonster, 9);
             }
         }
     }
@@ -451,7 +412,7 @@ public class monsterBase : MonoBehaviour
         bMouseOver = true;
         gameMaster.targetedMonster = this;
 
-        if (myMonster.isMine())
+        if (myMonster.GetOwnership())
         {
             redLine.enable(false, Vector2.zero);
             greenLine.enable(true, renderCamera.ScreenToWorldPoint(gameMaster.touchedPos));
@@ -475,7 +436,7 @@ public class monsterBase : MonoBehaviour
 
         bMouseOver = false;
 
-        if (myMonster.isMine())
+        if (myMonster.GetOwnership())
         {
             greenLine.focusTarget(false, gameObject.transform);
         }

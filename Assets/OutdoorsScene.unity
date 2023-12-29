@@ -9818,6 +9818,8 @@ MonoBehaviour:
   - {fileID: 1210816018}
   - {fileID: 1517764187}
   uniqueLocations:
+  - {fileID: 0}
+  - {fileID: 0}
   - {fileID: 17871140}
   - {fileID: 1831936208}
   - {fileID: 1251577043}
@@ -9829,7 +9831,7 @@ MonoBehaviour:
   touchedPos: {x: 0, y: 0, z: 0}
   bRendering: 0
   waitingForAction: 0
-  redirectedIndex: 5
+  redirectedMon: {fileID: 0}
   estimatedDamage: 0
   damagePop: {fileID: 2821367167744139789, guid: 01df6b197e88bb147a5b2df75de84332,
     type: 3}
@@ -9868,7 +9870,6 @@ MonoBehaviour:
     type: 3}
   movingToNewGame: 0
   activeMonsters: []
-  myTurn: 0
 --- !u!1 &425040790
 GameObject:
   m_ObjectHideFlags: 0

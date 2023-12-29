@@ -15,13 +15,18 @@ public class monster : ScriptableObject
     [Header("Info")]
     [SerializeField] private string monsterName;
     private string monsterNickname;
-    public bool[] bFlipSprite = new bool[3];
-    public bool canAct = false;
-    public bool bMine;
-    public int teamIndex;
-    public monsterBase myBase;
-    public Vector3 spawnLocation;
+    private bool canAct = false;
+    private bool bPlayer1;
+    private int teamIndex;
+    private bool ownership;
+    private bool dead;
+
+    [Header("Public Fields")]
+    public GameMaster gameMaster;
+    public Transform spawnLocation;
+    public Transform ownerTransform;
     public Transform attackPoint;
+    public bool[] bFlipSprite = new bool[3];
     public bool isTargetable = true;
     public Sprite[] stages = new Sprite[3];
     public Sprite[] stagesIcons = new Sprite[3];
@@ -43,6 +48,7 @@ public class monster : ScriptableObject
         exp++;
         if(exp >= 100)
         {
+            dead = false; // might want to do this somewhere else could be badge
             strawberries += 3;
             exp = 0;
             SetLevel(level + 1);
@@ -82,6 +88,17 @@ public class monster : ScriptableObject
 
     public string GetMonsterName() { return monsterName; }
     public string GetMonsterNickname() { return monsterNickname; }
+    public bool isPlayer1() { return bPlayer1; }
+    public void SetAsPlayer1() { bPlayer1 = true; }
+    public int GetIndex() { return teamIndex; }
+    public void SetTeamIndex(int which) { teamIndex = which; }
+    public bool isDead() { return dead; }
+    public void SetAct(bool state) { canAct = state; }
+    public bool CanAct() { return canAct; }
+    public void SetOwnership(bool state) { ownership = state; }
+    public bool GetOwnership() { return ownership; }
+
+
     public int GetMonsterID() { return monsterID; }
     public int GetInitialHP() { return initial_HP; }
     public int GetInitialStrength() { return initial_Strength; }
@@ -170,11 +187,6 @@ public class monster : ScriptableObject
         return level;
     }
 
-    public bool isMine()
-    {
-        return bMine;
-    }
-
     public moveContent[] GetMoveContents()
     {
         return moveContents;
@@ -197,15 +209,15 @@ public class monster : ScriptableObject
         }
     }
 
-    public delegate void OnRemoveConnections();
-    public event OnRemoveConnections onRemoveConnections;
-
     public void RemoveConnections()
     {
         onRemoveConnections?.Invoke();
     }
 
-    public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage);
+    public delegate void OnRemoveConnections();
+    public event OnRemoveConnections onRemoveConnections;
+
+    public delegate void OnTakeDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage);
     public event OnTakeDamage onTakeDamage;
 
     public delegate void OnDamagePopup(int change, bool shielededAttack);
@@ -214,12 +226,112 @@ public class monster : ScriptableObject
     public delegate void OnHealed(int change, bool bMine, int userIndex);
     public event OnHealed onHealed;
 
-    public delegate void OnDeclaredDamage(int finalCalculations, bool bMine2, int userIndex, bool willKill);
+    public delegate void OnDeclaredDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields);
     public event OnDeclaredDamage onDeclaredDamage;
 
-    public void DelcaringDamage(int theoreticalDamage, bool bMine2, int userIndex, bool destroyShields)
+    public delegate void OnAnimPlayed(string animName);
+    public event OnAnimPlayed onAnimPlayed;
+
+    public delegate void OnUsedAction(bool isAttack);
+    public event OnUsedAction onUsedAction;
+
+    public delegate void OnMovePosition(float x, float y);
+    public event OnMovePosition onMovePosition;
+
+    public delegate void OnAttackAgain(monster targetMon, int percentageMultiplier);
+    public event OnAttackAgain onAttackAgain;
+
+    public delegate void OnProjectileShot(projectileScript projectilePrefab, Transform target, Transform whichSpawn);
+    public event OnProjectileShot onProjectileShot;
+
+    public delegate void OnNextTurn();
+    public event OnNextTurn onNextTurn;
+
+    public void ShootProjectile(projectileScript projectilePrefab, Transform target, Transform whichSpawn)
     {
-        bool died = false;
+        onProjectileShot?.Invoke(projectilePrefab, target, whichSpawn);
+    }
+
+    public void AttackAgain(monster targetMon, int percentageMultiplier)
+    {
+        onAttackAgain?.Invoke(targetMon, percentageMultiplier);
+    }
+
+    public void MovePosition(float x, float y)
+    {
+        onMovePosition?.Invoke(x, y);
+    }
+
+    public void UsedAction(bool isAttack)
+    {
+        onUsedAction?.Invoke(isAttack);
+    }
+
+    public void PlayAnimation(string anim)
+    {
+        onAnimPlayed?.Invoke(anim);
+    }
+
+    public void NextTurn()
+    {
+        if (gameMaster.movingToNewGame == true || dead)
+            return;
+
+        if (statusEffects.Count <= 0)
+        {
+            onNextTurn?.Invoke();
+            return;
+        }
+
+        List<int> listOfIndexesToDelete = new List<int>();
+        foreach (statusEffectUI status in statusEffects)
+        {
+            status.NextTurn();
+
+            if (gameMaster.movingToNewGame == true)
+                return;
+
+            if (currentHP <= 0)
+                return;
+
+            if (status.GetCounter() <= 0)
+            {
+                listOfIndexesToDelete.Add(status.GetIndex());
+            }
+        }
+
+        if (destroyBubble)
+        {
+            statusEffectUI bubble = GetStatus(1);
+            if (bubble != null)
+            {
+                procStatus(true, 1, true);
+                DestroyStatus(1);
+            }
+        }
+
+        if (listOfIndexesToDelete.Count > 0)
+        {
+            foreach (int index in listOfIndexesToDelete)
+            {
+                bool shouldProcStatus = true;
+
+                if (index == 0 || index == 1)
+                    shouldProcStatus = false;
+
+                onProcStatus?.Invoke(true, index, shouldProcStatus);
+                DestroyStatus(index);
+            }
+        }
+
+        destroyBubble = false;
+
+        onNextTurn?.Invoke();
+    }
+
+    public void DelcaringDamage(monster usingMon, int damage, bool destroyShields)
+    {
+        bool willDie = false;
 
         if(destroyShields)
         {
@@ -240,9 +352,9 @@ public class monster : ScriptableObject
             }
         }
 
-        theoreticalDamage = CalculateConductive(theoreticalDamage, false);
+        damage = CalculateConductive(damage, false);
 
-        theoreticalDamage = DamageCap(theoreticalDamage);
+        damage = DamageCap(damage);
 
         statusEffectUI bubbleStatus = GetStatus(1);
         int bubbleHealth = 0;
@@ -251,16 +363,16 @@ public class monster : ScriptableObject
 
         int theoreticalHealth = currentHP + bubbleHealth;
 
-        theoreticalHealth += theoreticalDamage;
+        theoreticalHealth += damage;
 
         if (theoreticalHealth <= 0)
         {
-            died = true;
+            willDie = true;
         }
 
-        myBase.gameMaster.estimatedDamage = theoreticalDamage;
+        gameMaster.estimatedDamage = damage;
 
-        onDeclaredDamage?.Invoke(theoreticalHealth, bMine2, userIndex, died);
+        onDeclaredDamage?.Invoke(this, usingMon, theoreticalHealth, willDie, destroyShields);
     }
 
     private void HealBurn()
@@ -279,31 +391,15 @@ public class monster : ScriptableObject
     private bool BurnDamage;
     private bool destroyBubble = false;
     public void SetBurnDamage() { BurnDamage = true; }
-    public void ChangeHealth(int change, bool bMine, int userIndex, bool isAttack) // for who did the attack
+    public void TakeDamage(monster usingMon, int change)
     {
-        if (change == 0 || currentHP <= 0 || myBase.gameMaster.movingToNewGame == true)
+        if (change >= 0 || dead == true || gameMaster.movingToNewGame == true)
             return;
-
-        if(change > 0 && isAttack == false)
-        {
-            currentHP += change;
-
-            if (currentHP >= maxHP)
-                currentHP = maxHP;
-
-            HealBurn();
-            onDamagePopup?.Invoke(change, false);
-            onHealed?.Invoke(change, bMine, userIndex);
-            return; // it's a heal
-        }
 
         bool died = false;
 
         if(BurnDamage == false)
             change = CalculateConductive(change, true);
-
-        if (change >= 0 && isAttack == true)
-            return;
 
         change = DamageCap(change);
 
@@ -345,16 +441,35 @@ public class monster : ScriptableObject
         if (currentHP <= 0)
         {
             currentHP = 0;
+            dead = true;
             died = true;
-
-            //myBase.gameMaster.GetSpecificMonster(bMine, userIndex).GetExpHold(1).GainExp();
+            if(isPlayer1())
+            {
+                gameMaster.GiveKillExp(usingMon);
+            }
         }
 
-        onTakeDamage?.Invoke(change, died, bMine, userIndex, this, BurnDamage);
+        onTakeDamage?.Invoke(this, usingMon, change, died, BurnDamage);
         
         BurnDamage = false;
         
         onDamagePopup?.Invoke(change, false);
+    }
+
+    public void HealHealth()
+    {
+        /*if (change > 0 && isAttack == false)
+        {
+            currentHP += change;
+
+            if (currentHP >= maxHP)
+                currentHP = maxHP;
+
+            HealBurn();
+            onDamagePopup?.Invoke(change, false);
+            onHealed?.Invoke(change, bMine, userIndex);
+            return; // it's a heal
+        }*/
     }
 
     private int DamageCap(int incomingDamage)
@@ -390,30 +505,6 @@ public class monster : ScriptableObject
         strength = Mathf.RoundToInt(cutInHalf);
 
         return strength;
-    }
-
-    public delegate void OnAnimPlayed(string animName);
-    public event OnAnimPlayed onAnimPlayed;
-
-    public void PlayAnimation(string anim)
-    {
-        onAnimPlayed?.Invoke(anim);
-    }
-
-    public delegate void OnUsedAction(bool isAttack);
-    public event OnUsedAction onUsedAction;
-
-    public void UsedAction(bool isAttack)
-    {
-        onUsedAction?.Invoke(isAttack);
-    }
-
-    public delegate void OnMovePosition(bool goHome, float x, float y);
-    public event OnMovePosition onMovePosition;
-
-    public void MovePosition(bool goHome, float x, float y)
-    {
-        onMovePosition?.Invoke(goHome, x, y);
     }
 
     public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab);
@@ -461,7 +552,7 @@ public class monster : ScriptableObject
         }
     }
 
-    public void ApplyStatus(int statusIndex, GameObject statusPrefab, int counter, int power, bool bMine, int userIndex)
+    public void ApplyStatus(monster usingMonster, int statusIndex, GameObject statusPrefab, int counter, int power)
     {
         statusEffectUI status = GetStatus(statusIndex);
 
@@ -479,7 +570,7 @@ public class monster : ScriptableObject
         if(status == null)
         {
             statusEffectUI newUI = Instantiate(statusEffectPrefab, effectsList);
-            newUI.SetStatusIndex(statusIndex, counter, power, this, bMine, userIndex, myBase.gameMaster);
+            newUI.SetStatusIndex(this, usingMonster, statusIndex, counter, power, gameMaster);
             statusEffects.Add(newUI);
 
             onApplyStatus?.Invoke(statusIndex, statusPrefab);
@@ -490,86 +581,13 @@ public class monster : ScriptableObject
         }
     }
 
-    public void RemoveStatus(int statusIndex, bool bMine2, int TargetIndex)
+    public void TryRemoveStatus(int statusIndex)
     {
+        if (GetStatus(statusIndex) == null)
+            return;
+
         procStatus(true, statusIndex, true);
         DestroyStatus(statusIndex);
-    }
-
-    public delegate void OnAttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex);
-    public event OnAttackAgain onAttackAgain;
-
-    public void AttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
-    {
-        onAttackAgain?.Invoke(percentageMultiplier, bMine2, TargetOfTargetIndex);
-    }
-
-    public delegate void OnProjectileShot(projectileScript projectilePrefab, Transform target, bool uniqueSpawn, Transform whichSpawn);
-    public event OnProjectileShot onProjectileShot;
-
-    public void ShootProjectile(projectileScript projectilePrefab, Transform target, bool uniqueSpawn, Transform whichSpawn)
-    {
-        onProjectileShot?.Invoke(projectilePrefab, target, uniqueSpawn, whichSpawn);
-    }
-
-    public delegate void OnNextTurn();
-    public event OnNextTurn onNextTurn;
-
-    public void NextTurn()
-    {
-        if (myBase.gameMaster.movingToNewGame == true)
-            return;
-
-        if(statusEffects.Count <= 0)
-        {
-            onNextTurn?.Invoke();
-            return;
-        }
-
-        List<int> listOfIndexesToDelete = new List<int>();
-        foreach( statusEffectUI status in statusEffects)
-        {
-            status.NextTurn();
-
-            if (myBase.gameMaster.movingToNewGame == true)
-                return;
-
-            if (currentHP <= 0)
-                return;
-
-            if (status.GetCounter() <= 0)
-            {
-                listOfIndexesToDelete.Add(status.GetIndex());
-            }
-        }
-
-        if (destroyBubble)
-        {
-            statusEffectUI bubble = GetStatus(1);
-            if(bubble != null)
-            {
-                procStatus(true, 1, true);
-                DestroyStatus(1);
-            }
-        }
-
-        if (listOfIndexesToDelete.Count > 0)
-        {
-            foreach (int index in listOfIndexesToDelete)
-            {
-                bool shouldProcStatus = true;
-
-                if (index == 0 || index == 1)
-                    shouldProcStatus = false;
-
-                onProcStatus?.Invoke(true, index, shouldProcStatus);
-                DestroyStatus(index);
-            }
-        }
-
-        destroyBubble = false;
-
-        onNextTurn?.Invoke();
     }
 
     public float getHealthPercentage()

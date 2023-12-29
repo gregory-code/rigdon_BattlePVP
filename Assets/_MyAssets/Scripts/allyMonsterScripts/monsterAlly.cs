@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class monsterAlly : monsterBase
 {
-    public delegate void OnAttack(int attackID, int targetIndex, bool consumeTurn);
+    public delegate void OnAttack(int attackID, monster target, bool consumeTurn);
     public event OnAttack onAttack;
 
     public delegate void OnAbility(int abilityID);
@@ -41,7 +41,7 @@ public class monsterAlly : monsterBase
         if (gameMaster.inInfoScreen || gameMaster.movingToNewGame)
             return;
 
-        if (gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().bMine)
+        if (gameMaster.activeMonsters[0] == GetMonster() && GetMonster().GetOwnership())
         {
             lineRenderState(true);
             gameMaster.selectedMonster = this;
@@ -57,15 +57,15 @@ public class monsterAlly : monsterBase
             return;
         }
 
-        if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true && gameMaster.movingToNewGame == false)
+        if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMonster() && GetMonster().CanAct() == true && gameMaster.movingToNewGame == false)
         {
-            GetMyMonster().canAct = false;
-            onAttack?.Invoke(GetMyMonster().GetAttackID(), GetTargetedMonster().teamIndex, true);
+            GetMonster().SetAct(false);
+            onAttack?.Invoke(GetMonster().GetAttackID(), GetTargetedMonster(), true);
         }
-        if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMyMonster() && GetMyMonster().canAct == true && gameMaster.movingToNewGame == false)
+        if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMonster() && GetMonster().CanAct() == true && gameMaster.movingToNewGame == false)
         {
-            GetMyMonster().canAct = false;
-            onAbility?.Invoke(GetMyMonster().GetAbilityID());
+            GetMonster().SetAct(false);
+            onAbility?.Invoke(GetMonster().GetAbilityID());
         }
         lineRenderState(false);
     }

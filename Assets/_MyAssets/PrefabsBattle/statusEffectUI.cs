@@ -14,7 +14,6 @@ public class statusEffectUI : MonoBehaviour
 
     private monster myMonster;
     private monster usingMonster;
-    private int usingMonsterTeamIndex;
 
     private GameMaster gameMaster;
 
@@ -26,10 +25,8 @@ public class statusEffectUI : MonoBehaviour
 
     private int secondaryPower;
 
-    public void SetStatusIndex(int statusIndex, int counter, int power, monster myMonster, bool bmine, int userIndex, GameMaster gameMaster)
+    public void SetStatusIndex(monster myMonster, monster usingMonster, int statusIndex, int counter, int power, GameMaster gameMaster)
     {
-        usingMonster = gameMaster.GetMonster(myMonster, bmine, userIndex);
-
         statusImage.sprite = statusSprites[statusIndex];
         if(statusIndex == 5 || statusIndex == 6)
         {
@@ -37,9 +34,7 @@ public class statusEffectUI : MonoBehaviour
             statusImage.sprite = usingMonster.stagesIcons[usingMonster.GetSpriteIndexFromLevel()];
         }
 
-        usingMonsterTeamIndex = usingMonster.teamIndex;
-
-
+        this.usingMonster = usingMonster;
         this.gameMaster = gameMaster;
         this.statusIndex = statusIndex;
         this.power = power;
@@ -63,9 +58,9 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case 9:
-                power -= 100;
-                myMonster.myBase.attackMultiplier += power;
-                myMonster.myBase.destroyShields = true;
+                //power -= 100;
+                //myMonster.myBase.attackMultiplier += power;
+                //myMonster.myBase.destroyShields = true;
                 break;
         }
     }
@@ -130,7 +125,7 @@ public class statusEffectUI : MonoBehaviour
         {
             counter--;
             myMonster.SetBurnDamage();
-            myMonster.ChangeHealth(GetBurnDamage(), !gameMaster.IsItMyTurn(), usingMonsterTeamIndex, true);
+            myMonster.TakeDamage(usingMonster, GetBurnDamage());
         }
 
         UpdateStatusCounter(counter);
@@ -159,12 +154,12 @@ public class statusEffectUI : MonoBehaviour
         return damage;
     }
 
-    public void DelcaringDamage(int finalCalculations, bool bMine2, int userIndex, bool willKill)
+    public void DelcaringDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields)
     {
-        if(willKill)
+        if(willDie)
         {
-            gameMaster.redirectedIndex = myMonster.teamIndex;
-            myMonster.MovePosition(false, usingMonster.attackPoint.transform.position.x, usingMonster.attackPoint.transform.position.y);
+            gameMaster.redirectedMon = myMonster;
+            myMonster.MovePosition(usingMonster.attackPoint.transform.position.x, usingMonster.attackPoint.position.y);
             StartCoroutine(goBack());
         }
     }
@@ -172,7 +167,7 @@ public class statusEffectUI : MonoBehaviour
     public IEnumerator goBack()
     {
         yield return new WaitForSeconds(0.7f);
-        myMonster.MovePosition(true, 0, 0);
+        myMonster.MovePosition(myMonster.spawnLocation.transform.position.x, myMonster.spawnLocation.position.y);
     }
 
     public void StatusGotReapplied(int newCounter, int power)
@@ -230,20 +225,19 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case 9: // add extra logic if another multipler attack gets added
-                power -= 100;
-                myMonster.myBase.attackMultiplier -= power;
-                myMonster.myBase.destroyShields = false;
+                //power -= 100;
+                //myMonster.myBase.attackMultiplier -= power;
+                //myMonster.myBase.destroyShields = false;
                 break;
 
             case 10:
                 monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
-                monster[] enemyTeam = gameMaster.GetMonstersTeam(usingMonster);
 
                 for (int i = 0; i < 3; i++)
                 {
                     if (myTeam[i].GetCurrentHealth() > 0)
                     {
-                        myTeam[i].MovePosition(true, 0, 0);
+                        myTeam[i].MovePosition(myTeam[i].spawnLocation.position.x, myTeam[i].spawnLocation.position.y);
                     }
                 }
                 break;

@@ -76,6 +76,28 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         return (bIsPlayer1) ? player1Team : player2Team ;
     }
 
+    public bool OwnerShipCheck(bool isPlayer1)
+    {
+        return (isPlayer1 == this.bIsPlayer1) ? true : false ;
+    }
+
+    public monster GetMonsterFromReference(bool isPlayer1, int index)
+    {
+        if (bIsPlayer1 && isPlayer1)
+            return player1Team[index];
+
+        if (bIsPlayer1 == false && isPlayer1 == false)
+            return player2Team[index];
+        
+        if(bIsPlayer1 && isPlayer1 == false)
+            return player2Team[index];
+
+        if (bIsPlayer1 == false && isPlayer1)
+            return player1Team[index];
+
+        return player1Team[index];
+    }
+
     void Start()
     {
         SetCanvasGroup(false);
@@ -98,33 +120,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         myGroup.interactable = state;
         myGroup.blocksRaycasts = state;
-    }
-
-    public void GetBattlePlayList(List<string> battlPlayList)
-    {
-        battlePlayList = battlPlayList;
-        StartCoroutine(PlayTheMusic());
-    }
-
-    private IEnumerator PlayTheMusic()
-    {
-        gameIsActive = true;
-
-        if(battlePlayList.Count > 0)
-        {
-            int randomIndex = Random.Range(0, battlePlayList.Count);
-            jukeBox.PlaySong(battlePlayList[randomIndex]);
-
-            while (gameIsActive)
-            {
-                if (jukeBox.IsSongPlaying() == false)
-                {
-                    randomIndex = Random.Range(0, battlePlayList.Count);
-                    jukeBox.PlaySong(battlePlayList[randomIndex]);
-                }
-                yield return new WaitForSeconds(0.5f);
-            }
-        }
     }
 
     public void SetPlayerIDs(string ID_1, string ID_2)
@@ -168,6 +163,46 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         gameMaster.StartFight();
 
         SetCanvasGroup(false);
+    }
+
+    private IEnumerator CreateTeams()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            monster newAlly = Instantiate(monsters[myTeamPrefs[i].monsterValues[0]]);
+            newAlly.SetInitialStats();
+            newAlly.SetFromPref(myTeamPrefs[i]);
+            newAlly.SetTeamIndex(i);
+            newAlly.SetOwnership(true);
+
+            monster newEnemy = Instantiate(monsters[enemyTeamPrefs[i].monsterValues[0]]);
+            newEnemy.SetInitialStats();
+            newEnemy.SetFromPref(enemyTeamPrefs[i]);
+            newEnemy.SetTeamIndex(i);
+
+            for (int x = 0; x < expHolders.Length; x++)
+            {
+                expHolder newHolder1 = Instantiate(expHolders[x]);
+                expHolder newHolder2 = Instantiate(expHolders[x]);
+                newAlly.SetExpHolder(newHolder1);
+                newEnemy.SetExpHolder(newHolder2);
+            }
+
+            if (bIsPlayer1)
+            {
+                newAlly.SetAsPlayer1();
+                player1Team[i] = newAlly;
+                player2Team[i] = newEnemy;
+            }
+            else
+            {
+                newEnemy.SetAsPlayer1();
+                player2Team[i] = newAlly;
+                player1Team[i] = newEnemy;
+            }
+        }
+
+        yield return new WaitForEndOfFrame();
     }
 
     private void SetGameMenu()
@@ -346,42 +381,31 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
     }
 
-    private IEnumerator CreateTeams()
+    public void GetBattlePlayList(List<string> battlPlayList)
     {
-        for(int i = 0; i < 3; i++)
+        battlePlayList = battlPlayList;
+        StartCoroutine(PlayTheMusic());
+    }
+
+    private IEnumerator PlayTheMusic()
+    {
+        gameIsActive = true;
+
+        if (battlePlayList.Count > 0)
         {
-            monster newAlly = Instantiate(monsters[myTeamPrefs[i].monsterValues[0]]);
-            newAlly.SetInitialStats();
-            newAlly.SetFromPref(myTeamPrefs[i]);
-            newAlly.bMine = true;
-            newAlly.teamIndex = i;
+            int randomIndex = Random.Range(0, battlePlayList.Count);
+            jukeBox.PlaySong(battlePlayList[randomIndex]);
 
-            monster newEnemy = Instantiate(monsters[enemyTeamPrefs[i].monsterValues[0]]);
-            newEnemy.SetInitialStats();
-            newEnemy.SetFromPref(enemyTeamPrefs[i]);
-            newEnemy.teamIndex = i;
-
-            for (int x = 0; x < expHolders.Length; x++)
+            while (gameIsActive)
             {
-                expHolder newHolder1 = Instantiate(expHolders[x]);
-                expHolder newHolder2 = Instantiate(expHolders[x]);
-                newAlly.SetExpHolder(newHolder1);
-                newEnemy.SetExpHolder(newHolder2);
-            }
-
-            if (bIsPlayer1)
-            {
-                player1Team[i] = newAlly;
-                player2Team[i] = newEnemy;
-            }
-            else
-            {
-                player2Team[i] = newAlly;
-                player1Team[i] = newEnemy;
+                if (jukeBox.IsSongPlaying() == false)
+                {
+                    randomIndex = Random.Range(0, battlePlayList.Count);
+                    jukeBox.PlaySong(battlePlayList[randomIndex]);
+                }
+                yield return new WaitForSeconds(0.5f);
             }
         }
-
-        yield return new WaitForEndOfFrame();
     }
 
     [PunRPC]

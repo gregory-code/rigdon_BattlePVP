@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static monsterAlly;
+using static UnityEngine.GraphicsBuffer;
 
 public class lusseliaAlly : monsterAlly
 {
@@ -10,23 +11,23 @@ public class lusseliaAlly : monsterAlly
     {
         onAttack += UseAttack;
         onAbility += UseAbility;
-        GetMyMonster().onAttackAgain += AttackAgain;
-        GetMyMonster().onTakeDamage += TookDamage;
-        GetMyMonster().onRemoveConnections += RemoveConnections;
+        GetMonster().onAttackAgain += AttackAgain;
+        GetMonster().onTakeDamage += TookDamage;
+        GetMonster().onRemoveConnections += RemoveConnections;
     }
 
     private void RemoveConnections()
     {
         onAttack -= UseAttack;
         onAbility -= UseAbility;
-        GetMyMonster().onAttackAgain -= AttackAgain;
-        GetMyMonster().onTakeDamage -= TookDamage;
-        GetMyMonster().onRemoveConnections -= RemoveConnections;
+        GetMonster().onAttackAgain -= AttackAgain;
+        GetMonster().onTakeDamage -= TookDamage;
+        GetMonster().onRemoveConnections -= RemoveConnections;
     }
 
-    private void AttackAgain(int percentageMultiplier, bool bMine2, int TargetOfTargetIndex)
+    private void AttackAgain(monster targetMon, int percentageMultiplier)
     {
-        if (GetMyMonster().bMine == false)
+        if (GetMonster().GetOwnership() == false)
             return;
 
         while (attackMultiplier > 100)
@@ -35,15 +36,15 @@ public class lusseliaAlly : monsterAlly
             percentageMultiplier++;
         }
         attackMultiplier = percentageMultiplier;
-        UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
+        UseAttack(GetMonster().GetAttackID(), targetMon, false);
     }
 
-    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage)
+    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
     {
 
     }
 
-    private void UseAttack(int attackID, int targetIndex, bool consumeTurn)
+    private void UseAttack(int attackID, monster target, bool consumeTurn)
     {
         switch (attackID)
         {
@@ -51,11 +52,11 @@ public class lusseliaAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(Starfall(targetIndex, consumeTurn));
+                StartCoroutine(Starfall(target, consumeTurn));
                 break;
 
             case 2:
-                StartCoroutine(SolarWave(targetIndex, consumeTurn));
+                StartCoroutine(SolarWave(target, consumeTurn));
                 break;
         }
     }
@@ -77,62 +78,64 @@ public class lusseliaAlly : monsterAlly
         }
     }
 
-    private IEnumerator Starfall(int targetIndex, bool consumeTurn)
+    private IEnumerator Starfall(monster target, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "attack1");
+        gameMaster.AnimateMonster(GetMonster(), "attack1");
 
         yield return new WaitForSeconds(0.2f);
 
-        int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
+        int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
         attack1 = GetMultiplierDamage(attack1);
 
-        gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 7, !isMine(), targetIndex, true, 0);
+        gameMaster.ShootProjectile(GetMonster(), target, 7, 2);
 
-        gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
+        gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
-        targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
+        target = gameMaster.GetRedirectedMonster(target);
         yield return new WaitForSeconds(0.25f);
-        gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true); // - for damage
+        gameMaster.DamageMonster(GetMonster(), target, -attack1);
 
         int shouldAddBurnDamage = 0;
-        if (GetMyMonster().GetPassiveID() == 2)
+        if (GetMonster().GetPassiveID() == 2)
             shouldAddBurnDamage = 1;
 
         if (gameMaster.estimatedDamage < 0)
-            gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 7, !isMine(), targetIndex, GetMoveDamage(0, 1), shouldAddBurnDamage);
+            gameMaster.ApplyStatus(GetMonster(), target, 7, GetMoveDamage(0, 1), shouldAddBurnDamage);
 
         yield return new WaitForSeconds(0.8f);
 
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator SolarWave(int targetIndex, bool consumeTurn)
+    private IEnumerator SolarWave(monster target, bool consumeTurn)
     {
-        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "attack2");
+        gameMaster.AnimateMonster(GetMonster(), "attack2");
 
         yield return new WaitForSeconds(0.3f);
 
-        int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
+        int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
         attack1 = GetMultiplierDamage(attack1);
 
         monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
         for (int i = 0; i < 3; i++)
         {
-            if (enemyTeam[i].GetCurrentHealth() > 0)
-            {
-                targetIndex = i;
-                gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 9, !isMine(), targetIndex, true, 1);
-                gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
-                yield return new WaitForSeconds(1.2f);
-                gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true); // - for damage
+            if (enemyTeam[i].isDead())
+                continue;
 
-                int shouldAddBurnDamage = 0;
-                if (GetMyMonster().GetPassiveID() == 2)
-                    shouldAddBurnDamage = 1;
+            target = enemyTeam[i];
+            gameMaster.ShootProjectile(GetMonster(), target, 9, 3);
+            yield return new WaitForSeconds(1f);
+            gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
+            yield return new WaitForSeconds(0.2f);
+            target = gameMaster.GetRedirectedMonster(target);
+            gameMaster.DamageMonster(GetMonster(), target, -attack1);
 
-                if (gameMaster.estimatedDamage < 0)
-                    gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 7, !isMine(), targetIndex, 1, shouldAddBurnDamage);
-            }
+            int shouldAddBurnDamage = 0;
+            if (GetMonster().GetPassiveID() == 2)
+                shouldAddBurnDamage = 1;
+
+            if (gameMaster.estimatedDamage < 0)
+                gameMaster.ApplyStatus(GetMonster(), target, 7, 1, shouldAddBurnDamage);
         }
 
         yield return new WaitForSeconds(0.8f);
@@ -142,25 +145,25 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator LunarBlanket()
     {
-        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "ability1");
+        gameMaster.AnimateMonster(GetMonster(), "ability1");
 
         yield return new WaitForSeconds(0.3f);
-        int shieldStrength = (GetMyMonster().GetCurrentMagic() + GetMoveDamage(2, 0));
+        int shieldStrength = (GetMonster().GetCurrentMagic() + GetMoveDamage(2, 0));
         shieldStrength = GetMultiplierDamage(shieldStrength);
 
         float newBubbleBuffer = (shieldStrength * 1.1f) + 1.05f;
         shieldStrength = Mathf.RoundToInt(newBubbleBuffer);
 
-        monster[] myteam = gameMaster.GetMonstersTeam(GetMyMonster());
+        monster[] myteam = gameMaster.GetMonstersTeam(GetMonster());
         for (int i = 0; i < 3; i++)
         {
-            if (myteam[i].GetCurrentHealth() > 0)
-            {
-                gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 1, isMine(), i, shieldStrength, 0);
+            if (myteam[i].isDead())
+                continue;
 
-                if (GetMyMonster().GetPassiveID() == 1)
-                    gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 8, isMine(), i, 200, 0);
-            }
+            gameMaster.ApplyStatus(GetMonster(), myteam[i], 1, shieldStrength, 0);
+
+            if (GetMonster().GetPassiveID() == 1)
+                gameMaster.ApplyStatus(GetMonster(), myteam[i], 8, 200, 0);
         }
 
         yield return new WaitForSeconds(0.3f);
@@ -170,23 +173,23 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator Moonlight()
     {
-        gameMaster.AnimateMonster(isMine(), GetMyMonster().teamIndex, "ability2");
+        gameMaster.AnimateMonster(GetMonster(), "ability2");
 
         yield return new WaitForSeconds(0.3f);
 
-        int healMultiplier = (GetMyMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 0);
+        int healMultiplier = (GetMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 0);
         float heal = GetTargetedMonster().GetMaxHealth() * (1f * healMultiplier / 100f);
         int finalHeal = Mathf.RoundToInt(heal);
         finalHeal = GetMultiplierDamage(finalHeal);
 
-        gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 8, isMine(), GetTargetedMonster().teamIndex, false, 0);
+        gameMaster.ShootProjectile(GetMonster(), GetTargetedMonster(), 8, 0);
 
         yield return new WaitForSeconds(0.4f);
 
-        gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, isMine(), GetTargetedMonster().teamIndex, finalHeal, false);
+        //gameMaster.ChangeMonsterHealth(isMine(), GetMonster().teamIndex, isMine(), GetTargetedMonster().teamIndex, finalHeal, false); heal it
 
-        if (GetMyMonster().GetPassiveID() == 1)
-            gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 8, isMine(), GetTargetedMonster().teamIndex, 200, 0);
+        if (GetMonster().GetPassiveID() == 1)
+            gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 8, 200, 0);
 
         yield return new WaitForSeconds(0.8f);
 
