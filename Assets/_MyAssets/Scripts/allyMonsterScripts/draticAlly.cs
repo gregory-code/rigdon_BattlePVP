@@ -37,8 +37,11 @@ public class draticAlly : monsterAlly
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
 
-    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
+    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage)
     {
+        if (burnDamage)
+            return;
+
         if (GetMyMonster().GetPassiveID() == 2 && isMine()) // index for cloud legend
         {
             gameMaster.ApplyStatus(!isMine(), GetMyMonster().teamIndex, 0, isMine(), userIndex, 4, 0); // index 0  for conductive status

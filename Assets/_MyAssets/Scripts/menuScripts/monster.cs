@@ -21,7 +21,7 @@ public class monster : ScriptableObject
     public int teamIndex;
     public monsterBase myBase;
     public Vector3 spawnLocation;
-    public Vector3 attackPoint;
+    public Transform attackPoint;
     public bool isTargetable = true;
     public Sprite[] stages = new Sprite[3];
     public Sprite[] stagesIcons = new Sprite[3];
@@ -205,7 +205,7 @@ public class monster : ScriptableObject
         onRemoveConnections?.Invoke();
     }
 
-    public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon);
+    public delegate void OnTakeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage);
     public event OnTakeDamage onTakeDamage;
 
     public delegate void OnDamagePopup(int change, bool shielededAttack);
@@ -347,18 +347,13 @@ public class monster : ScriptableObject
             currentHP = 0;
             died = true;
 
-            if (myBase.isMine())
-            {
-                if (BurnDamage == false)
-                {
-                    myBase.gameMaster.GiveKillExp(bMine, userIndex);
-                }
-            }
+            //myBase.gameMaster.GetSpecificMonster(bMine, userIndex).GetExpHold(1).GainExp();
         }
 
+        onTakeDamage?.Invoke(change, died, bMine, userIndex, this, BurnDamage);
+        
         BurnDamage = false;
         
-        onTakeDamage?.Invoke(change, died, bMine, userIndex, this);
         onDamagePopup?.Invoke(change, false);
     }
 

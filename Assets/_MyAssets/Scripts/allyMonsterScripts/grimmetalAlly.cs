@@ -59,7 +59,7 @@ public class grimmetalAlly : monsterAlly
         }
     }
 
-    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
+    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage)
     {
 
     }
@@ -138,7 +138,7 @@ public class grimmetalAlly : monsterAlly
         gameMaster.MoveMonster(isMine(), GetMyMonster().teamIndex, false, isMine(), myTeam[1].teamIndex, false, 0);
         gameMaster.MoveMonster(!isMine(), targetIndex, false, !isMine(), enemyTeam[1].teamIndex, false, 0);
 
-        gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 10, !isMine(), targetIndex, 1, 0);
+        gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 10, !isMine(), targetIndex, 2, 0);
         gameMaster.ApplyStatus(isMine(), GetMyMonster().teamIndex, 10, isMine(), GetMyMonster().teamIndex, 2, 0);
 
         gameMaster.AdjustTurnOrder(!isMine(), targetIndex, true, false);
@@ -165,16 +165,21 @@ public class grimmetalAlly : monsterAlly
         int attack1 = GetMyMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
         attack1 = GetMultiplierDamage(attack1);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
 
         gameMaster.DeclaringDamage(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, destroyShields);
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.2f);
         targetIndex = gameMaster.GetRedirectedIndex(targetIndex);
 
         gameMaster.ShootProjectile(isMine(), GetMyMonster().teamIndex, 10, !isMine(), targetIndex, false, 0);
         gameMaster.ChangeMonsterHealth(isMine(), GetMyMonster().teamIndex, !isMine(), targetIndex, -attack1, true);
 
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(0.6f);
+        if(GetTargetedMonster().GetCurrentHealth() <= 0)
+        {
+            gameMaster.RemoveStatus(isMine(), GetMyMonster().teamIndex, 10, isMine(), GetMyMonster().teamIndex);
+        }
+        yield return new WaitForSeconds(0.4f);
 
         FinishMove(consumeTurn, true);
     }

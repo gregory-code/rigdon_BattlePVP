@@ -49,7 +49,7 @@ public class minfurAlly : monsterAlly
         UseAttack(GetMyMonster().GetAttackID(), TargetOfTargetIndex, false);
     }
 
-    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
+    private void TookDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage)
     {
         if (GetMyMonster().GetPassiveID() == 2 && !isMine()) // index for acron
         {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -130,10 +131,6 @@ public class statusEffectUI : MonoBehaviour
             counter--;
             myMonster.SetBurnDamage();
             myMonster.ChangeHealth(GetBurnDamage(), !gameMaster.IsItMyTurn(), usingMonsterTeamIndex, true);
-            if(myMonster.GetCurrentHealth() <= 0 && gameMaster.IsItMyTurn())
-            {
-                gameMaster.GiveKillExp(!gameMaster.IsItMyTurn(), usingMonsterTeamIndex);
-            }
         }
 
         UpdateStatusCounter(counter);
@@ -167,7 +164,7 @@ public class statusEffectUI : MonoBehaviour
         if(willKill)
         {
             gameMaster.redirectedIndex = myMonster.teamIndex;
-            myMonster.MovePosition(false, usingMonster.attackPoint.x, usingMonster.attackPoint.y);
+            myMonster.MovePosition(false, usingMonster.attackPoint.transform.position.x, usingMonster.attackPoint.transform.position.y);
             StartCoroutine(goBack());
         }
     }
@@ -240,6 +237,7 @@ public class statusEffectUI : MonoBehaviour
 
             case 10:
                 monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
+                monster[] enemyTeam = gameMaster.GetMonstersTeam(usingMonster);
 
                 for (int i = 0; i < 3; i++)
                 {

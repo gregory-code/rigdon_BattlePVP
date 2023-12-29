@@ -92,7 +92,6 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public monster GetMonster(monster reference, bool bMine, int index)
     {
-
         monster[] myTeam = gameMenu.GetMyTeam();
         monster[] enemyTeam = gameMenu.GetEnemyTeam();
 
@@ -256,6 +255,11 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     private void selectNew()
     {
+        if (activeMonsters[0].myBase == null)
+        {
+            deleteTurn(0);
+        }
+
         selectParticleScript newSelect = Instantiate(selectParticlesPrefab, activeMonsters[0].myBase.transform); // give it a parent to go to
         newSelect.Init(activeMonsters[0].matchingColor);
         Vector3 location = new Vector3(0, -12, 0);
@@ -313,7 +317,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [SerializeField] bool myTurn;
     public bool IsItMyTurn() { return myTurn; }
 
-    private monster GetSpecificMonster(bool bMine, int teamIndex) // bMine will be the same for both players RPC call
+    public monster GetSpecificMonster(bool bMine, int teamIndex) // bMine will be the same for both players RPC call
     {
         if (bMine && myTurn)
         {
@@ -392,18 +396,21 @@ public class GameMaster : MonoBehaviourPunCallbacks
             }
         }
 
+        if(addToFront)
+        {
+            if(monsterToAdd.GetCurrentHealth() > 0)
+            {
+                activeMonsters.Insert(0, monsterToAdd);
+                addTurn(monsterToAdd, true);
+            }
+            addToFront = false;
+        }
+
         waitingQueue = true;
 
         foreach (monster mon in activeMonsters)
         {
             mon.NextTurn();
-        }
-
-        if(addToFront)
-        {
-            activeMonsters.Insert(0, monsterToAdd);
-            addTurn(monsterToAdd, true);
-            addToFront = false;
         }
 
         selectNew();

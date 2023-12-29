@@ -53,12 +53,13 @@ public class monsterBase : MonoBehaviour
         lerpLocation.y = spawnLocation.transform.position.y;
 
         myMonster.GetExpHold(0).GainExp();
+        myMonster.GetExpHold(0).GainExp();
         myMonster.myBase = this;
 
         monsterDependecy dependecies = GetComponent<monsterDependecy>();
         GrabDependecies(dependecies);
 
-        this.myMonster.attackPoint = attackPoint.position;
+        this.myMonster.attackPoint = attackPoint;
 
         int stage = myMonster.GetSpriteIndexFromLevel();
         monsterSprite.sprite = myMonster.stages[stage];
@@ -146,7 +147,7 @@ public class monsterBase : MonoBehaviour
         SetHealthText();
     }
 
-    private void takeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon)
+    private void takeDamage(int change, bool died, bool bMine, int userIndex, monster recivingMon, bool burnDamage)
     {
         SetHealthText();
 
@@ -293,26 +294,30 @@ public class monsterBase : MonoBehaviour
         {
             foreach (int index in listOfIndexesToDelete)
             {
-                if(index == 5)
+                switch(index)
                 {
-                    foreach(monster mon in gameMaster.GetMonstersTeam(GetMyMonster()))
-                    {
-                        if(mon.GetStatus(index) != null)
-                        {
-                            mon.GetStatus(index).GettingRemoved();
-                            mon.DestroyStatus(index);
-                        }
-                        else if(mon.GetStatus(index + 1) != null)
-                        {
-                            mon.GetStatus(index + 1).GettingRemoved();
-                            mon.DestroyStatus(index + 1);
-                        }
-                    }
-                }
-                else
-                {
-                    GetMyMonster().GetStatus(index).GettingRemoved();
-                    GetMyMonster().DestroyStatus(index);
+                    default:
+                        GetMyMonster().GetStatus(index).GettingRemoved();
+                        GetMyMonster().DestroyStatus(index);
+                        break;
+
+                    case 5:
+                        monster ally = GetMyMonster().GetStatus(5).GetUsingMonster();
+                        ally.GetStatus(6).GettingRemoved();
+                        ally.DestroyStatus(6);
+
+                        GetMyMonster().GetStatus(5).GettingRemoved();
+                        GetMyMonster().DestroyStatus(5);
+                        break;
+
+                    case 6:
+                        monster ally2 = GetMyMonster().GetStatus(6).GetUsingMonster();
+                        ally2.GetStatus(5).GettingRemoved();
+                        ally2.DestroyStatus(5);
+
+                        GetMyMonster().GetStatus(6).GettingRemoved();
+                        GetMyMonster().DestroyStatus(6);
+                        break;
                 }
             }
         }
