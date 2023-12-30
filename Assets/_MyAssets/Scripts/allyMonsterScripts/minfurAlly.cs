@@ -223,15 +223,8 @@ public class minfurAlly : monsterAlly
             if (myteam[i].isDead())
                 continue;
 
-            if (myteam[i].GetIndex() == GetMonster().GetIndex())
-            {
-                gameMaster.ApplyStatus(GetMonster(), myteam[i], 4, (GetMoveDamage(2, 1) + 1), attack);
-            }
-            else
-            {
-                gameMaster.ApplyStatus(GetMonster(), myteam[i], 4, GetMoveDamage(2, 1), attack);
-                gameMaster.AnimateMonster(GetMonster(), "idle");
-            }
+            gameMaster.ApplyStatus(GetMonster(), myteam[i], 4, GetMoveDamage(2, 1), attack);
+            gameMaster.AnimateMonster(myteam[i], "idle");
         }
 
         yield return new WaitForSeconds(0.8f);

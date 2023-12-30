@@ -188,9 +188,10 @@ public class statusEffectUI : MonoBehaviour
         {
             counter--;
 
-            if (counter == 0)
+            if (counter <= 0)
             {
-                myMonster.procStatus(true, statusIndex, true);
+                myMonster.TryRemoveStatus(statusIndex, true);
+
             }
         }
     }

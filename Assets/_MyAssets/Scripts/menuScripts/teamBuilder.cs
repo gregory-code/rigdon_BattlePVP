@@ -472,6 +472,7 @@ public class teamBuilder : canvasGroupRenderer
         }
 
         passiveGrowthID = content.GetPassiveGrowth();
+
         growthValue = currentTeam.GetMonsterPref(currentMonster).monsterValues[passiveGrowthID + 4];
 
         if (passiveIsGivingGrowth && content.DoesPassiveGiveGrowth() == false)

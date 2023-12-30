@@ -14,12 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monsterID: 6
   monsterName: Incanteer
+  gameMaster: {fileID: 0}
+  spawnLocation: {fileID: 0}
+  ownerTransform: {fileID: 0}
+  attackPoint: {fileID: 0}
   bFlipSprite: 010101
-  canAct: 0
-  bMine: 0
-  teamIndex: 0
-  myBase: {fileID: 0}
-  spawnLocation: {x: 0, y: 0, z: 0}
   isTargetable: 1
   stages:
   - {fileID: 21300000, guid: aac5da70289c2e4448c37abaf69bf00d, type: 3}
@@ -31,10 +30,15 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 9558ade89b1974345b7cb946b308601a, type: 3}
   circleOutline: {fileID: 21300000, guid: 49d7e5a39360f5b4ca421631228003b6, type: 3}
   matchingColor: {r: 0.7647059, g: 0.34901962, b: 0.039215688, a: 0.39215687}
-  level: 0
   initial_HP: 20
   initial_Strength: 2
   initial_Magic: 1
   initial_Speed: 7
-  moveContents: []
-  hasStatus: 00000000
+  moveContents:
+  - {fileID: 8812975950963853024, guid: b37d827226b61994aa2332c323dd5842, type: 3}
+  - {fileID: 8812975950963853024, guid: 39006fdd518d9db45855e141371b2f9a, type: 3}
+  - {fileID: 8812975950963853024, guid: 0d5742795cc9cac47aea2bfdc2ad683b, type: 3}
+  - {fileID: 8812975950963853024, guid: ae0f90c0d93d340479f3919698ba56ac, type: 3}
+  - {fileID: 8812975950963853024, guid: 389cddd72606caa4ca36c8b0e974fcfd, type: 3}
+  - {fileID: 8812975950963853024, guid: 58f2743c9cd9e1f4494cd8ff1991d7c2, type: 3}
+  statusEffects: []
