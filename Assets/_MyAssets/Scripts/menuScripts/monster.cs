@@ -247,6 +247,12 @@ public class monster : ScriptableObject
     public delegate void OnNextTurn();
     public event OnNextTurn onNextTurn;
 
+    public delegate void OnAboutToAttack(monster attackingMon, monster gettingAttacked);
+    public event OnAboutToAttack onAboutToAttack;
+
+    public delegate void OnHoldAttack();
+    public event OnHoldAttack onHoldAttack;
+
     public delegate void OnAttackBreaksShields(bool state);
     public event OnAttackBreaksShields onAttackBreaksShields;
 
@@ -286,6 +292,16 @@ public class monster : ScriptableObject
     public void ChangeAttackMultiplier(int change)
     {
         onChangeAttackMultiplier?.Invoke(change);
+    }
+
+    public void AboutToAttack(monster gettingAttacked)
+    {
+        onAboutToAttack?.Invoke(this, gettingAttacked);
+    }
+
+    public void HoldAttack()
+    {
+        onHoldAttack?.Invoke();
     }
 
     public void NextTurn()
@@ -577,6 +593,11 @@ public class monster : ScriptableObject
         else
         {
             status.StatusGotReapplied(counter, power);
+
+            if(status.GetIndex() == 14)
+            {
+                procStatus(false, 14, true);
+            }
         }
     }
 

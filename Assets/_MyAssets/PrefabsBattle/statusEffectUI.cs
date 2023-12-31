@@ -62,6 +62,14 @@ public class statusEffectUI : MonoBehaviour
                 myMonster.ChangeAttackMultiplier(this.power);
                 myMonster.ApplyShieldBreak(true);
                 break;
+
+            case 12:
+                StatChange(0, power);
+                break;
+
+            case 13:
+                StatChange(0, power);
+                break;
         }
     }
 
@@ -176,7 +184,7 @@ public class statusEffectUI : MonoBehaviour
 
     public void StatusGotReapplied(int newCounter, int power)
     {
-        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 3 || statusIndex == 4 || statusIndex == 7)
+        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 3 || statusIndex == 4 || statusIndex == 7 || statusIndex == 12 || statusIndex == 13 || statusIndex == 14)
         {
             UpdateStatusCounter(counter + newCounter);
         }
@@ -184,8 +192,19 @@ public class statusEffectUI : MonoBehaviour
 
     private void UsedAction(bool isAttack)
     {
-        if(statusIndex == 3 || statusIndex == 4)
+        if (statusIndex == 3 || statusIndex == 4 || statusIndex == 12 || statusIndex == 13)
         {
+
+            if(isAttack && statusIndex == 12 && myMonster.GetOwnership() && counter >= 1)
+            {
+                monster[] allies = gameMaster.GetMonstersTeam(myMonster);
+                foreach(monster ally  in allies)
+                {
+                    gameMaster.ApplyStatus(myMonster, ally, 13, 1, (power + 2));
+                    gameMaster.AnimateMonster(ally, "idle");
+                }
+            }
+            
             counter--;
 
             if (counter <= 0)
@@ -239,6 +258,14 @@ public class statusEffectUI : MonoBehaviour
                         myTeam[i].MovePosition(myTeam[i].spawnLocation.position.x, myTeam[i].spawnLocation.position.y);
                     }
                 }
+                break;
+
+            case 12:
+                StatChange(0, -power);
+                break;
+
+            case 13:
+                StatChange(0, -power);
                 break;
         }
     }

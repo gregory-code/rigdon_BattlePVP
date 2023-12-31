@@ -84,6 +84,12 @@ public class draticAlly : monsterAlly
 
     private IEnumerator RingingThunder(monster target, bool consumeTurn)
     {
+        if (holdAttack)
+        {
+            holdAttack = false;
+            yield return new WaitForSeconds(1f);
+        }
+
         int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(0,0); // consider reducing by a % that would be hype
         attack1 = GetMultiplierDamage(attack1);
 
@@ -151,6 +157,12 @@ public class draticAlly : monsterAlly
 
     private IEnumerator BoomSpear(monster target, bool consumeTurn)
     {
+        if (holdAttack)
+        {
+            holdAttack = false;
+            yield return new WaitForSeconds(1f);
+        }
+
         int attack1 = GetMonster().GetCurrentMagic() + GetMoveDamage(1,0);
         attack1 = GetMultiplierDamage(attack1);
 

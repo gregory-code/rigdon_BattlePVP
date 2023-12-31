@@ -9762,6 +9762,7 @@ RectTransform:
   - {fileID: 17871140}
   - {fileID: 1831936208}
   - {fileID: 1251577043}
+  - {fileID: 1958197924}
   - {fileID: 1851747825}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9823,6 +9824,7 @@ MonoBehaviour:
   - {fileID: 17871140}
   - {fileID: 1831936208}
   - {fileID: 1251577043}
+  - {fileID: 1958197924}
   monsterPrefab: {fileID: 5283204708080974220, guid: 1c5895dbf50ad944b89e1f3e02b07051,
     type: 3}
   monsterBasesToDeleteLater: []
@@ -9847,6 +9849,8 @@ MonoBehaviour:
   - {fileID: 624532902802443625, guid: 48d1ae155f3a9cc4fafa6c46b1d0cc82, type: 3}
   - {fileID: 7570793173756038611, guid: b869469e26e572543bd372f3274bf3a0, type: 3}
   - {fileID: 1441670118508295303, guid: a96a2115540cd844fa7e1c0b31746f9a, type: 3}
+  - {fileID: -6994415367948908567, guid: 688b8fdfea7aaae43b2ff051a46bdf0b, type: 3}
+  - {fileID: 3059736901087236833, guid: 94425b8acae45db4fb3b779dd8545705, type: 3}
   statusPrefabs:
   - {fileID: 145170, guid: 4f9f5c792c78b6e4bb91286ba103cf5b, type: 3}
   - {fileID: 1135644536747142, guid: 9116a8c6e83d27543896c0ec8be7944e, type: 3}
@@ -9860,6 +9864,9 @@ MonoBehaviour:
   - {fileID: 143098, guid: 8bfcb670fdbe69049ba78f18c342a9bf, type: 3}
   - {fileID: 1895138145459492, guid: 3c4269bcc0828c547ac6babe3283b4d6, type: 3}
   - {fileID: 135198, guid: e39ea200cc99b104ba149175814bd8f3, type: 3}
+  - {fileID: 5273686884121143755, guid: d2bb0c542569ba24b959fb785eea4b34, type: 3}
+  - {fileID: 5273686884121143755, guid: d2bb0c542569ba24b959fb785eea4b34, type: 3}
+  - {fileID: 138498, guid: 17cddf5c81d3a984a90108279eac0291, type: 3}
   regularDeath: {fileID: 173590, guid: 9199f48996e301e408b14a54449d591a, type: 3}
   grimmetalDeath: {fileID: 1221293952758510, guid: cf2871a4bbfb7f64d8172bf9429514d1,
     type: 3}
@@ -21552,6 +21559,9 @@ MonoBehaviour:
   - {fileID: 4328858284941032501, guid: fdfd9141c82ced94a88a6b51c3eaa976, type: 3}
   - {fileID: 4328858284941032501, guid: d9473fcd033451142aeca6938f56ac3b, type: 3}
   - {fileID: 6070293028441550235, guid: 8275450482b3a1e49a80324683055a08, type: 3}
+  - {fileID: 4328858284941032501, guid: b4453af47b5504148930a2ff9bbd0d77, type: 3}
+  - {fileID: 4328858284941032501, guid: de5cf7156f0ac7a4ab74a1d0252043f4, type: 3}
+  - {fileID: 6070293028441550235, guid: 7f2ed86e0aad24043b8f5b7abe132b26, type: 3}
   moveContentList: []
 --- !u!114 &957664542
 MonoBehaviour:
@@ -46930,6 +46940,41 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1957657990}
   m_CullTransparentMesh: 1
+--- !u!1 &1958197923
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1958197924}
+  m_Layer: 5
+  m_Name: centerStage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1958197924
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1958197923}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 413420227}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 10, y: 10}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1964576314
 GameObject:
   m_ObjectHideFlags: 0

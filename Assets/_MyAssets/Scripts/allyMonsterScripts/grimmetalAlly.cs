@@ -100,6 +100,12 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator Cleave(monster target, bool consumeTurn)
     {
+        if (holdAttack)
+        {
+            holdAttack = false;
+            yield return new WaitForSeconds(1f);
+        }
+
         gameMaster.AnimateMonster(GetMonster(), "attack1");
         gameMaster.MoveMonster(GetMonster(), target, 0);
 
@@ -128,6 +134,12 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator Duel(monster target, bool consumeTurn)
     {
+        if (holdAttack)
+        {
+            holdAttack = false;
+            yield return new WaitForSeconds(1f);
+        }
+
         gameMaster.AnimateMonster(GetMonster(), "attack2");
 
         yield return new WaitForSeconds(0.5f);

@@ -410,9 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '           Burn Incanteer (1 turn)
-
-    and deal '
+  m_text: "           Deal           of the targets \n     current health and        
+    the \n             target for 1 turn"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -544,13 +543,13 @@ MonoBehaviour:
   - {fileID: 8205547447539754975}
   - {fileID: 465393707680873253}
   - {fileID: 8962566636708827019}
-  exists: 010100
+  exists: 010000
   statIndex: 010000000000000000000000
   usesStatModifier: 010000
-  isPerecentage: 000000
-  percentageStatMultiplier: 0
-  scaleNums1: 010000000200000003000000
-  scaleNums2: 010000000200000003000000
+  isPerecentage: 010000
+  percentageStatMultiplier: 2
+  scaleNums1: 140000001e00000028000000
+  scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
   statGrowthIndex: 0
@@ -858,7 +857,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -23.5, y: 15}
+  m_AnchoredPosition: {x: -12, y: 15}
   m_SizeDelta: {x: -160.8491, y: -66.8492}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
@@ -889,7 +888,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3
+  m_text: 20%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -993,8 +992,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.3929977, y: -9.513}
-  m_SizeDelta: {x: -2.788, y: -19.027}
+  m_AnchoredPosition: {x: 48.6, y: -6.9}
+  m_SizeDelta: {x: -152.8145, y: -70.901}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
 CanvasRenderer:
@@ -1024,7 +1023,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: burn
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -1034,8 +1033,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4280156620
+  m_fontColor: {r: 0.8, g: 0.003921569, b: 0.11764706, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1058,9 +1057,9 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_fontStyle: 5
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -1159,7 +1158,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,

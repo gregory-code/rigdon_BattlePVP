@@ -117,6 +117,12 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator Cuddle(monster target, bool consumeTurn)
     {
+        if (holdAttack)
+        {
+            holdAttack = false;
+            yield return new WaitForSeconds(1f);
+        }
+
         gameMaster.AnimateMonster(GetMonster(), "attack1");
         gameMaster.MoveMonster(GetMonster(), target, 0);
 
@@ -132,7 +138,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(target, 1, 2, 4, 8, 9, 11);
+            YoinkStatuses(target, 1, 2, 4, 8, 9, 11, 12, 13);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -144,7 +150,7 @@ public class minfurAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private void YoinkStatuses(monster yoinkie, int status, int status2, int status3, int status4, int status5, int status6)
+    private void YoinkStatuses(monster yoinkie, int status, int status2, int status3, int status4, int status5, int status6, int status7, int status8)
     {
         if (GetTargetedMonster().statusEffects.Count <= 0)
             return;
@@ -153,7 +159,8 @@ public class minfurAlly : monsterAlly
 
         foreach (statusEffectUI effect in GetTargetedMonster().statusEffects)
         {
-            if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3 || effect.GetIndex() == status4 || effect.GetIndex() == status5 || effect.GetIndex() == 6) // add more of these as they get added
+            if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3 || effect.GetIndex() == status4 
+                || effect.GetIndex() == status5 || effect.GetIndex() == status6 || effect.GetIndex() == status7 || effect.GetIndex() == status8) // add more of these as they get added
             {
                 listOfIndexesToSteal.Add(effect.GetIndex());
             }
@@ -173,6 +180,12 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator FluffyRoll(monster target, bool consumeTurn)
     {
+        if (holdAttack)
+        {
+            holdAttack = false;
+            yield return new WaitForSeconds(1f);
+        }
+
         gameMaster.AnimateMonster(GetMonster(), "attack2");
         gameMaster.ShootProjectile(GetMonster(), target, 5, 0);
         gameMaster.MoveMonster(GetMonster(), target, 0);
@@ -189,7 +202,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(target, 1, 2, 4, 8, 9, 11);
+            YoinkStatuses(target, 1, 2, 4, 8, 9, 11, 12, 13);
         }
 
         gameMaster.AdjustTurnOrder(target, false, true);
@@ -214,7 +227,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1);
+            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1, -1, -1);
         }
 
         monster[] myteam = gameMaster.GetMonstersTeam(GetMonster());
@@ -223,8 +236,15 @@ public class minfurAlly : monsterAlly
             if (myteam[i].isDead())
                 continue;
 
-            gameMaster.ApplyStatus(GetMonster(), myteam[i], 4, GetMoveDamage(2, 1), attack);
-            gameMaster.AnimateMonster(myteam[i], "idle");
+            if (myteam[i] == GetMonster())
+            {
+                gameMaster.ApplyStatus(GetMonster(), myteam[i], 4, (GetMoveDamage(2, 1) + 1), attack);
+            }
+            else
+            {
+                gameMaster.ApplyStatus(GetMonster(), myteam[i], 4, GetMoveDamage(2, 1), attack);
+                gameMaster.AnimateMonster(myteam[i], "idle");
+            }
         }
 
         yield return new WaitForSeconds(0.8f);
@@ -258,7 +278,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1);
+            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1, -1, -1);
         }
 
         yield return new WaitForSeconds(0.5f);

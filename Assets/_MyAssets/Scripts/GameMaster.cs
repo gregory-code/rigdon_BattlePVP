@@ -82,6 +82,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
             case 4:
                 return newMonster.AddComponent<grimmetalAlly>();
 
+            case 6:
+                return newMonster.AddComponent<incanteerAlly>();
+
             case 8:
                 return newMonster.AddComponent<lusseliaAlly>();
 
@@ -463,6 +466,10 @@ public class GameMaster : MonoBehaviourPunCallbacks
             case 3:
                 pos = (doIOwnThis == true) ? uniqueLocations[uniquePos].position : uniqueLocations[uniquePos + 1].position;
                 break;
+
+            case 5:
+                pos = uniqueLocations[uniquePos].position;
+                break;
         }
 
         pos.x += (doIOwnThis) ? -3 : 3 ;
@@ -634,6 +641,10 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
             case 3:
                 spawn = (doIOwnThis) ? uniqueLocations[uniqueSpawn] : uniqueLocations[uniqueSpawn + 1];
+                break;
+
+            case 5:
+                spawn = uniqueLocations[uniqueSpawn];
                 break;
         }
 

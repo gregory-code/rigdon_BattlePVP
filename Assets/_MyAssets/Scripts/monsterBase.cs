@@ -33,6 +33,7 @@ public class monsterBase : MonoBehaviour
 
     public int attackMultiplier = 100;
     public bool destroyShields = false;
+    public bool holdAttack = false;
 
     public delegate void OnOpenInfo();
     public event OnOpenInfo onOpenInfo;
@@ -82,6 +83,7 @@ public class monsterBase : MonoBehaviour
         myMonster.onRemoveTaunt += RemoveTaunt;
         myMonster.onAttackBreaksShields += DestroyShields;
         myMonster.onChangeAttackMultiplier += AttackMultiplier;
+        myMonster.onHoldAttack += HoldAttack;
         myMonster.onRemoveConnections += RemoveConnections;
 
         nameText.text = myMonster.GetMonsterNickname();
@@ -125,6 +127,11 @@ public class monsterBase : MonoBehaviour
         health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
         tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
         transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
+    }
+
+    private void HoldAttack()
+    {
+        holdAttack = true;
     }
 
     public monster GetMonster()
@@ -255,7 +262,7 @@ public class monsterBase : MonoBehaviour
     private void ShootProjectile(projectileScript projectilePrefab, Transform target, Transform whichSpawn)
     {
         projectileScript newProjectile = Instantiate(projectilePrefab, whichSpawn);
-        newProjectile.Init(target);
+        newProjectile.Init(target, monsterSprite.transform);
     }
 
     private void damagePopup(int change, bool shieldedAttack)
