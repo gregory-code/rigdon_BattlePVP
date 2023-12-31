@@ -304,6 +304,13 @@ public class monster : ScriptableObject
         onHoldAttack?.Invoke();
     }
 
+    public void AdjustDamageReduction(int change)
+    {
+        damagePercentage += change;
+    }
+
+    int damagePercentage = 100;
+
     public void NextTurn()
     {
         if (gameMaster.movingToNewGame == true || dead)
@@ -354,6 +361,8 @@ public class monster : ScriptableObject
 
         damage = CalculateConductive(damage, false);
 
+        damage = CalculateDamageReductionPercentage(damage);
+
         damage = DamageCap(damage);
 
         int bubbleHealth = 0;
@@ -386,6 +395,8 @@ public class monster : ScriptableObject
             change = CalculateConductive(change, true);
 
         change = DamageCap(change);
+
+        change = CalculateDamageReductionPercentage(change);
 
         change = HandleBubble(change, usingMon);
 
@@ -490,6 +501,12 @@ public class monster : ScriptableObject
         }
 
         return damage;
+    }
+
+    private int CalculateDamageReductionPercentage(int damage)
+    {
+        float Multiplier = damage * (1f * damagePercentage / 100f);
+        return Mathf.RoundToInt(Multiplier);
     }
 
     public int GetHalfStrength()

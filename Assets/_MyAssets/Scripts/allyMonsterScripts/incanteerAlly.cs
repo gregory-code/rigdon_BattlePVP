@@ -224,11 +224,24 @@ public class incanteerAlly : monsterAlly
     private IEnumerator BrambleCrown()
     {
         gameMaster.AnimateMonster(GetMonster(), "ability2");
+        gameMaster.MoveMonster(GetMonster(), GetTargetedMonster(), 0);
 
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(.8f);
+
+        gameMaster.ShootProjectile(GetMonster(), GetTargetedMonster(), 13, 0);
+
+        yield return new WaitForSeconds(0.2f);
+
+        int counter = GetMonster().GetCurrentMagic() + GetMoveDamage(3, 1);
+        int power = GetMonster().GetCurrentSpeed() + GetMoveDamage(3, 0);
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 15, (counter + 1), power);
 
         if (GetMonster().GetPassiveID() == 1)
             gameMaster.AdjustTurnOrder(GetTargetedMonster(), true, false);
+
+        yield return new WaitForSeconds(0.5f);
+
+        gameMaster.MoveMonster(GetMonster(), GetTargetedMonster(), 1);
 
         FinishMove(true, false);
     }

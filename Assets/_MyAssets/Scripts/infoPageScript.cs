@@ -114,6 +114,23 @@ public class infoPageScript : canvasGroupRenderer
             {
                 effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "%";
             }
+            if(status.GetIndex() == 15)
+            {
+                switch(status.GetLevelIndex())
+                {
+                    case 0:
+                        effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = "40%";
+                        break;
+
+                    case 1:
+                        effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = "50%";
+                        break;
+
+                    case 2:
+                        effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = "60%";
+                        break;
+                }
+            }
             listOfEffects.Add(effect);
         }
 

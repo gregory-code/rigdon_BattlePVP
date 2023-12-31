@@ -70,6 +70,24 @@ public class statusEffectUI : MonoBehaviour
             case 13:
                 StatChange(0, power);
                 break;
+
+            case 15:
+                switch(myMonster.GetSpriteIndexFromLevel())
+                {
+                    case 0:
+                        myMonster.AdjustDamageReduction(-40);
+                        break;
+
+                    case 1:
+                        myMonster.AdjustDamageReduction(-50);
+                        break;
+
+                    case 2:
+                        myMonster.AdjustDamageReduction(-60);
+                        break;
+                }
+                StatChange(3, power);
+                break;
         }
     }
 
@@ -91,9 +109,9 @@ public class statusEffectUI : MonoBehaviour
         StatChange(1, secondaryPower);
     }
 
-    public monster GetUsingMonster()
+    public int GetLevelIndex()
     {
-        return usingMonster;
+        return myMonster.GetSpriteIndexFromLevel();
     }
 
     public int GetIndex()
@@ -127,7 +145,7 @@ public class statusEffectUI : MonoBehaviour
             shouldDelete = (counter <= 0);
         }
 
-        if(statusIndex == 0 || statusIndex == 2 || statusIndex == 10)
+        if(statusIndex == 0 || statusIndex == 2 || statusIndex == 10 || statusIndex == 15)
         {
             shouldDelete = TickCounter();
         }
@@ -267,6 +285,24 @@ public class statusEffectUI : MonoBehaviour
             case 13:
                 StatChange(0, -power);
                 break;
+
+            case 15:
+                switch (myMonster.GetSpriteIndexFromLevel())
+                {
+                    case 0:
+                        myMonster.AdjustDamageReduction(40);
+                        break;
+
+                    case 1:
+                        myMonster.AdjustDamageReduction(50);
+                        break;
+
+                    case 2:
+                        myMonster.AdjustDamageReduction(60);
+                        break;
+                }
+                StatChange(3, -power);
+                break;
         }
     }
 
@@ -284,6 +320,25 @@ public class statusEffectUI : MonoBehaviour
 
             case 2: // speed
                 myMonster.ChangeCurrentSpeed(change);
+                break;
+
+            case 3: // highest stat
+                int strength = myMonster.GetCurrentStrength();
+                int magic = myMonster.GetCurrentMagic();
+                int speed = myMonster.GetCurrentSpeed();
+
+                if(strength >= magic && strength >= magic)
+                {
+                    myMonster.ChangeCurrentStrength(change);
+                }
+                else if (magic >= strength && magic >= speed)
+                {
+                    myMonster.ChangeCurrentMagic(change);
+                }
+                else
+                {
+                    myMonster.ChangeCurrentSpeed(change);
+                }
                 break;
         }
     }

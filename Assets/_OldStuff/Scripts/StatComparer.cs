@@ -8,16 +8,15 @@ public class StatComparer : IComparer<monster>
     {
         if (x.GetMonsterID() == y.GetMonsterID())
         {
-            int randomSpeedTieWin = Random.Range(0, 2);
-            if(randomSpeedTieWin == 0)
+            if(x.isPlayer1() == true)
             {
-                x.ChangeCurrentStrength(-1);
+                x.ChangeCurrentSpeed(-1);
                 x.ChangeCurrentStrength(1);
                 x.ChangeCurrentMagic(1);
             }
             else
             {
-                y.ChangeCurrentStrength(-1);
+                y.ChangeCurrentSpeed(-1);
                 y.ChangeCurrentStrength(1);
                 y.ChangeCurrentMagic(1);
             }

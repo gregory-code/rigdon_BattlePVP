@@ -138,7 +138,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(target, 1, 2, 4, 8, 9, 11, 12, 13);
+            YoinkStatuses(target, 1, 2, 4, 8, 9, 11, 12, 13, 15);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -150,7 +150,7 @@ public class minfurAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private void YoinkStatuses(monster yoinkie, int status, int status2, int status3, int status4, int status5, int status6, int status7, int status8)
+    private void YoinkStatuses(monster yoinkie, int status, int status2, int status3, int status4, int status5, int status6, int status7, int status8, int status9)
     {
         if (GetTargetedMonster().statusEffects.Count <= 0)
             return;
@@ -160,7 +160,7 @@ public class minfurAlly : monsterAlly
         foreach (statusEffectUI effect in GetTargetedMonster().statusEffects)
         {
             if (effect.GetIndex() == status || effect.GetIndex() == status2 || effect.GetIndex() == status3 || effect.GetIndex() == status4 
-                || effect.GetIndex() == status5 || effect.GetIndex() == status6 || effect.GetIndex() == status7 || effect.GetIndex() == status8) // add more of these as they get added
+       || effect.GetIndex() == status5 || effect.GetIndex() == status6 || effect.GetIndex() == status7 || effect.GetIndex() == status8 || effect.GetIndex() == status9) // add more of these as they get added
             {
                 listOfIndexesToSteal.Add(effect.GetIndex());
             }
@@ -202,7 +202,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(target, 1, 2, 4, 8, 9, 11, 12, 13);
+            YoinkStatuses(target, 1, 2, 4, 8, 9, 11, 12, 13, 15);
         }
 
         gameMaster.AdjustTurnOrder(target, false, true);
@@ -227,7 +227,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1, -1, -1);
+            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1, -1, -1, -1);
         }
 
         monster[] myteam = gameMaster.GetMonstersTeam(GetMonster());
@@ -278,7 +278,7 @@ public class minfurAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 1)
         {
-            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1, -1, -1);
+            YoinkStatuses(GetTargetedMonster(), 0, 3, 7, -1, -1, -1, -1, -1, -1);
         }
 
         yield return new WaitForSeconds(0.5f);
