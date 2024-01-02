@@ -1089,7 +1089,7 @@ MonoBehaviour:
   isPerecentage: 000100
   percentageStatMultiplier: 5
   scaleNums1: 030000000500000008000000
-  scaleNums2: 000000000f0000001e000000
+  scaleNums2: 0f0000001900000023000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
   statGrowthIndex: 0

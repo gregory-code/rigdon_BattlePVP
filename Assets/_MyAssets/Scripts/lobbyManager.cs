@@ -21,6 +21,8 @@ public class lobbyManager : MonoBehaviourPunCallbacks
     string gameRoomID = "";
     bool isLobbyRoom = true;
 
+    int format = 0;
+
     [SerializeField] TextMeshProUGUI playersOnlineText;
 
     [SerializeField] GameObject connectedWifi;
@@ -62,16 +64,19 @@ public class lobbyManager : MonoBehaviourPunCallbacks
             case battleMenu.format.standard:
                 RoomIDs = standardRoomIDs;
                 formatID = 0;
+                format = 0;
                 break;
 
             case battleMenu.format.random:
                 RoomIDs = randomRoomIDs;
                 formatID = 1;
+                format = 1;
                 break;
 
             case battleMenu.format.draft:
                 RoomIDs = draftRoomIDs;
                 formatID = 2;
+                format = 2;
                 break;
         }
 
@@ -136,7 +141,7 @@ public class lobbyManager : MonoBehaviourPunCallbacks
             List<string> playerIDs = gameRoomID.ToString().Split('õ').ToList();
             gameMenu.GetBattlePlayList(playLists.battleSongs);
             gameMenu.SetPlayerIDs(playerIDs[0], playerIDs[1]);
-            StartCoroutine(gameMenu.SetUpGame());
+            StartCoroutine(gameMenu.SetUpGame(format));
 
         }
     }

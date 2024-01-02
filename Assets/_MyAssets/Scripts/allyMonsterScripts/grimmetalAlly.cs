@@ -42,7 +42,7 @@ public class grimmetalAlly : monsterAlly
             percentageMultiplier++;
         }
         attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
     }
 
     private void MonsterDied(monster whoDied)
@@ -64,7 +64,7 @@ public class grimmetalAlly : monsterAlly
 
     }
 
-    private void UseAttack(int attackID, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
     {
         switch (attackID)
         {
@@ -72,11 +72,11 @@ public class grimmetalAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(Cleave(target, consumeTurn));
+                StartCoroutine(Cleave(user, target, consumeTurn));
                 break;
 
             case 2:
-                StartCoroutine(Duel(target, consumeTurn));
+                StartCoroutine(Duel(user, target, consumeTurn));
                 break;
         }
     }
@@ -98,7 +98,7 @@ public class grimmetalAlly : monsterAlly
         }
     }
 
-    private IEnumerator Cleave(monster target, bool consumeTurn)
+    private IEnumerator Cleave(monster user, monster target, bool consumeTurn)
     {
         if (holdAttack)
         {
@@ -106,33 +106,33 @@ public class grimmetalAlly : monsterAlly
             yield return new WaitForSeconds(1f);
         }
 
-        gameMaster.AnimateMonster(GetMonster(), "attack1");
-        gameMaster.MoveMonster(GetMonster(), target, 0);
+        gameMaster.AnimateMonster(user, "attack1");
+        gameMaster.MoveMonster(user, target, 0);
 
-        int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
-        int extraDamage = GetMonster().GetCurrentStrength() + GetMoveDamage(0, 1);
-        float attackEffect = extraDamage * (1f * GetMonster().GetCurrentHealth() / GetMonster().GetMaxHealth() * 1f);
+        int attack1 = user.GetCurrentStrength() + GetMoveDamage(0, 0);
+        int extraDamage = user.GetCurrentStrength() + GetMoveDamage(0, 1);
+        float attackEffect = extraDamage * (1f * user.GetCurrentHealth() / user.GetMaxHealth() * 1f);
         attack1 += Mathf.RoundToInt(attackEffect);
         attack1 = GetMultiplierDamage(attack1);
 
 
         yield return new WaitForSeconds(1f);
-        gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
 
-        gameMaster.ShootProjectile(GetMonster(), target, 10, 0);
+        gameMaster.ShootProjectile(user, target, 10, 0);
         yield return new WaitForSeconds(0.1f);
-        gameMaster.DamageMonster(GetMonster(), target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1);
 
         yield return new WaitForSeconds(0.4f);
-        gameMaster.MoveMonster(GetMonster(), target, 1);
+        gameMaster.MoveMonster(user, target, 1);
         yield return new WaitForSeconds(0.4f);
 
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator Duel(monster target, bool consumeTurn)
+    private IEnumerator Duel(monster user, monster target, bool consumeTurn)
     {
         if (holdAttack)
         {
@@ -140,18 +140,18 @@ public class grimmetalAlly : monsterAlly
             yield return new WaitForSeconds(1f);
         }
 
-        gameMaster.AnimateMonster(GetMonster(), "attack2");
+        gameMaster.AnimateMonster(user, "attack2");
 
         yield return new WaitForSeconds(0.5f);
 
-        monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
-        monster[] myTeam = gameMaster.GetMonstersTeam(GetMonster());
+        monster[] enemyTeam = gameMaster.GetMonstersTeam(target);
+        monster[] myTeam = gameMaster.GetMonstersTeam(user);
 
-        gameMaster.MoveMonster(GetMonster(), myTeam[1], 0);
+        gameMaster.MoveMonster(user, myTeam[1], 0);
         gameMaster.MoveMonster(target, enemyTeam[1], 0);
 
-        gameMaster.ApplyStatus(GetMonster(), GetMonster(), 10, 2, 0);
-        gameMaster.ApplyStatus(GetMonster(), target, 10, 2, 0);
+        gameMaster.ApplyStatus(user, user, 10, 2, 0);
+        gameMaster.ApplyStatus(user, target, 10, 2, 0);
 
         gameMaster.AdjustTurnOrder(target, true, false);
 
@@ -159,7 +159,7 @@ public class grimmetalAlly : monsterAlly
         {
             if (enemyTeam[i].GetCurrentHealth() > 0)
             {
-                if (enemyTeam[i] != GetTargetedMonster())
+                if (enemyTeam[i] != target)
                 {
                     gameMaster.MoveMonster(enemyTeam[i], enemyTeam[i], 3);
                 }
@@ -167,29 +167,29 @@ public class grimmetalAlly : monsterAlly
 
             if (myTeam[i].GetCurrentHealth() > 0)
             {
-                if (myTeam[i] != GetMonster())
+                if (myTeam[i] != user)
                 {
                     gameMaster.MoveMonster(myTeam[i], myTeam[i], 3);
                 }
             }
         }
 
-        int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
+        int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0);
         attack1 = GetMultiplierDamage(attack1);
 
         yield return new WaitForSeconds(0.3f);
 
-        gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
 
-        gameMaster.ShootProjectile(GetMonster(), target, 10, 0);
-        gameMaster.DamageMonster(GetMonster(), target, -attack1);
+        gameMaster.ShootProjectile(user, target, 10, 0);
+        gameMaster.DamageMonster(user, target, -attack1);
 
         yield return new WaitForSeconds(0.6f);
         if(GetTargetedMonster().isDead())
         {
-            gameMaster.TryRemoveStatus(GetMonster(), 10);
+            gameMaster.TryRemoveStatus(user, 10);
         }
         yield return new WaitForSeconds(0.4f);
 

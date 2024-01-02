@@ -18,8 +18,14 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] Image leftCurtain;
     [SerializeField] TextMeshProUGUI myTitle;
     [SerializeField] TextMeshProUGUI myTeamTitle;
+    [SerializeField] TextMeshProUGUI myGamesWonText;
+    int myGameWon = 0;
+
     [SerializeField] TextMeshProUGUI enemyTitle;
     [SerializeField] TextMeshProUGUI enemyTeamTitle;
+    [SerializeField] TextMeshProUGUI enemyGamesWonText;
+    int enemyGamesWon = 0;
+
     [SerializeField] GameObject allMenus;
     [SerializeField] GameObject menuChecks;
     bool showCurtain;
@@ -61,6 +67,9 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     monsterPreferences[] myTeamPrefs = new monsterPreferences[3];
     monsterPreferences[] enemyTeamPrefs = new monsterPreferences[3];
 
+    [SerializeField] randomTeam[] randoTeams;
+    [SerializeField] string[] randoNames;
+
     bool gotEnemyTeam;
 
     [Header("Monster References")]
@@ -77,6 +86,22 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     public monster[] GetMyTeam()
     {
         return (bIsPlayer1) ? player1Team : player2Team ;
+    }
+
+    public void PlayerWon(bool player1Won)
+    {
+        if(player1Won && bIsPlayer1)
+        {
+            myGameWon++;
+        }
+        else if (player1Won == false && bIsPlayer1 == false)
+        {
+            myGameWon++;
+        }
+        else
+        {
+            enemyGamesWon++;
+        }
     }
 
     public bool OwnerShipCheck(bool isPlayer1)
@@ -132,24 +157,39 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         bIsPlayer1 = (player1_ID == firebaseScript.GetUserID()) ? true : false;
     }
 
-    public IEnumerator SetUpGame()
+    public IEnumerator SetUpGame(int format)
     {
         SetCanvasGroup(true);
         showCurtain = true;
+
+        myGameWon = 0;
+        enemyGamesWon = 0;
+        SetGamesWonText();
 
         SetFilter(false);
 
         gotEnemyTeam = false;
 
-        myTeamPrefs = battleMenuScript.GetMonsterPrefsFromSelectedTeam();
-        string myTeamname = battleMenuScript.GetSelectedTeamName();
-        myTeamName = myTeamname;
+        switch(format)
+        {
+            case 0:
+            case 2:
+                myTeamPrefs = battleMenuScript.GetMonsterPrefsFromSelectedTeam();
+                myTeamName = battleMenuScript.GetSelectedTeamName();
+                break;
+
+            case 1:
+                int random = Random.Range(0, randoTeams.Length);
+                myTeamPrefs = randoTeams[random].GetTeam();
+                myTeamName = randoNames[random];
+                break;
+        }
 
         yield return StartCoroutine(GetUsernames());
         
         yield return new WaitForSeconds(0.5f);
 
-        yield return StartCoroutine(SendMyTeamPrefs(myTeamname));
+        yield return StartCoroutine(SendMyTeamPrefs(myTeamName));
 
         yield return StartCoroutine(CreateTeams());
 
@@ -208,6 +248,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
 
         yield return new WaitForEndOfFrame();
+    }
+
+    private void SetGamesWonText()
+    {
+        myGamesWonText.text = (myGameWon == 0) ? "" : "Games Won: " + myGameWon;
+        enemyGamesWonText.text = (enemyGamesWon == 0) ? "" : "Games Won: " + enemyGamesWon;
     }
 
     private void SetGameMenu()
@@ -311,6 +357,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         SetCanvasGroup(true);
         showCurtain = true;
         waitingForEnemy = true;
+
+        SetGamesWonText();
 
         SetFilter(false);
 

@@ -412,7 +412,7 @@ public class monster : ScriptableObject
 
             if(isPlayer1())
             {
-                gameMaster.GiveKillExp(usingMon);
+                //gameMaster.GiveKillExp(usingMon);
             }
         }
 

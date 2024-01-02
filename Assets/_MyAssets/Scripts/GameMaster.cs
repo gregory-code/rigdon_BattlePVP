@@ -53,7 +53,33 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        handleTurnOrder();
+        //handleTurnOrder();
+        handleReticle();
+    }
+
+    private void handleTurnOrder()
+    {
+        if (monsterTurnList.Count <= 0)
+            return;
+
+        for (int i = 0; i < monsterTurnList.Count; ++i)
+        {
+            Vector3 lerp = (i == 0) ? new Vector3(-535, 77, 0) : new Vector3(-438 + (69 * (i - 1)), 70, 0);
+            Vector3 size = (i == 0) ? new Vector3(1.357f, 1.357f, 1.357f) : Vector3.one;
+
+            monsterTurnList[i].transform.localPosition = lerp;
+            monsterTurnList[i].transform.localScale = size;
+        }
+    }
+
+    private void handleReticle()
+    {
+        if (bRendering == false || redLine.IsHoveringOverTarget() || greenLine.IsHoveringOverTarget()) 
+            return;
+
+        Vector3 touchPos = Input.mousePosition;
+        redLine.updateReticleLocation(renderCamera.ScreenToWorldPoint(touchPos));
+        greenLine.updateReticleLocation(renderCamera.ScreenToWorldPoint(touchPos));
     }
 
     public void spawnTeams()
@@ -196,21 +222,6 @@ public class GameMaster : MonoBehaviourPunCallbacks
         }
     }
 
-    private void handleTurnOrder()
-    {
-        if (monsterTurnList.Count <= 0)
-            return;
-
-        for (int i = 0; i < monsterTurnList.Count; ++i)
-        {
-            Vector3 lerp = (i == 0) ? new Vector3(-535, 77, 0) : new Vector3(-438 + (69 * (i - 1)), 70, 0);
-            Vector3 size = (i == 0) ? new Vector3(1.357f, 1.357f, 1.357f) : Vector3.one ;
-
-            monsterTurnList[i].transform.localPosition = lerp;
-            monsterTurnList[i].transform.localScale = size;
-        }
-    }
-
     private void ClearField()
     {
         foreach (monster mon in activeMonsters)
@@ -310,8 +321,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
                 team2Alive = true;
         }
 
-        if (team1Alive == false || team2Alive == false)
+        if (team1Alive == false)
         {
+            gameMenu.PlayerWon(false);
+            return true;
+        }
+
+        if(team2Alive == false)
+        {
+            gameMenu.PlayerWon(true);
             return true;
         }
 

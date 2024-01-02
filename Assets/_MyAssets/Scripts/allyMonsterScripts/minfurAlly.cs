@@ -47,7 +47,7 @@ public class minfurAlly : monsterAlly
             percentageMultiplier++;
         }
         attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
     }
 
     private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
@@ -75,7 +75,7 @@ public class minfurAlly : monsterAlly
 
     }
 
-    private void UseAttack(int attackID, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
     {
         switch (attackID)
         {
@@ -83,11 +83,11 @@ public class minfurAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(Cuddle(target, consumeTurn));
+                StartCoroutine(Cuddle(user, target, consumeTurn));
                 break;
 
             case 2:
-                StartCoroutine(FluffyRoll(target, consumeTurn));
+                StartCoroutine(FluffyRoll(user, target, consumeTurn));
                 break;
         }
     }
@@ -115,7 +115,7 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private IEnumerator Cuddle(monster target, bool consumeTurn)
+    private IEnumerator Cuddle(monster user, monster target, bool consumeTurn)
     {
         if (holdAttack)
         {
@@ -123,16 +123,16 @@ public class minfurAlly : monsterAlly
             yield return new WaitForSeconds(1f);
         }
 
-        gameMaster.AnimateMonster(GetMonster(), "attack1");
-        gameMaster.MoveMonster(GetMonster(), target, 0);
+        gameMaster.AnimateMonster(user, "attack1");
+        gameMaster.MoveMonster(user, target, 0);
 
         yield return new WaitForSeconds(0.83f);
 
-        int attack = GetMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
+        int attack = user.GetCurrentStrength() + GetMoveDamage(0, 0);
         attack = GetMultiplierDamage(attack);
 
-        gameMaster.ShootProjectile(GetMonster(), target, 3, 0);
-        gameMaster.ApplyStatus(GetMonster(), target, 3, GetMoveDamage(0, 1), -attack);
+        gameMaster.ShootProjectile(user, target, 3, 0);
+        gameMaster.ApplyStatus(user, target, 3, GetMoveDamage(0, 1), -attack);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -143,7 +143,7 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.MoveMonster(GetMonster(), target, 1);
+        gameMaster.MoveMonster(user, target, 1);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -178,7 +178,7 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private IEnumerator FluffyRoll(monster target, bool consumeTurn)
+    private IEnumerator FluffyRoll(monster user, monster target, bool consumeTurn)
     {
         if (holdAttack)
         {
@@ -186,19 +186,19 @@ public class minfurAlly : monsterAlly
             yield return new WaitForSeconds(1f);
         }
 
-        gameMaster.AnimateMonster(GetMonster(), "attack2");
-        gameMaster.ShootProjectile(GetMonster(), target, 5, 0);
-        gameMaster.MoveMonster(GetMonster(), target, 0);
+        gameMaster.AnimateMonster(user, "attack2");
+        gameMaster.ShootProjectile(user, target, 5, 0);
+        gameMaster.MoveMonster(user, target, 0);
 
-        int attack = GetMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
+        int attack = user.GetCurrentStrength() + GetMoveDamage(1, 0);
         attack = GetMultiplierDamage(attack);
 
-        gameMaster.DeclaringDamage(GetMonster(), target, -attack, destroyShields);
+        gameMaster.DeclaringDamage(user, target, -attack, destroyShields);
         yield return new WaitForSeconds(0.1f);
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.2f);
-        gameMaster.DamageMonster(GetMonster(), target, -attack);
+        gameMaster.DamageMonster(user, target, -attack);
 
         if (GetMonster().GetPassiveID() == 1)
         {
@@ -209,7 +209,7 @@ public class minfurAlly : monsterAlly
 
         yield return new WaitForSeconds(1.15f);
 
-        gameMaster.MoveMonster(GetMonster(), target, 1);
+        gameMaster.MoveMonster(user, target, 1);
 
         yield return new WaitForSeconds(0.3f);
 

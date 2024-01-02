@@ -36,7 +36,7 @@ public class lusseliaAlly : monsterAlly
             percentageMultiplier++;
         }
         attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
     }
 
     private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
@@ -44,7 +44,7 @@ public class lusseliaAlly : monsterAlly
 
     }
 
-    private void UseAttack(int attackID, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
     {
         switch (attackID)
         {
@@ -52,11 +52,11 @@ public class lusseliaAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(Starfall(target, consumeTurn));
+                StartCoroutine(Starfall(user, target, consumeTurn));
                 break;
 
             case 2:
-                StartCoroutine(SolarWave(target, consumeTurn));
+                StartCoroutine(SolarWave(user, target, consumeTurn));
                 break;
         }
     }
@@ -78,7 +78,7 @@ public class lusseliaAlly : monsterAlly
         }
     }
 
-    private IEnumerator Starfall(monster target, bool consumeTurn)
+    private IEnumerator Starfall(monster user, monster target, bool consumeTurn)
     {
         if (holdAttack)
         {
@@ -86,34 +86,34 @@ public class lusseliaAlly : monsterAlly
             yield return new WaitForSeconds(1f);
         }
 
-        gameMaster.AnimateMonster(GetMonster(), "attack1");
+        gameMaster.AnimateMonster(user, "attack1");
 
         yield return new WaitForSeconds(0.2f);
 
-        int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(0, 0);
+        int attack1 = user.GetCurrentStrength() + GetMoveDamage(0, 0);
         attack1 = GetMultiplierDamage(attack1);
 
-        gameMaster.ShootProjectile(GetMonster(), target, 7, 2);
+        gameMaster.ShootProjectile(user, target, 7, 2);
 
-        gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
         yield return new WaitForSeconds(0.25f);
-        gameMaster.DamageMonster(GetMonster(), target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1);
 
         int shouldAddBurnDamage = 0;
         if (GetMonster().GetPassiveID() == 2)
             shouldAddBurnDamage = 1;
 
         if (gameMaster.estimatedDamage < 0)
-            gameMaster.ApplyStatus(GetMonster(), target, 7, GetMoveDamage(0, 1), shouldAddBurnDamage);
+            gameMaster.ApplyStatus(user, target, 7, GetMoveDamage(0, 1), shouldAddBurnDamage);
 
         yield return new WaitForSeconds(0.8f);
 
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator SolarWave(monster target, bool consumeTurn)
+    private IEnumerator SolarWave(monster user, monster target, bool consumeTurn)
     {
         if (holdAttack)
         {
@@ -121,11 +121,11 @@ public class lusseliaAlly : monsterAlly
             yield return new WaitForSeconds(1f);
         }
 
-        gameMaster.AnimateMonster(GetMonster(), "attack2");
+        gameMaster.AnimateMonster(user, "attack2");
 
         yield return new WaitForSeconds(0.3f);
 
-        int attack1 = GetMonster().GetCurrentStrength() + GetMoveDamage(1, 0);
+        int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0);
         attack1 = GetMultiplierDamage(attack1);
 
         monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
@@ -135,19 +135,19 @@ public class lusseliaAlly : monsterAlly
                 continue;
 
             target = enemyTeam[i];
-            gameMaster.ShootProjectile(GetMonster(), target, 9, 3);
+            gameMaster.ShootProjectile(user, target, 9, 3);
             yield return new WaitForSeconds(0.4f);
-            gameMaster.DeclaringDamage(GetMonster(), target, -attack1, destroyShields);
+            gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
             yield return new WaitForSeconds(0.2f);
             target = gameMaster.GetRedirectedMonster(target);
-            gameMaster.DamageMonster(GetMonster(), target, -attack1);
+            gameMaster.DamageMonster(user, target, -attack1);
 
             int shouldAddBurnDamage = 0;
             if (GetMonster().GetPassiveID() == 2)
                 shouldAddBurnDamage = 1;
 
             if (gameMaster.estimatedDamage < 0)
-                gameMaster.ApplyStatus(GetMonster(), target, 7, 1, shouldAddBurnDamage);
+                gameMaster.ApplyStatus(user, target, 7, 1, shouldAddBurnDamage);
         }
 
         yield return new WaitForSeconds(0.8f);

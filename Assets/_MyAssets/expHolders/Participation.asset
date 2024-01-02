@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 085b03f80145d5543b5c411aabd17dda, type: 3}
   m_Name: Participation
   m_EditorClassIdentifier: 
-  expModifier: 100
+  expModifier: 75
   titleText: Participation |

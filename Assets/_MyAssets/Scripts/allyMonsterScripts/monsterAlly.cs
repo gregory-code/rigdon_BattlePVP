@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class monsterAlly : monsterBase
 {
-    public delegate void OnAttack(int attackID, monster target, bool consumeTurn);
+    public delegate void OnAttack(int attackID, monster user, monster target, bool consumeTurn);
     public event OnAttack onAttack;
 
     public delegate void OnAbility(int abilityID);
@@ -17,15 +17,6 @@ public class monsterAlly : monsterBase
     private void Awake()
     {
         onOpenInfo += openInfo;
-    }
-
-    private void LateUpdate()
-    {
-        if (gameMaster.bRendering == false || redLine.IsHoveringOverTarget() || greenLine.IsHoveringOverTarget()) return;
-
-        Vector3 touchPos = Input.mousePosition;
-        redLine.updateReticleLocation(renderCamera.ScreenToWorldPoint(touchPos));
-        greenLine.updateReticleLocation(renderCamera.ScreenToWorldPoint(touchPos));
     }
 
     private void openInfo()
@@ -61,7 +52,7 @@ public class monsterAlly : monsterBase
         {
             MadeChoice();
             GetMonster().AboutToAttack(GetTargetedMonster());
-            onAttack?.Invoke(GetMonster().GetAttackID(), GetTargetedMonster(), true);
+            onAttack?.Invoke(GetMonster().GetAttackID(), GetMonster(), GetTargetedMonster(), true);
         }
         if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMonster() && GetMonster().CanAct() == true && gameMaster.movingToNewGame == false)
         {

@@ -119,14 +119,18 @@ public class monsterBase : MonoBehaviour
         myMonster.onDamagePopup -= damagePopup;
         myMonster.onMovePosition -= movePosition;
         myMonster.onRemoveTaunt -= RemoveTaunt;
+        myMonster.onAttackBreaksShields -= DestroyShields;
+        myMonster.onChangeAttackMultiplier -= AttackMultiplier;
+        myMonster.onHoldAttack -= HoldAttack;
         myMonster.onRemoveConnections -= RemoveConnections;
     }
 
     void Update()
     {
-        health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
-        tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
+
+        //health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
+        //tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
+        //transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
     }
 
     private void HoldAttack()
@@ -176,9 +180,6 @@ public class monsterBase : MonoBehaviour
     private void SetHealthText()
     {
         healthText.text = myMonster.GetCurrentHealth() + "";
-
-        if (myMonster.getHealthPercentage() >= 0.2f)
-            healthText.color = new Vector4(229, 66, 66, 255);
     }
 
     GameObject[] statusPrefabs = new GameObject[20];
@@ -428,7 +429,13 @@ public class monsterBase : MonoBehaviour
 
     public void OnMouseOver()
     {
-        if(gameMaster.bRendering == false)
+        if(gameMaster.activeMonsters[0] == GetMonster() && GetMonster().GetOwnership() && loadingInfoScreen == false)
+        {
+            loadingInfoScreen = true;
+            StartCoroutine(loadInfoScreen());
+        }
+
+        if(gameMaster.bRendering == false && loadingInfoScreen == false)
         {
             loadingInfoScreen = true;
             StartCoroutine(loadInfoScreen());
@@ -479,12 +486,10 @@ public class monsterBase : MonoBehaviour
 
     public IEnumerator loadInfoScreen()
     {
-        yield return new WaitForSeconds(1);
-
-        onOpenInfo?.Invoke();
-
+        yield return new WaitForSeconds(1.5f);
         if (loadingInfoScreen == true)
         {
+            onOpenInfo?.Invoke();
             GameObject.FindObjectOfType<infoPageScript>().DisplayMonster(myMonster);
         }
     }
