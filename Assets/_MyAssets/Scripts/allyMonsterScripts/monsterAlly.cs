@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class monsterAlly : monsterBase
 {
-    public delegate void OnAttack(int attackID, monster user, monster target, bool consumeTurn);
+    public delegate void OnAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage);
     public event OnAttack onAttack;
 
     public delegate void OnAbility(int abilityID);
@@ -52,7 +52,7 @@ public class monsterAlly : monsterBase
         {
             MadeChoice();
             GetMonster().AboutToAttack(GetTargetedMonster());
-            onAttack?.Invoke(GetMonster().GetAttackID(), GetMonster(), GetTargetedMonster(), true);
+            onAttack?.Invoke(GetMonster().GetAttackID(), GetMonster(), GetTargetedMonster(), true, 0);
         }
         if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMonster() && GetMonster().CanAct() == true && gameMaster.movingToNewGame == false)
         {

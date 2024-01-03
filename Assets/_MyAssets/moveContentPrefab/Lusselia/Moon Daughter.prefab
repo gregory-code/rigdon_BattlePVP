@@ -410,8 +410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Lusselia's support moves give an on-hit shield that block the next negative
-    effect +1            growth
+  m_text: "Lusselia's support moves grants \n    the target(s) a"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -547,12 +546,13 @@ MonoBehaviour:
   statIndex: 000000000000000000000000
   usesStatModifier: 000000
   isPerecentage: 000000
+  isPlus: 000000
   percentageStatMultiplier: 0
   scaleNums1: 000000000000000000000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
-  givesStatGrowth: 1
-  statGrowthIndex: 2
+  givesStatGrowth: 0
+  statGrowthIndex: 0
 --- !u!1 &4617123071582503824
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,8 +587,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 28.3, y: -29.5}
-  m_SizeDelta: {x: -165.4338, y: -66.7665}
+  m_AnchoredPosition: {x: 39.9, y: -7.4}
+  m_SizeDelta: {x: -134.0325, y: -66.7665}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8189784747283389297
 CanvasRenderer:
@@ -618,7 +618,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: magic
+  m_text: spell shield
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -628,8 +628,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294942208
-  m_fontColor: {r: 0, g: 0.61960787, b: 1, a: 1}
+    rgba: 4291559828
+  m_fontColor: {r: 0.5803922, g: 0.003921569, b: 0.8, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -652,7 +652,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 5
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

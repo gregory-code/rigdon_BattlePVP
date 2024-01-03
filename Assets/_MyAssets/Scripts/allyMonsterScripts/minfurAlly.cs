@@ -36,18 +36,12 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private void AttackAgain(monster targetMon, int percentageMultiplier)
+    private void AttackAgain(monster targetMon, int extraDamage)
     {
         if (GetMonster().GetOwnership() == false)
             return;
 
-        while (attackMultiplier > 100)
-        {
-            attackMultiplier--;
-            percentageMultiplier++;
-        }
-        attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
     }
 
     private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
@@ -75,7 +69,7 @@ public class minfurAlly : monsterAlly
 
     }
 
-    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
     {
         switch (attackID)
         {
@@ -83,11 +77,11 @@ public class minfurAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(Cuddle(user, target, consumeTurn));
+                StartCoroutine(Cuddle(user, target, consumeTurn, extraDamage));
                 break;
 
             case 2:
-                StartCoroutine(FluffyRoll(user, target, consumeTurn));
+                StartCoroutine(FluffyRoll(user, target, consumeTurn, extraDamage));
                 break;
         }
     }
@@ -115,7 +109,7 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private IEnumerator Cuddle(monster user, monster target, bool consumeTurn)
+    private IEnumerator Cuddle(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -129,7 +123,7 @@ public class minfurAlly : monsterAlly
         yield return new WaitForSeconds(0.83f);
 
         int attack = user.GetCurrentStrength() + GetMoveDamage(0, 0);
-        attack = GetMultiplierDamage(attack);
+        attack += extraDamage;
 
         gameMaster.ShootProjectile(user, target, 3, 0);
         gameMaster.ApplyStatus(user, target, 3, GetMoveDamage(0, 1), -attack);
@@ -178,7 +172,7 @@ public class minfurAlly : monsterAlly
         }
     }
 
-    private IEnumerator FluffyRoll(monster user, monster target, bool consumeTurn)
+    private IEnumerator FluffyRoll(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -191,7 +185,7 @@ public class minfurAlly : monsterAlly
         gameMaster.MoveMonster(user, target, 0);
 
         int attack = user.GetCurrentStrength() + GetMoveDamage(1, 0);
-        attack = GetMultiplierDamage(attack);
+        attack += extraDamage;
 
         gameMaster.DeclaringDamage(user, target, -attack, destroyShields);
         yield return new WaitForSeconds(0.1f);
@@ -223,7 +217,6 @@ public class minfurAlly : monsterAlly
         yield return new WaitForSeconds(0.3f);
 
         int attack = GetMonster().GetCurrentMagic() + GetMoveDamage(2, 0);
-        attack = GetMultiplierDamage(attack);
 
         if (GetMonster().GetPassiveID() == 1)
         {

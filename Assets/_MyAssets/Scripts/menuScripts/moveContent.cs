@@ -18,6 +18,8 @@ public class moveContent : MonoBehaviour
     
     [SerializeField] bool[] isPerecentage = new bool[3];
 
+    [SerializeField] bool[] isPlus;
+
     [SerializeField] int percentageStatMultiplier;
 
     [SerializeField] int[] scaleNums1 = new int[3];
@@ -89,19 +91,32 @@ public class moveContent : MonoBehaviour
     {
         int extraModifier = 0;
 
+        if (usesStatModifier[numIndex])
+            extraModifier = leveledstatBlock[statIndex[numIndex]];
+
+        if (usesStatModifier[numIndex] && isPerecentage[numIndex])
+            extraModifier = leveledstatBlock[statIndex[numIndex]] * percentageStatMultiplier;
+
+        int result = extraModifier + scaleNumGroup[tier];
+
+        if (isPerecentage[numIndex] == true && isPlus[numIndex] == true)
+        {
+            numText[numIndex].text = (result >= 0) ? $"+{result}%" : $"{result}%";
+            return;
+        }
+        
         if (isPerecentage[numIndex] == true)
         {
-            if (usesStatModifier[numIndex])
-                extraModifier = leveledstatBlock[statIndex[numIndex]] * percentageStatMultiplier;
-
-            numText[numIndex].text = $"{scaleNumGroup[tier] + extraModifier}%";
+            numText[numIndex].text = $"{result}%";
+            return;
         }
-        else
+        
+        if (isPlus[numIndex] == true)
         {
-            if (usesStatModifier[numIndex])
-                extraModifier = leveledstatBlock[statIndex[numIndex]];
-
-            numText[numIndex].text = $"{scaleNumGroup[tier] + extraModifier}";
+            numText[numIndex].text = (result >= 0) ? $"+{result}" : $"{result}";
+            return;
         }
+
+        numText[numIndex].text = $"{result}";
     }
 }

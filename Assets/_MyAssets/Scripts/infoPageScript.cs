@@ -105,32 +105,20 @@ public class infoPageScript : canvasGroupRenderer
         {
             GameObject effect = Instantiate(effectsPrefabs[status.GetIndex()], effectsList);
             effect.GetComponent<Image>().sprite = status.GetComponent<Image>().sprite;
-            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() >= 99) ? "" : status.GetCounter() + "";
-            if(status.GetIndex() == 7)
+            effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() >= 160) ? "" : status.GetCounter() + "";
+            switch(status.GetIndex())
             {
-                effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetBurnDamage() + "";
-            }
-            if (status.GetIndex() == 9)
-            {
-                effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "%";
-            }
-            if(status.GetIndex() == 15)
-            {
-                switch(status.GetLevelIndex())
-                {
-                    case 0:
-                        effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = "40%";
-                        break;
+                case 1:
+                    effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetBurnDamage() + "";
+                    break;
 
-                    case 1:
-                        effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = "50%";
-                        break;
-
-                    case 2:
-                        effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = "60%";
-                        break;
-                }
+                case 6:
+                    int tier = status.GetLevelIndex();
+                    int reduction = 40 + (tier * 10);
+                    effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = $"{reduction}%";
+                    break;
             }
+
             listOfEffects.Add(effect);
         }
 

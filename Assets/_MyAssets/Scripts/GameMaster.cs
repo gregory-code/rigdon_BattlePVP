@@ -53,7 +53,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        //handleTurnOrder();
+        handleTurnOrder();
         handleReticle();
     }
 
@@ -581,15 +581,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
         GetMonster(isReciving, recivingIndex).TryRemoveStatus(statusIndex, true);
     }
 
-    public void AttackAgain(monster recivingMon, monster targetMon, int percentageMultiplier)
+    public void AttackAgain(monster recivingMon, monster targetMon, int extraDamage)
     {
-        this.photonView.RPC("AttackAgainRPC", RpcTarget.AllBuffered, recivingMon.isPlayer1(), recivingMon.GetIndex(), targetMon.isPlayer1(), targetMon.GetIndex(), percentageMultiplier);
+        this.photonView.RPC("AttackAgainRPC", RpcTarget.AllBuffered, recivingMon.isPlayer1(), recivingMon.GetIndex(), targetMon.isPlayer1(), targetMon.GetIndex(), extraDamage);
     }
 
     [PunRPC]
-    void AttackAgainRPC(bool isReciving, int recivingIndex, bool isTarget, int targetIndex, int percentageMultiplier)
+    void AttackAgainRPC(bool isReciving, int recivingIndex, bool isTarget, int targetIndex, int extraDamage)
     {
-        GetMonster(isReciving, recivingIndex).AttackAgain(GetMonster(isTarget, targetIndex), percentageMultiplier);
+        GetMonster(isReciving, recivingIndex).AttackAgain(GetMonster(isTarget, targetIndex), extraDamage);
     }
 
     public delegate void OnMonsterDied(monster whoDied);

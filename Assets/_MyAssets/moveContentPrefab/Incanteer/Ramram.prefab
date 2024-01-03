@@ -410,8 +410,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "When an ally attacks an enemy,\nIncanteer attacks them first for \n\t\t         
-    damage"
+  m_text: 'When an ally attacks an enemy,
+
+    Incanteer follows up afterwards with
+    its attack for            damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -544,11 +546,12 @@ MonoBehaviour:
   - {fileID: 465393707680873253}
   - {fileID: 8962566636708827019}
   exists: 010000
-  statIndex: 000000000000000000000000
-  usesStatModifier: 000000
+  statIndex: 020000000000000000000000
+  usesStatModifier: 010000
   isPerecentage: 010000
-  percentageStatMultiplier: 0
-  scaleNums1: 320000003c00000046000000
+  isPlus: 000000
+  percentageStatMultiplier: 10
+  scaleNums1: 1e0000002800000032000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
@@ -857,7 +860,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -27.8, y: -28.9}
+  m_AnchoredPosition: {x: 29.1, y: -28.9}
   m_SizeDelta: {x: -124.8126, y: -72.8412}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
@@ -898,8 +901,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294942208
+  m_fontColor: {r: 0, g: 0.61960787, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

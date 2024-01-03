@@ -14517,7 +14517,7 @@ GameObject:
   - component: {fileID: 19896342}
   - component: {fileID: 19982486}
   m_Layer: 0
-  m_Name: lusseliaOnHitShieldProc
+  m_Name: spellShieldProc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

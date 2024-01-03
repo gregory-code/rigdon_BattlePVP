@@ -31,18 +31,12 @@ public class grimmetalAlly : monsterAlly
         GetMonster().onRemoveConnections -= RemoveConnections;
     }
 
-    private void AttackAgain(monster targetMon, int percentageMultiplier)
+    private void AttackAgain(monster targetMon, int extraDamage)
     {
         if (GetMonster().GetOwnership() == false)
             return;
 
-        while (attackMultiplier > 100)
-        {
-            attackMultiplier--;
-            percentageMultiplier++;
-        }
-        attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
     }
 
     private void MonsterDied(monster whoDied)
@@ -64,7 +58,7 @@ public class grimmetalAlly : monsterAlly
 
     }
 
-    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
     {
         switch (attackID)
         {
@@ -72,11 +66,11 @@ public class grimmetalAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(Cleave(user, target, consumeTurn));
+                StartCoroutine(Cleave(user, target, consumeTurn, extraDamage));
                 break;
 
             case 2:
-                StartCoroutine(Duel(user, target, consumeTurn));
+                StartCoroutine(Duel(user, target, consumeTurn, extraDamage));
                 break;
         }
     }
@@ -98,7 +92,7 @@ public class grimmetalAlly : monsterAlly
         }
     }
 
-    private IEnumerator Cleave(monster user, monster target, bool consumeTurn)
+    private IEnumerator Cleave(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -110,10 +104,10 @@ public class grimmetalAlly : monsterAlly
         gameMaster.MoveMonster(user, target, 0);
 
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(0, 0);
-        int extraDamage = user.GetCurrentStrength() + GetMoveDamage(0, 1);
-        float attackEffect = extraDamage * (1f * user.GetCurrentHealth() / user.GetMaxHealth() * 1f);
+        int bonusDamage = user.GetCurrentStrength() + GetMoveDamage(0, 1);
+        float attackEffect = bonusDamage * (1f * user.GetCurrentHealth() / user.GetMaxHealth() * 1f);
         attack1 += Mathf.RoundToInt(attackEffect);
-        attack1 = GetMultiplierDamage(attack1);
+        attack1 += extraDamage;
 
 
         yield return new WaitForSeconds(1f);
@@ -132,7 +126,7 @@ public class grimmetalAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator Duel(monster user, monster target, bool consumeTurn)
+    private IEnumerator Duel(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -175,7 +169,7 @@ public class grimmetalAlly : monsterAlly
         }
 
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0);
-        attack1 = GetMultiplierDamage(attack1);
+        attack1 += extraDamage;
 
         yield return new WaitForSeconds(0.3f);
 

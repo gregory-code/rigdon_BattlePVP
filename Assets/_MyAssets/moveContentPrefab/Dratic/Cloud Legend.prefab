@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.3929977, y: -9.513}
-  m_SizeDelta: {x: -2.788, y: -19.027}
+  m_AnchoredPosition: {x: 71.9, y: 6.6}
+  m_SizeDelta: {x: -151.7116, y: -61.1807}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1823904300507731133
 CanvasRenderer:
@@ -65,18 +65,18 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: level
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
-  m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
+  m_fontAsset: {fileID: 11400000, guid: 68d9ea1d40b218d44af701c69ee56f02, type: 2}
+  m_sharedMaterial: {fileID: -8958479619415375818, guid: 68d9ea1d40b218d44af701c69ee56f02,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278255395
+  m_fontColor: {r: 0.13725491, g: 1, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -470,10 +470,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Gain +1             growth
+  m_text: 'Gain +3                    per
 
-    When Dratic is targeted and hit, enemy
-    recieves'
+    When damaged the enemy receives'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -652,8 +651,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 25.902, y: -9.513}
-  m_SizeDelta: {x: -51.805, y: -19.027}
+  m_AnchoredPosition: {x: -6.5, y: 7.5}
+  m_SizeDelta: {x: -116.6473, y: -53.028}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2620360609626530328
 CanvasRenderer:
@@ -683,7 +682,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: health
+  m_text: max health
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -819,6 +818,7 @@ MonoBehaviour:
   statIndex: 
   usesStatModifier: 000000
   isPerecentage: 000000
+  isPlus: 000000
   percentageStatMultiplier: 0
   scaleNums1: 000000000000000000000000
   scaleNums2: 000000000000000000000000
@@ -1129,8 +1129,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 51.418, y: -31.333}
-  m_SizeDelta: {x: -102.838, y: -62.668}
+  m_AnchoredPosition: {x: -14.5, y: -25.5}
+  m_SizeDelta: {x: -142.2429, y: -76.2487}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &507422865170548519
 CanvasRenderer:

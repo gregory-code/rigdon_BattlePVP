@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,96 +18,37 @@ public class statusEffectUI : MonoBehaviour
 
     private GameMaster gameMaster;
 
+    private enum status { Conductive, Burn, Weakness, Bubble, Taunt, SpellShield, BrambleCrown, GoldenHorn  }
+    private status myStatus;
+
     private int statusIndex;
     private int counter;
     private int power;
 
     bool alreadyRemoved = false;
 
-    private int secondaryPower;
-
     public void SetStatusIndex(monster myMonster, monster usingMonster, int statusIndex, int counter, int power, GameMaster gameMaster)
     {
         statusImage.sprite = statusSprites[statusIndex];
-        if(statusIndex == 5 || statusIndex == 6)
-        {
-            usingMonster.onDeclaredDamage += DelcaringDamage;
-            statusImage.sprite = usingMonster.stagesIcons[usingMonster.GetSpriteIndexFromLevel()];
-        }
 
-        this.usingMonster = usingMonster;
-        this.gameMaster = gameMaster;
-        this.statusIndex = statusIndex;
-        this.power = power;
         this.myMonster = myMonster;
-        myMonster.onUsedAction += UsedAction;
+        this.usingMonster = usingMonster;
+        this.statusIndex = statusIndex;
         UpdateStatusCounter(counter);
+        this.power = power;
+        this.gameMaster = gameMaster;
+        myMonster.onUsedAction += UsedAction;
 
-        switch(statusIndex)
+        if(Enum.IsDefined(typeof(status), statusIndex))
         {
-            case 3:
-                StatChange(0, power);
-                break;
-
-            case 4:
-                StatChange(0, power);
-                StatChange(1, power);
-                break;
-
-            case 5:
-                EstablishBestFriends();
-                break;
-
-            case 9:
-                this.power -= 100;
-                myMonster.ChangeAttackMultiplier(this.power);
-                myMonster.ApplyShieldBreak(true);
-                break;
-
-            case 12:
-                StatChange(0, power);
-                break;
-
-            case 13:
-                StatChange(0, power);
-                break;
-
-            case 15:
-                switch(myMonster.GetSpriteIndexFromLevel())
-                {
-                    case 0:
-                        myMonster.AdjustDamageReduction(-40);
-                        break;
-
-                    case 1:
-                        myMonster.AdjustDamageReduction(-50);
-                        break;
-
-                    case 2:
-                        myMonster.AdjustDamageReduction(-60);
-                        break;
-                }
-                StatChange(3, power);
-                break;
+            myStatus = (status)statusIndex;
         }
-    }
-
-    private void EstablishBestFriends()
-    {
-        this.power = usingMonster.GetCurrentStrength();
-        secondaryPower = usingMonster.GetCurrentMagic();
-
-        if (usingMonster.GetSpriteIndexFromLevel() == 0)
+        else
         {
-            float cutInHalf = this.power / 2f;
-            this.power = Mathf.RoundToInt(cutInHalf);
-
-            float cutInHalf2 = secondaryPower / 2f;
-            secondaryPower = Mathf.RoundToInt(cutInHalf2);
+            Debug.Log("Index outside of defined status condintions");
         }
 
-        StatChange(0, this.power);
-        StatChange(1, secondaryPower);
+        GettingApplied();
     }
 
     public int GetLevelIndex()
@@ -134,47 +76,9 @@ public class statusEffectUI : MonoBehaviour
         return statusSprites[statusIndex];
     }
 
-    public bool NextTurn()
-    {
-        bool shouldDelete = false;
-
-        if (statusIndex == 1) // 1 is bubble
-        {
-            float newBubbleValue = (counter * 0.9f) - 1;
-            counter = Mathf.RoundToInt(newBubbleValue);
-            shouldDelete = (counter <= 0);
-        }
-
-        if(statusIndex == 0 || statusIndex == 2 || statusIndex == 10 || statusIndex == 15)
-        {
-            shouldDelete = TickCounter();
-        }
-
-        if (statusIndex == 7 && gameMaster.activeMonsters[0] == myMonster)
-        {
-            shouldDelete = TickCounter();
-            myMonster.SetBurnDamage();
-            myMonster.TakeDamage(usingMonster, GetBurnDamage());
-        }
-
-        UpdateStatusCounter(counter);
-        return shouldDelete;
-    }
-
-    public bool TickCounter()
-    {
-        counter--;
-        if(counter <= 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     public int GetBurnDamage()
     {
-        float burnDamage = (myMonster.GetMaxHealth() * 0.35f) * -1f;
+        float burnDamage = (myMonster.GetMaxHealth() * 0.4f) * -1f;
         burnDamage += myMonster.GetCurrentStrength();
         int damage = Mathf.RoundToInt(burnDamage);
         if(power == 1)
@@ -184,52 +88,122 @@ public class statusEffectUI : MonoBehaviour
         return damage;
     }
 
-    public void DelcaringDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields)
-    {
-        if(willDie)
-        {
-            gameMaster.redirectedMon = myMonster;
-            myMonster.MovePosition(usingMonster.attackPoint.transform.position.x, usingMonster.attackPoint.position.y);
-            StartCoroutine(goBack());
-        }
-    }
-
-    public IEnumerator goBack()
-    {
-        yield return new WaitForSeconds(0.7f);
-        myMonster.MovePosition(myMonster.spawnLocation.transform.position.x, myMonster.spawnLocation.position.y);
-    }
-
     public void StatusGotReapplied(int newCounter, int power)
     {
-        if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 3 || statusIndex == 4 || statusIndex == 7 || statusIndex == 12 || statusIndex == 13 || statusIndex == 14)
+        switch (myStatus)
         {
-            UpdateStatusCounter(counter + newCounter);
+            case status.Conductive:
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.Burn:
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.Weakness:
+                ReapplyPower(power);
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.Bubble:
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.Taunt:
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.SpellShield:
+                break;
+
+            case status.BrambleCrown:
+                ReapplyPower(power);
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.GoldenHorn:
+                UpdateStatusCounter(counter + newCounter);
+                break;
         }
     }
 
     private void UsedAction(bool isAttack)
     {
-        if (statusIndex == 3 || statusIndex == 4 || statusIndex == 12 || statusIndex == 13)
+        bool shouldProcStatus = true;
+
+        switch (myStatus)
         {
+            case status.Conductive:
+                shouldProcStatus = false;
+                counter--;
+                break;
 
-            if(isAttack && statusIndex == 12 && myMonster.GetOwnership() && counter >= 1)
-            {
-                monster[] allies = gameMaster.GetMonstersTeam(myMonster);
-                foreach(monster ally  in allies)
-                {
-                    gameMaster.ApplyStatus(myMonster, ally, 13, 1, (power + 2));
-                    gameMaster.AnimateMonster(ally, "idle");
-                }
-            }
-            
-            counter--;
+            case status.Burn:
+                counter--;
+                myMonster.SetBurnDamage();
+                myMonster.TakeDamage(usingMonster, GetBurnDamage());
+                break;
 
-            if (counter <= 0)
-            {
-                myMonster.TryRemoveStatus(statusIndex, true);
+            case status.Weakness:
+                counter--;
+                break;
 
-            }
+            case status.Bubble:
+                shouldProcStatus = false;
+                float newBubbleValue = (counter * 0.9f) - 1;
+                counter = Mathf.RoundToInt(newBubbleValue);
+                break;
+
+            case status.Taunt:
+                counter--;
+                break;
+
+            case status.SpellShield:
+                shouldProcStatus = false;
+                counter--;
+                break;
+
+            case status.BrambleCrown:
+                counter--;
+                break;
+
+            case status.GoldenHorn:
+                break;
+        }
+
+        UpdateStatusCounter(counter);
+
+        if (counter <= 0)
+        {
+            myMonster.TryRemoveStatus(statusIndex, shouldProcStatus);
+        }
+    }
+
+    private void GettingApplied()
+    {
+        switch (myStatus)
+        {
+            case status.Conductive:
+                break;
+            case status.Burn:
+                break;
+            case status.Weakness:
+                break;
+            case status.Bubble:
+                break;
+            case status.Taunt:
+                break;
+            case status.SpellShield:
+                break;
+            case status.BrambleCrown:
+                int tier = myMonster.GetSpriteIndexFromLevel();
+                int reduction = 40 + (tier * 10);
+                myMonster.AdjustDamageReduction(-reduction);
+
+                StatChange(3, power);
+                break;
+            case status.GoldenHorn:
+                break;
         }
     }
 
@@ -240,70 +214,38 @@ public class statusEffectUI : MonoBehaviour
 
         alreadyRemoved = true;
 
-        switch(statusIndex)
+        switch (myStatus)
         {
-            case 3:
-                StatChange(0, -power);
+            case status.Conductive:
                 break;
-
-            case 4:
-                StatChange(0, -power);
-                StatChange(1, -power);
+            case status.Burn:
                 break;
-
-            case 5:
-                usingMonster.onDeclaredDamage -= DelcaringDamage;
-                StatChange(0, -power);
-                StatChange(1, -power);
+            case status.Weakness:
                 break;
-
-            case 6:
-                usingMonster.onDeclaredDamage -= DelcaringDamage;
+            case status.Bubble:
                 break;
-
-            case 9:
-                myMonster.ChangeAttackMultiplier(-power);
-                myMonster.ApplyShieldBreak(false);
+            case status.Taunt:
                 break;
-
-            case 10:
-                monster[] myTeam = gameMaster.GetMonstersTeam(myMonster);
-
-                for (int i = 0; i < 3; i++)
-                {
-                    if (myTeam[i].GetCurrentHealth() > 0)
-                    {
-                        myTeam[i].MovePosition(myTeam[i].spawnLocation.position.x, myTeam[i].spawnLocation.position.y);
-                    }
-                }
+            case status.SpellShield:
                 break;
+            case status.BrambleCrown:
+                int tier = myMonster.GetSpriteIndexFromLevel();
+                int reduction = 40 + (tier * 10);
+                myMonster.AdjustDamageReduction(reduction);
 
-            case 12:
-                StatChange(0, -power);
-                break;
-
-            case 13:
-                StatChange(0, -power);
-                break;
-
-            case 15:
-                switch (myMonster.GetSpriteIndexFromLevel())
-                {
-                    case 0:
-                        myMonster.AdjustDamageReduction(40);
-                        break;
-
-                    case 1:
-                        myMonster.AdjustDamageReduction(50);
-                        break;
-
-                    case 2:
-                        myMonster.AdjustDamageReduction(60);
-                        break;
-                }
                 StatChange(3, -power);
                 break;
+            case status.GoldenHorn:
+                break;
         }
+    }
+
+    private void ReapplyPower(int power)
+    {
+        GettingRemoved();
+        float roundedPower = (power + this.power) / 2;
+        this.power = Mathf.RoundToInt(roundedPower);
+        GettingApplied();
     }
 
     private void StatChange(int which, int change)
@@ -322,7 +264,13 @@ public class statusEffectUI : MonoBehaviour
                 myMonster.ChangeCurrentSpeed(change);
                 break;
 
-            case 3: // highest stat
+            case 3: // all stats
+                myMonster.ChangeCurrentStrength(change);
+                myMonster.ChangeCurrentMagic(change);
+                myMonster.ChangeCurrentSpeed(change);
+                break;
+
+            case 4: // highest stat
                 int strength = myMonster.GetCurrentStrength();
                 int magic = myMonster.GetCurrentMagic();
                 int speed = myMonster.GetCurrentSpeed();
@@ -346,6 +294,6 @@ public class statusEffectUI : MonoBehaviour
     public void UpdateStatusCounter(int newCounter)
     {
         this.counter = newCounter;
-        activeCounterText.text = (newCounter >= 99) ? "" : $"{newCounter}";
+        activeCounterText.text = (newCounter >= 160) ? "" : $"{newCounter}";
     }
 }

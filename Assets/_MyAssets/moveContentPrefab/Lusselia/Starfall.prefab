@@ -410,7 +410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '           Deal     damage and       the target for    turns(s)'
+  m_text: "           Deal     damage \n           the enemy for    turns(s)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -546,6 +546,7 @@ MonoBehaviour:
   statIndex: 010000000000000000000000
   usesStatModifier: 010000
   isPerecentage: 000000
+  isPlus: 000000
   percentageStatMultiplier: 0
   scaleNums1: 03000000080000000d000000
   scaleNums2: 010000000200000003000000
@@ -856,7 +857,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -25.2, y: 14.6}
+  m_AnchoredPosition: {x: -24.8, y: 14.6}
   m_SizeDelta: {x: -166.4265, y: -66.0635}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
@@ -991,7 +992,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 78.8, y: 15.1}
+  m_AnchoredPosition: {x: -77.3, y: -7.2}
   m_SizeDelta: {x: -171.6944, y: -56.897}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
@@ -1126,7 +1127,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -13.9, y: -7.2}
+  m_AnchoredPosition: {x: 32.7, y: -7.2}
   m_SizeDelta: {x: -161.5421, y: -72.3776}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9157608670724634358

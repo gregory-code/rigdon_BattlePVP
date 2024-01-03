@@ -31,7 +31,6 @@ public class monsterBase : MonoBehaviour
     private Transform attackPoint;
     private Vector3 lerpLocation;
 
-    public int attackMultiplier = 100;
     public bool destroyShields = false;
     public bool holdAttack = false;
 
@@ -82,7 +81,6 @@ public class monsterBase : MonoBehaviour
         myMonster.onMovePosition += movePosition;
         myMonster.onRemoveTaunt += RemoveTaunt;
         myMonster.onAttackBreaksShields += DestroyShields;
-        myMonster.onChangeAttackMultiplier += AttackMultiplier;
         myMonster.onHoldAttack += HoldAttack;
         myMonster.onRemoveConnections += RemoveConnections;
 
@@ -120,17 +118,15 @@ public class monsterBase : MonoBehaviour
         myMonster.onMovePosition -= movePosition;
         myMonster.onRemoveTaunt -= RemoveTaunt;
         myMonster.onAttackBreaksShields -= DestroyShields;
-        myMonster.onChangeAttackMultiplier -= AttackMultiplier;
         myMonster.onHoldAttack -= HoldAttack;
         myMonster.onRemoveConnections -= RemoveConnections;
     }
 
     void Update()
     {
-
-        //health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
-        //tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
-        //transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
+        health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
+        tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
     }
 
     private void HoldAttack()
@@ -190,7 +186,7 @@ public class monsterBase : MonoBehaviour
         statusPrefabs[whichStatus] = Instantiate(statusPrefab, effectSpawn);
         statusPrefabs[whichStatus].transform.localPosition = Vector3.one;
 
-        if(whichStatus == 2 || whichStatus == 10)
+        if(whichStatus == 4)
             SetTaunt();
     }
 
@@ -231,8 +227,8 @@ public class monsterBase : MonoBehaviour
         monster[] enemyTeam = gameMaster.GetMonstersTeam(myMonster);
         for (int i = 0; i < enemyTeam.Length; i++)
         {
-            statusEffectUI taunt = enemyTeam[i].GetStatus(2);
-            statusEffectUI duel = enemyTeam[i].GetStatus(10);
+            statusEffectUI taunt = enemyTeam[i].GetStatus(4);
+            statusEffectUI duel = enemyTeam[i].GetStatus(12);
             if (taunt != null || duel != null)
             {
                 ApplyTargetable(enemyTeam);
@@ -247,8 +243,8 @@ public class monsterBase : MonoBehaviour
     {
         for (int i = 0; i < enemyTeam.Length; i++)
         {
-            statusEffectUI taunt = enemyTeam[i].GetStatus(2);
-            statusEffectUI duel = enemyTeam[i].GetStatus(10);
+            statusEffectUI taunt = enemyTeam[i].GetStatus(4);
+            statusEffectUI duel = enemyTeam[i].GetStatus(12);
             if (taunt == null && duel == null)
             {
                 enemyTeam[i].isTargetable = false;
@@ -295,34 +291,10 @@ public class monsterBase : MonoBehaviour
         {
             foreach (int index in listOfIndexes)
             {
-                switch(index)
-                {
-                    default:
-                        myMonster.GetStatus(index).GettingRemoved();
-                        myMonster.DestroyStatus(index);
-
-                        if(index == 5)
-                        {
-                            foreach(monster ally in gameMaster.GetMonstersTeam(GetMonster()))
-                            {
-                                if(ally.GetStatusList().Count > 0)
-                                    ally.TryRemoveStatus(6, true);
-                            }
-                        }
-
-                        if (index == 6)
-                        {
-                            foreach (monster ally in gameMaster.GetMonstersTeam(GetMonster()))
-                            {
-                                if (ally.GetStatusList().Count > 0)
-                                    ally.TryRemoveStatus(5, true);
-                            }
-                        }
-                        break; // maybe do some logic for best friends
-                }
+                myMonster.GetStatus(index).GettingRemoved();
+                myMonster.DestroyStatus(index);
             }
         }
-
         myMonster.statusEffects.Clear();
 
         yield return new WaitForSeconds(0.35f);
@@ -361,12 +333,6 @@ public class monsterBase : MonoBehaviour
         return GetCurrentMove(moveContentID).GetScaleValues(moveScaleID)[tier];
     }
 
-    public int GetMultiplierDamage(int damage)
-    {
-        float Multiplier = damage * (1f * attackMultiplier / 100f);
-        return Mathf.RoundToInt(Multiplier);
-    }
-
     public monster GetTargetedMonster()
     {
         return gameMaster.targetedMonster.myMonster;
@@ -391,7 +357,6 @@ public class monsterBase : MonoBehaviour
 
             yield return new WaitForSeconds(0.2f);
 
-            attackMultiplier = 100;
             destroyShields = false;
         }
 
@@ -415,11 +380,6 @@ public class monsterBase : MonoBehaviour
                 gameMaster.TryRemoveStatus(myMonster, 9);
             }
         }
-    }
-
-    private void AttackMultiplier(int attackMultiplier)
-    {
-        this.attackMultiplier += attackMultiplier;
     }
 
     private void DestroyShields(bool state)

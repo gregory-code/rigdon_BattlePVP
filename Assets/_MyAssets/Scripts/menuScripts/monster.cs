@@ -256,17 +256,14 @@ public class monster : ScriptableObject
     public delegate void OnAttackBreaksShields(bool state);
     public event OnAttackBreaksShields onAttackBreaksShields;
 
-    public delegate void OnChangeAttackMultiplier(int attackMultiplier);
-    public event OnChangeAttackMultiplier onChangeAttackMultiplier;
-
     public void ShootProjectile(projectileScript projectilePrefab, Transform target, Transform whichSpawn)
     {
         onProjectileShot?.Invoke(projectilePrefab, target, whichSpawn);
     }
 
-    public void AttackAgain(monster targetMon, int percentageMultiplier)
+    public void AttackAgain(monster targetMon, int extraDamage)
     {
-        onAttackAgain?.Invoke(targetMon, percentageMultiplier);
+        onAttackAgain?.Invoke(targetMon, extraDamage);
     }
 
     public void MovePosition(float x, float y)
@@ -276,6 +273,9 @@ public class monster : ScriptableObject
 
     public void UsedAction(bool isAttack)
     {
+        if (gameMaster.movingToNewGame == true || dead)
+            return;
+
         onUsedAction?.Invoke(isAttack);
     }
 
@@ -287,11 +287,6 @@ public class monster : ScriptableObject
     public void ApplyShieldBreak(bool state)
     {
         onAttackBreaksShields?.Invoke(state);
-    }
-
-    public void ChangeAttackMultiplier(int change)
-    {
-        onChangeAttackMultiplier?.Invoke(change);
     }
 
     public void AboutToAttack(monster gettingAttacked)
@@ -316,33 +311,6 @@ public class monster : ScriptableObject
         if (gameMaster.movingToNewGame == true || dead)
             return;
 
-        List<int> statusIndexes = GetStatusList();
-        if(statusIndexes.Count > 0)
-        {
-            foreach(int index in statusIndexes)
-            {
-                statusEffectUI status = GetStatus(index);
-                if (status == null)
-                    continue;
-
-                bool remove = status.NextTurn();
-
-                if (gameMaster.movingToNewGame == true)
-                    return;
-
-                if (currentHP <= 0)
-                    return;
-
-                bool shouldProcStatus = true;
-
-                if (index == 0 || index == 1)
-                    shouldProcStatus = false;
-
-                if(remove)
-                    TryRemoveStatus(index, shouldProcStatus);
-            }
-        }
-
         onNextTurn?.Invoke();
     }
 
@@ -354,8 +322,8 @@ public class monster : ScriptableObject
         {
             if(GetStatusList().Count > 0)
             {
-                TryRemoveStatus(1, true);
-                TryRemoveStatus(8, true);
+                TryRemoveStatus(3, true);
+                TryRemoveStatus(5, true);
             }
         }
 
@@ -366,7 +334,7 @@ public class monster : ScriptableObject
         damage = DamageCap(damage);
 
         int bubbleHealth = 0;
-        statusEffectUI bubbleStatus = GetStatus(1);
+        statusEffectUI bubbleStatus = GetStatus(3);
         if (bubbleStatus != null)
             bubbleHealth = bubbleStatus.GetCounter();
 
@@ -425,7 +393,7 @@ public class monster : ScriptableObject
 
     public int HandleBubble(int change, monster attackingMon)
     {
-        statusEffectUI bubbleStatus = GetStatus(1);
+        statusEffectUI bubbleStatus = GetStatus(3);
         if (bubbleStatus != null && bubbleStatus.GetCounter() > 0)
         {
             int bubbleAmount = bubbleStatus.GetCounter();
@@ -445,7 +413,7 @@ public class monster : ScriptableObject
             }
             else
             {
-                TryRemoveStatus(1, true);
+                TryRemoveStatus(3, true);
                 change += bubbleAmount;
                 onDamagePopup?.Invoke(-bubbleAmount, true);
             }
@@ -458,16 +426,6 @@ public class monster : ScriptableObject
     {
         if (heal <= 0 || dead == true || gameMaster.movingToNewGame == true)
             return;
-
-        statusEffectUI burnStatus = GetStatus(7);
-        if (burnStatus != null)
-        {
-            if (burnStatus.TickCounter() == true)
-            {
-                onProcStatus?.Invoke(true, 7, true);
-                DestroyStatus(7);
-            }
-        }
 
         currentHP += heal;
 
@@ -565,36 +523,15 @@ public class monster : ScriptableObject
         onProcStatus?.Invoke(shouldDestroy, statusIndex, triggerProc);
     }
 
-    public void DestroyStatus(int statusIndex)
-    {
-        Destroy(GetStatus(statusIndex).gameObject);
-        statusEffects.Remove(GetStatus(statusIndex));
-
-        if(statusIndex == 2 || statusIndex == 10)
-        {
-            onRemoveTaunt?.Invoke();
-        }
-    }
-
     public void ApplyStatus(monster usingMonster, int statusIndex, GameObject statusPrefab, int counter, int power)
     {
         statusEffectUI status = GetStatus(statusIndex);
 
-        if(GetStatus(8) != null)
+        if(GetStatus(5) != null) // spell shield
         {
-            if(statusIndex == 0 || statusIndex == 3 || statusIndex == 7)
+            if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2)
             {
-                TryRemoveStatus(8, true);
-                return;
-            }
-        }
-
-        if (GetStatus(11) != null)
-        {
-            if (statusIndex == 0 || statusIndex == 3 || statusIndex == 7)
-            {
-                TryRemoveStatus(11, true);
-                usingMonster.ApplyStatus(this, statusIndex, statusPrefab, counter, power);
+                TryRemoveStatus(5, true);
                 return;
             }
         }
@@ -610,11 +547,6 @@ public class monster : ScriptableObject
         else
         {
             status.StatusGotReapplied(counter, power);
-
-            if(status.GetIndex() == 14)
-            {
-                procStatus(false, 14, true);
-            }
         }
     }
 
@@ -627,6 +559,17 @@ public class monster : ScriptableObject
         DestroyStatus(statusIndex);
     }
 
+    public void DestroyStatus(int statusIndex)
+    {
+        Destroy(GetStatus(statusIndex).gameObject);
+        statusEffects.Remove(GetStatus(statusIndex));
+
+        if (statusIndex == 4)
+        {
+            onRemoveTaunt?.Invoke();
+        }
+    }
+
     public float getHealthPercentage()
     {
         return (currentHP * 1.0f / maxHP);
@@ -634,7 +577,7 @@ public class monster : ScriptableObject
 
     public float GetBubblePercentage()
     {
-        statusEffectUI status = GetStatus(1);
+        statusEffectUI status = GetStatus(3);
 
         if (status == null)
             return 0;

@@ -336,9 +336,13 @@ MonoBehaviour:
   statIndex: 020000000100000000000000
   usesStatModifier: 010100
   isPerecentage: 000000
+  isPlus: 000000
+  percentageStatMultiplier: 0
   scaleNums1: 010000000200000003000000
   scaleNums2: 020000000400000006000000
   scaleNums3: 000000000000000000000000
+  givesStatGrowth: 0
+  statGrowthIndex: 0
 --- !u!1 &3313463067436964870
 GameObject:
   m_ObjectHideFlags: 0
@@ -809,7 +813,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '            Deal     then deal'
+  m_text: "            Deal     damage\n    then deal      damage"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -988,7 +992,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 59, y: 14.3}
+  m_AnchoredPosition: {x: -16.9, y: -7.3}
   m_SizeDelta: {x: -172.9891, y: -57.6803}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5561437785387547687

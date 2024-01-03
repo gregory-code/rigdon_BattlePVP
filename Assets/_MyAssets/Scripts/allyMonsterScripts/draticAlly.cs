@@ -23,18 +23,12 @@ public class draticAlly : monsterAlly
         GetMonster().onRemoveConnections -= RemoveConnections;
     }
 
-    private void AttackAgain(monster targetMon, int percentageMultiplier)
+    private void AttackAgain(monster targetMon, int extraDamage)
     {
         if (GetMonster().GetOwnership() == false)
             return;
 
-        while(attackMultiplier > 100)
-        {
-            attackMultiplier--;
-            percentageMultiplier++;
-        }
-        attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
     }
 
     private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
@@ -44,11 +38,11 @@ public class draticAlly : monsterAlly
 
         if (GetMonster().GetPassiveID() == 2 && GetMonster().GetOwnership()) // index for cloud legend
         {
-            gameMaster.ApplyStatus(GetMonster(), usingMon, 0, 4, 0); // index 0  for conductive status
+            gameMaster.ApplyStatus(GetMonster(), usingMon, 0, 2, 0); // index 0  for conductive status
         }
     }
 
-    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
     {
         switch (attackID)
         {
@@ -56,11 +50,11 @@ public class draticAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(RingingThunder(user, target, consumeTurn));
+                StartCoroutine(RingingThunder(user, target, consumeTurn, extraDamage));
                 break;
 
             case 2:
-                StartCoroutine(BoomSpear(user, target, consumeTurn));
+                StartCoroutine(BoomSpear(user, target, consumeTurn, extraDamage));
                 break;
         }
     }
@@ -82,7 +76,7 @@ public class draticAlly : monsterAlly
         }
     }
 
-    private IEnumerator RingingThunder(monster user, monster target, bool consumeTurn)
+    private IEnumerator RingingThunder(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -91,13 +85,11 @@ public class draticAlly : monsterAlly
         }
 
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(0,0); // consider reducing by a % that would be hype
-        attack1 = GetMultiplierDamage(attack1);
+        attack1 += extraDamage;
 
-        int attack2 = user.GetCurrentStrength() + GetMoveDamage(0, 1);
-        attack2 = GetMultiplierDamage(attack2);
-
-        int attack3 = user.GetCurrentStrength() + GetMoveDamage(0, 2);
-        attack3 = GetMultiplierDamage(attack3);
+        float inHalf = (attack1 / 2f);
+        int attack2 = Mathf.RoundToInt(inHalf);
+        int attack3 = Mathf.RoundToInt(inHalf);
 
         gameMaster.AnimateMonster(user, "attack1");
 
@@ -112,7 +104,7 @@ public class draticAlly : monsterAlly
         gameMaster.DamageMonster(user, target, -attack1);
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
-            gameMaster.ApplyStatus(user, target, 0, 4, 0);
+            gameMaster.ApplyStatus(user, target, 0, 1, 0);
 
         yield return new WaitForSeconds(0.1f);
 
@@ -130,7 +122,7 @@ public class draticAlly : monsterAlly
             gameMaster.DamageMonster(user, nextTarget, -attack2);
 
             if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
-                gameMaster.ApplyStatus(user, nextTarget, 0, 4, 0);
+                gameMaster.ApplyStatus(user, nextTarget, 0, 1, 0);
 
             monster finalTarget = gameMaster.GetRandomEnemy(target.GetIndex(), nextTarget.GetIndex(), false);
             if (finalTarget != null)
@@ -146,7 +138,7 @@ public class draticAlly : monsterAlly
                 gameMaster.DamageMonster(user, finalTarget, -attack3);
 
                 if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
-                    gameMaster.ApplyStatus(user, finalTarget, 0, 4, 0);
+                    gameMaster.ApplyStatus(user, finalTarget, 0, 1, 0);
             }
         }
 
@@ -155,7 +147,7 @@ public class draticAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator BoomSpear(monster user, monster target, bool consumeTurn)
+    private IEnumerator BoomSpear(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -164,10 +156,10 @@ public class draticAlly : monsterAlly
         }
 
         int attack1 = user.GetCurrentMagic() + GetMoveDamage(1,0);
-        attack1 = GetMultiplierDamage(attack1);
+        attack1 += extraDamage;
 
         int attack2 = user.GetCurrentStrength() + GetMoveDamage(1,1);
-        attack2 = GetMultiplierDamage(attack2);
+        attack2 += extraDamage;
 
         gameMaster.AnimateMonster(user, "attack2");
 
@@ -183,7 +175,7 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.1f);
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
-            gameMaster.ApplyStatus(user, target, 0, 4, 0);
+            gameMaster.ApplyStatus(user, target, 0, 1, 0);
 
         gameMaster.ShootProjectile(user, target, 1, 0);
 
@@ -196,7 +188,7 @@ public class draticAlly : monsterAlly
 
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
-            gameMaster.ApplyStatus(user, target, 0, 4, 0);
+            gameMaster.ApplyStatus(user, target, 0, 1, 0);
 
         yield return new WaitForSeconds(0.8f);
 
@@ -214,9 +206,9 @@ public class draticAlly : monsterAlly
         if (randomTarget == null)
             randomTarget = gameMaster.GetRandomEnemy(-1, -1, false);
 
-        int abilityMultiplier = (GetMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
+        int extraDamage = (GetMonster().GetCurrentMagic() + GetMoveDamage(2, 0));
 
-        gameMaster.AttackAgain(GetTargetedMonster(), randomTarget, abilityMultiplier);
+        gameMaster.AttackAgain(GetTargetedMonster(), randomTarget, extraDamage);
 
         gameMaster.waitingForAction = true;
         while(gameMaster.waitingForAction == true)
@@ -231,16 +223,21 @@ public class draticAlly : monsterAlly
     {
         gameMaster.AnimateMonster(GetMonster(), "ability2");
         yield return new WaitForSeconds(0.3f);
-        int shieldMultiplier = (GetMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 1);
+
+        int shieldMultiplier = (GetMonster().GetCurrentMagic() * GetCurrentMove(3).GetPercentageMultiplier()) + GetMoveDamage(3, 0);
         float shieldStrength = GetTargetedMonster().GetMaxHealth() * (1f * shieldMultiplier / 100f);
         int shield = Mathf.RoundToInt(shieldStrength);
-        shield = GetMultiplierDamage(shield);
-
+        
         float newBubbleBuffer = (shield * 1.1f) + 1.05f;
-        shield = Mathf.RoundToInt(newBubbleBuffer);
+        if(GetMonster() == GetTargetedMonster()) 
+            shield = Mathf.RoundToInt(newBubbleBuffer);
 
-        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 1, shield, 0);
-        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 2, (GetMoveDamage(3, 0) + 1), 0); // I think however many turns +1 since NextTurn();
+        int turnDuration = (GetMoveDamage(3, 1));
+        if (GetMonster() == GetTargetedMonster())
+            turnDuration++;
+
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 3, shield, 0);
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 4, turnDuration, 0);
 
         yield return new WaitForSeconds(0.3f);
 

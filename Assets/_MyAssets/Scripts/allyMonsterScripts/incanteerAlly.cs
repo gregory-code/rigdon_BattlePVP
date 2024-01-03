@@ -33,16 +33,13 @@ public class incanteerAlly : monsterAlly
 
         allyAttacking.HoldAttack();
 
-        int attackMulti = GetMoveDamage(5, 0);
+        float attackMulti = GetMoveDamage(5, 0);
+        int attackID = GetMonster().GetAttackID();
+        int attackDamage = GetMonster().GetCurrentStrength() + GetMoveDamage((attackID - 1), 0);
+        float damageMultiplied = (attackDamage * 1f) * (attackMulti / 100);
+        int extraDamage = Mathf.RoundToInt(damageMultiplied);
 
-        while (attackMultiplier > 100)
-        {
-            attackMultiplier--;
-            attackMulti++;
-        }
-        attackMultiplier = attackMulti;
-
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), enemyGettingAttacked, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), enemyGettingAttacked, false, extraDamage);
     }
 
     private void RemoveConnections()
@@ -65,21 +62,15 @@ public class incanteerAlly : monsterAlly
         GetMonster().onRemoveConnections -= RemoveConnections;
     }
 
-    private void AttackAgain(monster targetMon, int percentageMultiplier)
+    private void AttackAgain(monster targetMon, int extraDamage)
     {
         if (GetMonster().GetOwnership() == false)
             return;
 
-        while (attackMultiplier > 100)
-        {
-            attackMultiplier--;
-            percentageMultiplier++;
-        }
-        attackMultiplier = percentageMultiplier;
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false);
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
     }
 
-    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn)
+    private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
     {
         switch (attackID)
         {
@@ -87,11 +78,11 @@ public class incanteerAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(GoldenHorn(user, target, consumeTurn));
+                StartCoroutine(GoldenHorn(user, target, consumeTurn, extraDamage));
                 break;
 
             case 2:
-                StartCoroutine(FireRush(user, target, consumeTurn));
+                StartCoroutine(FireRush(user, target, consumeTurn, extraDamage));
                 break;
         }
     }
@@ -104,22 +95,10 @@ public class incanteerAlly : monsterAlly
                 break;
 
             case 1:
-                if (GetTargetedMonster().GetIndex() == GetMonster().GetIndex())
-                {
-                    gameMaster.SetFilter(false);
-                    GetMonster().SetAct(true);
-                    return;
-                }
                 StartCoroutine(LeadTheCharge());
                 break;
 
             case 2:
-                if (GetTargetedMonster().GetIndex() == GetMonster().GetIndex())
-                {
-                    gameMaster.SetFilter(false);
-                    GetMonster().SetAct(true);
-                    return;
-                }
                 StartCoroutine(BrambleCrown());
                 break;
         }
@@ -127,7 +106,7 @@ public class incanteerAlly : monsterAlly
 
     private int goldenHornDamage = 0;
 
-    private IEnumerator GoldenHorn(monster user, monster target, bool consumeTurn)
+    private IEnumerator GoldenHorn(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -140,9 +119,9 @@ public class incanteerAlly : monsterAlly
 
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(0, 0);
         attack1 += goldenHornDamage;
-        attack1 = GetMultiplierDamage(attack1);
+        attack1 += extraDamage;
 
-        gameMaster.ShootProjectile(user, target, 11, 0);
+        gameMaster.ShootProjectile(user, target, 6, 0);
         yield return new WaitForSeconds(0.6f);
         yield return new WaitForSeconds(0.4f);
         gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
@@ -155,14 +134,14 @@ public class incanteerAlly : monsterAlly
         gameMaster.MoveMonster(user, target, 1);
 
         yield return new WaitForSeconds(2.2f);
-        int extraDamage = user.GetCurrentSpeed() + GetMoveDamage(0, 1);
-        gameMaster.ApplyStatus(user, user, 14, extraDamage, 0);
-        goldenHornDamage += extraDamage;
+        int bonusDamage = user.GetCurrentSpeed() + GetMoveDamage(0, 1);
+        gameMaster.ApplyStatus(user, user, 7, bonusDamage, 0);
+        goldenHornDamage += bonusDamage;
 
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator FireRush(monster user, monster target, bool consumeTurn)
+    private IEnumerator FireRush(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         if (holdAttack)
         {
@@ -173,15 +152,10 @@ public class incanteerAlly : monsterAlly
         gameMaster.AnimateMonster(user, "attack1");
         gameMaster.MoveMonster(user, target, 0);
 
-        int attack1 = (user.GetCurrentStrength() * GetCurrentMove(1).GetPercentageMultiplier()) + GetMoveDamage(1, 0);
-        int enemyCurrentHealth = target.GetCurrentHealth();
+        int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0);
+        attack1 += extraDamage;
 
-        float percentageEnemyHealth = enemyCurrentHealth * (1f * attack1 / 100f);
-        attack1 = Mathf.RoundToInt(percentageEnemyHealth);
-
-        attack1 = GetMultiplierDamage(attack1);
-
-        gameMaster.ShootProjectile(user, target, 12, 0);
+        gameMaster.ShootProjectile(user, target, 7, 0);
         yield return new WaitForSeconds(0.6f);
         yield return new WaitForSeconds(0.4f);
         gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
@@ -189,7 +163,7 @@ public class incanteerAlly : monsterAlly
         target = gameMaster.GetRedirectedMonster(target);
         gameMaster.DamageMonster(user, target, -attack1);
 
-        gameMaster.ApplyStatus(user, target, 7, 1, 0);
+        gameMaster.ApplyStatus(user, target, 1, 1, 0);
 
         yield return new WaitForSeconds(0.55f);
         gameMaster.MoveMonster(user, target, 1);
@@ -209,9 +183,9 @@ public class incanteerAlly : monsterAlly
 
         int buff = GetMonster().GetCurrentMagic() + GetMoveDamage(2, 0);
 
-        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 12, 1, buff);
+        //gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 12, 1, buff);
 
-        if (GetMonster().GetPassiveID() == 1)
+        if (GetMonster().GetPassiveID() == 1 && GetTargetedMonster().GetIndex() != GetMonster().GetIndex())
             gameMaster.AdjustTurnOrder(GetTargetedMonster(), true, false);
 
         yield return new WaitForSeconds(1.6f);
@@ -228,15 +202,18 @@ public class incanteerAlly : monsterAlly
 
         yield return new WaitForSeconds(.8f);
 
-        gameMaster.ShootProjectile(GetMonster(), GetTargetedMonster(), 13, 0);
+        gameMaster.ShootProjectile(GetMonster(), GetTargetedMonster(), 8, 0);
 
         yield return new WaitForSeconds(0.2f);
 
-        int counter = GetMonster().GetCurrentMagic() + GetMoveDamage(3, 1);
-        int power = GetMonster().GetCurrentSpeed() + GetMoveDamage(3, 0);
-        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 15, (counter + 1), power);
+        int counter = GetMoveDamage(3, 2);
+        int power = GetMonster().GetCurrentMagic() + GetMoveDamage(3, 1);
+        if (GetMonster() == GetTargetedMonster())
+            counter++;
 
-        if (GetMonster().GetPassiveID() == 1)
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 6, counter, power);
+
+        if (GetMonster().GetPassiveID() == 1 && GetTargetedMonster().GetIndex() != GetMonster().GetIndex())
             gameMaster.AdjustTurnOrder(GetTargetedMonster(), true, false);
 
         yield return new WaitForSeconds(0.5f);

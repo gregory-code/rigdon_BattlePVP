@@ -4134,21 +4134,13 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   statusProcPrefabs:
   - {fileID: 166006, guid: a2e78dba7d7f8f34e9be44acb8469dc2, type: 3}
+  - {fileID: 1573430751113452, guid: 36b98a6665f226d47b28e409f4802f68, type: 3}
+  - {fileID: 0}
   - {fileID: 177804, guid: 7568214281a1fb443bc81a02ed35c3a6, type: 3}
   - {fileID: 153256, guid: b056e3fe90727c54192ced1b360380d0, type: 3}
-  - {fileID: 3758703766934008911, guid: 6103590a89fb3a340ac6b495f8044769, type: 3}
-  - {fileID: 6579453261124972213, guid: 48b84ca0b0824f040a354eec785236e4, type: 3}
-  - {fileID: 154672, guid: 413a0058aedf83f48b14aba1e9757a89, type: 3}
-  - {fileID: 154672, guid: 413a0058aedf83f48b14aba1e9757a89, type: 3}
-  - {fileID: 1573430751113452, guid: 36b98a6665f226d47b28e409f4802f68, type: 3}
   - {fileID: 177804, guid: b3c9fb1f409adc043ade593d426cfa24, type: 3}
-  - {fileID: 1211592783823396, guid: af4f3d30d8d15444f8130efec385e635, type: 3}
-  - {fileID: 1250201152801508, guid: 36e3054da80675e48ac8ee9353edb023, type: 3}
-  - {fileID: 1091416279739030, guid: 32152125583b31a408f90a6ac8ce9e5e, type: 3}
-  - {fileID: 6579453261124972213, guid: b2296ec7f399df547a9d9b8f8727c1c6, type: 3}
-  - {fileID: 6579453261124972213, guid: b2296ec7f399df547a9d9b8f8727c1c6, type: 3}
-  - {fileID: 147642, guid: d63d36b4b1bdab149b6edc844c897ca5, type: 3}
   - {fileID: 1126696128565986, guid: 58db12ef2cf9c7446aaf443bf85b83a4, type: 3}
+  - {fileID: 147642, guid: d63d36b4b1bdab149b6edc844c897ca5, type: 3}
 --- !u!1 &5297733555498542932
 GameObject:
   m_ObjectHideFlags: 0

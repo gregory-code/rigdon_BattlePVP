@@ -410,8 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Burn inflicted by Lusselia gains an added 50% str bonus added to the damage
-    +1               growth
+  m_text: "          inflicted by Lusselia gains \n        50% of their             
+    \n        as added bonus damage"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -547,12 +547,13 @@ MonoBehaviour:
   statIndex: 000000000000000000000000
   usesStatModifier: 000000
   isPerecentage: 000000
+  isPlus: 000000
   percentageStatMultiplier: 0
   scaleNums1: 000000000000000000000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
-  givesStatGrowth: 1
-  statGrowthIndex: 1
+  givesStatGrowth: 0
+  statGrowthIndex: 0
 --- !u!1 &4617123071582503824
 GameObject:
   m_ObjectHideFlags: 0
@@ -587,8 +588,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.3929977, y: -9.513}
-  m_SizeDelta: {x: -2.788, y: -19.027}
+  m_AnchoredPosition: {x: -25.7, y: -9.5130005}
+  m_SizeDelta: {x: -67.411, y: -19.027}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8189784747283389297
 CanvasRenderer:
@@ -992,8 +993,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 32.2, y: -29.7}
-  m_SizeDelta: {x: -114.4408, y: -67.5677}
+  m_AnchoredPosition: {x: 40.2, y: -7.5}
+  m_SizeDelta: {x: -130.0841, y: -67.5677}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
 CanvasRenderer:

@@ -410,7 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '           Heal an ally for           of their max '
+  m_text: "           Heal target for\n                        and remove all \n            
+    negative effects"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -546,7 +547,8 @@ MonoBehaviour:
   statIndex: 020000000000000000000000
   usesStatModifier: 010000
   isPerecentage: 010000
-  percentageStatMultiplier: 2
+  isPlus: 000000
+  percentageStatMultiplier: 5
   scaleNums1: 0a000000140000001e000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
@@ -856,7 +858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 54.6, y: 14.7}
+  m_AnchoredPosition: {x: 50.1, y: 14.7}
   m_SizeDelta: {x: -167.4045, y: -65.0678}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
@@ -991,8 +993,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -19.1, y: -7.5}
-  m_SizeDelta: {x: -146.0479, y: -65.068}
+  m_AnchoredPosition: {x: -50.9, y: -7.5}
+  m_SizeDelta: {x: -128.7176, y: -65.068}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
 CanvasRenderer:
@@ -1022,7 +1024,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: health
+  m_text: max health
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,

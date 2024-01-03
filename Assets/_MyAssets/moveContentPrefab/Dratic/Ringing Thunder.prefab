@@ -275,7 +275,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 3
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -379,7 +379,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -45.6, y: 14.4}
+  m_AnchoredPosition: {x: -42.4, y: 14.4}
   m_SizeDelta: {x: -160.4346, y: -55.1483}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5509760928414913384
@@ -812,14 +812,15 @@ MonoBehaviour:
   - {fileID: 6711273226218543542}
   - {fileID: 6256427395530792947}
   - {fileID: 5784574664880808071}
-  exists: 010101
-  statIndex: 010000000100000001000000
-  usesStatModifier: 010101
+  exists: 010000
+  statIndex: 010000000000000000000000
+  usesStatModifier: 010000
   isPerecentage: 000000
+  isPlus: 000000
   percentageStatMultiplier: 0
   scaleNums1: 030000000600000009000000
-  scaleNums2: 010000000300000005000000
-  scaleNums3: ffffffff0000000001000000
+  scaleNums2: 000000000000000000000000
+  scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
   statGrowthIndex: 0
 --- !u!1 &7001555841151200802
@@ -887,7 +888,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -1157,12 +1158,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '      Deal    to the first target,
+  m_text: '      Deal     damage
 
-    then     to a random target,
+    The attack bounces to remaining
 
-    and    
-    to the remaining target'
+    enemies
+    dealing 50% damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,

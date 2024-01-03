@@ -417,7 +417,7 @@ GameObject:
   - component: {fileID: 2227084916891886237}
   - component: {fileID: 2094225589162298504}
   m_Layer: 5
-  m_Name: onHitShieldEffect
+  m_Name: spellShieldEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

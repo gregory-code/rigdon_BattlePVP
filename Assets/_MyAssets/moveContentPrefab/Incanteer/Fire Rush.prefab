@@ -410,8 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "           Deal           of the targets \n     current health and        
-    the \n             target for 1 turn"
+  m_text: "           Deal       damage\n             the enemy for 1 turn\nthis
+    attack has            crit chance"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -543,12 +543,13 @@ MonoBehaviour:
   - {fileID: 8205547447539754975}
   - {fileID: 465393707680873253}
   - {fileID: 8962566636708827019}
-  exists: 010000
-  statIndex: 010000000000000000000000
-  usesStatModifier: 010000
-  isPerecentage: 010000
+  exists: 010100
+  statIndex: 010000000300000000000000
+  usesStatModifier: 010100
+  isPerecentage: 000100
+  isPlus: 000100
   percentageStatMultiplier: 2
-  scaleNums1: 1a000000240000002e000000
+  scaleNums1: 02000000060000000a000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
@@ -857,7 +858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -12, y: 15}
+  m_AnchoredPosition: {x: -20.5, y: 15}
   m_SizeDelta: {x: -160.8491, y: -66.8492}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
@@ -888,7 +889,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 20%
+  m_text: 2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -992,8 +993,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 48.6, y: -6.9}
-  m_SizeDelta: {x: -152.8145, y: -70.901}
+  m_AnchoredPosition: {x: -71.2, y: -7.2}
+  m_SizeDelta: {x: -174.7134, y: -70.901}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &522491313636001682
 CanvasRenderer:
@@ -1127,7 +1128,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 60.9, y: -22.4}
+  m_AnchoredPosition: {x: 11.6, y: -29.6}
   m_SizeDelta: {x: -154.6594, y: -70.8865}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9157608670724634358
@@ -1158,7 +1159,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: +19%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -1168,8 +1169,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278254335
+  m_fontColor: {r: 1, g: 0.98039216, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
