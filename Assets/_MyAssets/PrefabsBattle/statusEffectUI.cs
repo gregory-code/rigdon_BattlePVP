@@ -122,6 +122,7 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case status.GoldenHorn:
+                myMonster.procStatus(false, statusIndex, true);
                 UpdateStatusCounter(counter + newCounter);
                 break;
         }
@@ -141,7 +142,7 @@ public class statusEffectUI : MonoBehaviour
             case status.Burn:
                 counter--;
                 myMonster.SetBurnDamage();
-                myMonster.TakeDamage(usingMonster, GetBurnDamage());
+                myMonster.TakeDamage(usingMonster, GetBurnDamage(), false);
                 break;
 
             case status.Weakness:
@@ -202,7 +203,9 @@ public class statusEffectUI : MonoBehaviour
 
                 StatChange(3, power);
                 break;
+
             case status.GoldenHorn:
+                myMonster.procStatus(false, statusIndex, true);
                 break;
         }
     }
@@ -213,6 +216,8 @@ public class statusEffectUI : MonoBehaviour
             return;
 
         alreadyRemoved = true;
+
+        myMonster.onUsedAction -= UsedAction;
 
         switch (myStatus)
         {

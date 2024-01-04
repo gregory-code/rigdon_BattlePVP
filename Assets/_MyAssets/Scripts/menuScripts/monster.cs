@@ -217,10 +217,10 @@ public class monster : ScriptableObject
     public delegate void OnRemoveConnections();
     public event OnRemoveConnections onRemoveConnections;
 
-    public delegate void OnTakeDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage);
+    public delegate void OnTakeDamage(monster recivingMon, monster usingMon, int damage, bool died, bool crit, bool burnDamage);
     public event OnTakeDamage onTakeDamage;
 
-    public delegate void OnDamagePopup(int change, bool shielededAttack);
+    public delegate void OnDamagePopup(int change, bool shielededAttack, bool crit);
     public event OnDamagePopup onDamagePopup;
 
     public delegate void OnHealed(monster recivingMon, monster usingMon, int heal);
@@ -354,10 +354,16 @@ public class monster : ScriptableObject
 
     private bool BurnDamage;
     public void SetBurnDamage() { BurnDamage = true; }
-    public void TakeDamage(monster usingMon, int change)
+    public void TakeDamage(monster usingMon, int change, bool crit)
     {
         if (change >= 0 || dead == true || gameMaster.movingToNewGame == true)
             return;
+
+        if(crit)
+        {
+            float critDamage = change * 1.5f;
+            change = Mathf.RoundToInt(critDamage);
+        }
 
         if(BurnDamage == false)
             change = CalculateConductive(change, true);
@@ -366,7 +372,7 @@ public class monster : ScriptableObject
 
         change = CalculateDamageReductionPercentage(change);
 
-        change = HandleBubble(change, usingMon);
+        change = HandleBubble(change, usingMon, crit);
 
         if (change >= 0)
             return;
@@ -384,14 +390,14 @@ public class monster : ScriptableObject
             }
         }
 
-        onTakeDamage?.Invoke(this, usingMon, change, dead, BurnDamage);
+        onTakeDamage?.Invoke(this, usingMon, change, dead, crit, BurnDamage);
         
         BurnDamage = false;
         
-        onDamagePopup?.Invoke(change, false);
+        onDamagePopup?.Invoke(change, false, crit);
     }
 
-    public int HandleBubble(int change, monster attackingMon)
+    public int HandleBubble(int change, monster attackingMon, bool crit)
     {
         statusEffectUI bubbleStatus = GetStatus(3);
         if (bubbleStatus != null && bubbleStatus.GetCounter() > 0)
@@ -406,8 +412,8 @@ public class monster : ScriptableObject
 
             if (bubbleStatus.GetCounter() > 0)
             {
-                onDamagePopup?.Invoke(change, true);
-                onTakeDamage?.Invoke(this, attackingMon, change, false, BurnDamage);
+                onDamagePopup?.Invoke(change, true, false);
+                onTakeDamage?.Invoke(this, attackingMon, change, false, crit, BurnDamage);
                 BurnDamage = false;
                 change = 0;
             }
@@ -415,7 +421,7 @@ public class monster : ScriptableObject
             {
                 TryRemoveStatus(3, true);
                 change += bubbleAmount;
-                onDamagePopup?.Invoke(-bubbleAmount, true);
+                onDamagePopup?.Invoke(-bubbleAmount, true, false);
             }
         }
 
@@ -432,7 +438,7 @@ public class monster : ScriptableObject
         if (currentHP >= maxHP)
             currentHP = maxHP;
 
-        onDamagePopup?.Invoke(heal, false);
+        onDamagePopup?.Invoke(heal, false, false);
         onHealed?.Invoke(this, usingMon, heal);
     }
 

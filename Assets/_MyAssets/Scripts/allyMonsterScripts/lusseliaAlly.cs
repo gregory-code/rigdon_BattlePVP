@@ -12,7 +12,6 @@ public class lusseliaAlly : monsterAlly
         onAttack += UseAttack;
         onAbility += UseAbility;
         GetMonster().onAttackAgain += AttackAgain;
-        GetMonster().onTakeDamage += TookDamage;
         GetMonster().onRemoveConnections += RemoveConnections;
     }
 
@@ -21,7 +20,6 @@ public class lusseliaAlly : monsterAlly
         onAttack -= UseAttack;
         onAbility -= UseAbility;
         GetMonster().onAttackAgain -= AttackAgain;
-        GetMonster().onTakeDamage -= TookDamage;
         GetMonster().onRemoveConnections -= RemoveConnections;
     }
 
@@ -31,11 +29,6 @@ public class lusseliaAlly : monsterAlly
             return;
 
         UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
-    }
-
-    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
-    {
-
     }
 
     private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
@@ -93,7 +86,7 @@ public class lusseliaAlly : monsterAlly
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
         yield return new WaitForSeconds(0.25f);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
         int shouldAddBurnDamage = 0;
         if (GetMonster().GetPassiveID() == 2)
@@ -134,7 +127,7 @@ public class lusseliaAlly : monsterAlly
             gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
             yield return new WaitForSeconds(0.2f);
             target = gameMaster.GetRedirectedMonster(target);
-            gameMaster.DamageMonster(user, target, -attack1);
+            gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
             int shouldAddBurnDamage = 0;
             if (GetMonster().GetPassiveID() == 2)
@@ -193,6 +186,18 @@ public class lusseliaAlly : monsterAlly
         yield return new WaitForSeconds(0.4f);
 
         gameMaster.HealMonster(GetMonster(), GetTargetedMonster(), finalHeal);
+
+        List<int> listOfIndexes = GetTargetedMonster().GetStatusList();
+        if (listOfIndexes.Count > 0)
+        {
+            foreach (int index in listOfIndexes)
+            {
+                if(index == 0 || index == 1 || index == 2)
+                {
+                    gameMaster.TryRemoveStatus(GetTargetedMonster(), index);
+                }
+            }
+        }
 
         if (GetMonster().GetPassiveID() == 1)
             gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 5, 200, 0);

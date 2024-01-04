@@ -44,7 +44,7 @@ public class minfurAlly : monsterAlly
         UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
     }
 
-    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
+    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool crit, bool burnDamage)
     {
         if (GetMonster().GetPassiveID() == 2 && GetMonster().GetOwnership()) // index for acron
         {
@@ -192,7 +192,7 @@ public class minfurAlly : monsterAlly
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.2f);
-        gameMaster.DamageMonster(user, target, -attack);
+        gameMaster.DamageMonster(user, target, -attack, IsCrit(0));
 
         if (GetMonster().GetPassiveID() == 1)
         {

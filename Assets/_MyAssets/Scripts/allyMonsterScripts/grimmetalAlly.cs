@@ -14,7 +14,6 @@ public class grimmetalAlly : monsterAlly
             gameMaster.bRegularDeath = false;
 
         GetMonster().onAttackAgain += AttackAgain;
-        GetMonster().onTakeDamage += TookDamage;
         GetMonster().onRemoveConnections += RemoveConnections;
 
         if (GetMonster().GetPassiveID() == 1)
@@ -27,7 +26,6 @@ public class grimmetalAlly : monsterAlly
         onAbility -= UseAbility;
         gameMaster.onMonsterDied -= MonsterDied;
         GetMonster().onAttackAgain -= AttackAgain;
-        GetMonster().onTakeDamage -= TookDamage;
         GetMonster().onRemoveConnections -= RemoveConnections;
     }
 
@@ -51,11 +49,6 @@ public class grimmetalAlly : monsterAlly
             GetMonster().PlayAnimation("idle");
             GetMonster().GetExpHold(2).GainExp();
         }
-    }
-
-    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
-    {
-
     }
 
     private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
@@ -117,7 +110,7 @@ public class grimmetalAlly : monsterAlly
 
         gameMaster.ShootProjectile(user, target, 10, 0);
         yield return new WaitForSeconds(0.1f);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
         yield return new WaitForSeconds(0.4f);
         gameMaster.MoveMonster(user, target, 1);
@@ -178,7 +171,7 @@ public class grimmetalAlly : monsterAlly
         target = gameMaster.GetRedirectedMonster(target);
 
         gameMaster.ShootProjectile(user, target, 10, 0);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
         yield return new WaitForSeconds(0.6f);
         if(GetTargetedMonster().isDead())

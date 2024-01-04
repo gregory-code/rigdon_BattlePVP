@@ -31,7 +31,7 @@ public class draticAlly : monsterAlly
         UseAttack(GetMonster().GetAttackID(), GetMonster(), targetMon, false, extraDamage);
     }
 
-    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool burnDamage)
+    private void TookDamage(monster recivingMon, monster usingMon, int damage, bool died, bool crit, bool burnDamage)
     {
         if (burnDamage)
             return;
@@ -101,7 +101,7 @@ public class draticAlly : monsterAlly
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.40f);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
             gameMaster.ApplyStatus(user, target, 0, 1, 0);
@@ -119,7 +119,7 @@ public class draticAlly : monsterAlly
 
             yield return new WaitForSeconds(0.1f);
 
-            gameMaster.DamageMonster(user, nextTarget, -attack2);
+            gameMaster.DamageMonster(user, nextTarget, -attack2, IsCrit(0));
 
             if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
                 gameMaster.ApplyStatus(user, nextTarget, 0, 1, 0);
@@ -135,7 +135,7 @@ public class draticAlly : monsterAlly
 
                 yield return new WaitForSeconds(0.1f);
 
-                gameMaster.DamageMonster(user, finalTarget, -attack3);
+                gameMaster.DamageMonster(user, finalTarget, -attack3, IsCrit(0));
 
                 if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
                     gameMaster.ApplyStatus(user, finalTarget, 0, 1, 0);
@@ -170,7 +170,7 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
         yield return new WaitForSeconds(0.3f);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
         yield return new WaitForSeconds(0.1f);
 
@@ -184,7 +184,7 @@ public class draticAlly : monsterAlly
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.25f);
-        gameMaster.DamageMonster(user, target, -attack2);
+        gameMaster.DamageMonster(user, target, -attack2, IsCrit(0));
 
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)

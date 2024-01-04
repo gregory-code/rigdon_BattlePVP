@@ -160,7 +160,7 @@ public class monsterBase : MonoBehaviour
         SetHealthText();
     }
 
-    private void takeDamage(monster recivingMon, monster usingMon, int change, bool died, bool burnDamage)
+    private void takeDamage(monster recivingMon, monster usingMon, int change, bool died, bool crit, bool burnDamage)
     {
         SetHealthText();
 
@@ -171,6 +171,18 @@ public class monsterBase : MonoBehaviour
         }
 
         monsterAnimator.SetTrigger("damaged");
+    }
+
+    public bool IsCrit(int addedChance)
+    {
+        int roll = Random.Range(0, 101);
+        int threshold = (myMonster.GetCurrentSpeed() * 2) + addedChance;
+
+        if(roll <= threshold)
+        {
+            return true;
+        }
+        return false;
     }
 
     private void SetHealthText()
@@ -262,10 +274,10 @@ public class monsterBase : MonoBehaviour
         newProjectile.Init(target, monsterSprite.transform);
     }
 
-    private void damagePopup(int change, bool shieldedAttack)
+    private void damagePopup(int change, bool shieldedAttack, bool crit)
     {
         damagePopScript popUp = Instantiate(damagePop, transform.position, transform.rotation);
-        popUp.Init(change, shieldedAttack);
+        popUp.Init(change, shieldedAttack, crit);
     }
 
     private IEnumerator destroyMyself()
@@ -291,8 +303,7 @@ public class monsterBase : MonoBehaviour
         {
             foreach (int index in listOfIndexes)
             {
-                myMonster.GetStatus(index).GettingRemoved();
-                myMonster.DestroyStatus(index);
+                myMonster.TryRemoveStatus(index, false);
             }
         }
         myMonster.statusEffects.Clear();
@@ -353,8 +364,6 @@ public class monsterBase : MonoBehaviour
     {
         if (isAttack)
         {
-            CheckForSteelYourself();
-
             yield return new WaitForSeconds(0.2f);
 
             destroyShields = false;
@@ -367,18 +376,6 @@ public class monsterBase : MonoBehaviour
         if (consumeTurn == true)
         {
             gameMaster.NextTurn();
-        }
-    }
-
-    private void CheckForSteelYourself()
-    {
-        if (myMonster.GetStatusList().Count > 0)
-        {
-            statusEffectUI steelYourself = myMonster.GetStatus(9);
-            if(steelYourself != null && myMonster.GetOwnership())
-            {
-                gameMaster.TryRemoveStatus(myMonster, 9);
-            }
         }
     }
 

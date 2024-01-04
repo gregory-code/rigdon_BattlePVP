@@ -12,12 +12,17 @@ public class damagePopScript : MonoBehaviour
     [SerializeField] Color healedColor;
     [SerializeField] Color shieldedColor;
 
-    public void Init(int change, bool shielededColor)
+    [SerializeField] GameObject crit;
+
+    public void Init(int change, bool shielededColor, bool crit)
     {
-        popAnimator.SetTrigger("pop" + Random.Range(0, 3)); // do 1 over the amount you want. So (0, 3) is really (0, 2)
+        popAnimator.SetTrigger("pop" + Random.Range(0, 5)); // do 1 over the amount you want. So (0, 3) is really (0, 2)
 
         transform.localEulerAngles = Vector3.one;
         transform.localRotation = Quaternion.Euler(0, 0, 0);
+
+        if (crit)
+            this.crit.SetActive(true);
 
         damageText.color = (change < 0) ? damagedColor : healedColor;
 
@@ -25,6 +30,11 @@ public class damagePopScript : MonoBehaviour
             damageText.color = shieldedColor;
 
         damageText.text = (change < 0) ? "" + change : "+" + change ;
-        Destroy(this.gameObject, 0.9f);
+        Destroy(this.gameObject, 1.5f);
+    }
+
+    private void LateUpdate()
+    {
+        
     }
 }

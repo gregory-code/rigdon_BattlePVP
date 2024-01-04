@@ -127,7 +127,7 @@ public class incanteerAlly : monsterAlly
         gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
         yield return new WaitForSeconds(0.3f);
         target = gameMaster.GetRedirectedMonster(target);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
 
 
         yield return new WaitForSeconds(0.55f);
@@ -161,7 +161,7 @@ public class incanteerAlly : monsterAlly
         gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
         yield return new WaitForSeconds(0.3f);
         target = gameMaster.GetRedirectedMonster(target);
-        gameMaster.DamageMonster(user, target, -attack1);
+        gameMaster.DamageMonster(user, target, -attack1, IsCrit(GetMonster().GetCurrentSpeed() * 2));
 
         gameMaster.ApplyStatus(user, target, 1, 1, 0);
 
