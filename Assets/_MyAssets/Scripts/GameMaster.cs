@@ -353,7 +353,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
             waitingQueue = false;
             ClearField();
-            gameMenu.StartIntermission();
+
+            if(fightingAI)
+            {
+            }
+            else
+            {
+                gameMenu.StartIntermission();
+            }
         }
     }
 

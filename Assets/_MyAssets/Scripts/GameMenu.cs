@@ -41,6 +41,14 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     private List<moveContent> moveContentList = new List<moveContent>();
     [SerializeField] monster[] monsterOptions = new monster[3];
 
+    [Header("Choose New Upgrade")]
+    [SerializeField] GameObject choosingUpgrade;
+    [SerializeField] Image[] upgradeImage;
+    [SerializeField] TextMeshProUGUI[] upgradeTitle;
+    [SerializeField] TextMeshProUGUI[] upgradeDescription;
+
+    [SerializeField] Button[] chooseUpgardeButtons;
+
     [Header("Enemy Mons")]
     [SerializeField] monster[] enemyMonsters;
     [SerializeField] monsterPreferences[] enemyPrefs;
@@ -200,6 +208,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         intermission.SetActive(state);
         decisionMonster.SetActive(!state);
+        choosingUpgrade.SetActive(!state);
     }
 
     private IEnumerator ChooseNewIDs(int whichAllyIndex)
@@ -244,6 +253,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         intermission.SetActive(false);
         decisionMonster.SetActive(true);
+        choosingUpgrade.SetActive(false);
 
         allMenus.SetActive(false);
         menuChecks.SetActive(false);
