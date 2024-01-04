@@ -392,7 +392,11 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < enemyTeam.Length; i++)
         {
-            if (enemyTeam[i].isDead())
+            if (enemyTeam[i] == null)
+            {
+                enemyIndexes[i] = -1;
+            }
+            else if (enemyTeam[i].isDead())
             {
                 enemyIndexes[i] = -1;
             }

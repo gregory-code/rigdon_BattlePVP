@@ -107,8 +107,11 @@ public class lusseliaAlly : monsterAlly
         bool didCrit = false;
 
         monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < enemyTeam.Length; i++)
         {
+            if (enemyTeam[i] == null)
+                continue;
+
             if (enemyTeam[i].isDead())
                 continue;
 
@@ -143,8 +146,11 @@ public class lusseliaAlly : monsterAlly
         float newBubbleBuffer = (shieldStrength * 1.1f) + 1.05f;
 
         monster[] myteam = gameMaster.GetMonstersTeam(GetMonster());
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < myteam.Length; i++)
         {
+            if (myteam[i] == null)
+                continue;
+
             if (myteam[i].isDead())
                 continue;
 
