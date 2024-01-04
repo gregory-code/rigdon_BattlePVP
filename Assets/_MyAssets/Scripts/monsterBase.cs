@@ -19,6 +19,7 @@ public class monsterBase : MonoBehaviour
     [Header("Monster Prefab")]
     [SerializeField] monster myMonster;
     private SpriteRenderer monsterSprite;
+    private SpriteRenderer monsterShadow;
     private Image health;
     private Image tempHealth;
     private TextMeshProUGUI healthText;
@@ -59,11 +60,10 @@ public class monsterBase : MonoBehaviour
         myMonster.attackPoint = this.attackPoint;
 
         int stage = myMonster.GetSpriteIndexFromLevel();
-        monsterSprite.sprite = myMonster.stages[stage];
-        if (myMonster.bFlipSprite[stage] == true)
-            monsterSprite.flipX = !monsterSprite.flipX;
+        SetImage(monsterSprite, myMonster.stages[stage], stage);
+        SetImage(monsterShadow, myMonster.stages[stage], stage);
 
-        if(myMonster.GetOwnership() == false)
+        if (myMonster.GetOwnership() == false)
         {
             Vector3 flipRotation = new Vector3(0, 180, 0);
             transform.localEulerAngles = flipRotation;
@@ -87,14 +87,22 @@ public class monsterBase : MonoBehaviour
         healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
     }
 
+    private void SetImage(SpriteRenderer target, Sprite image, int stage)
+    {
+        target.sprite = image;
+        if (myMonster.bFlipSprite[stage] == true)
+            target.flipX = !target.flipX;
+    }
+
     private void GrabDependecies(monsterDependecy dependecy)
     {
         monsterSprite = dependecy.GetMonsterSprite();
+        monsterShadow = dependecy.GetMonsterShadow();
         health = dependecy.GetHealthBar();
         healthText = dependecy.GetHealthText();
         nameText = dependecy.GetNameText();
         HUD = dependecy.GetHUD();
-        monsterAnimator = dependecy.GetAnimator(myMonster.GetMonsterID(), myMonster.GetSpriteIndexFromLevel());
+        monsterAnimator = (myMonster.IsAI()) ? dependecy.GetEnemyAnimator(myMonster.GetMonsterID(), myMonster.GetSpriteIndexFromLevel()) : dependecy.GetAnimator(myMonster.GetMonsterID(), myMonster.GetSpriteIndexFromLevel());
         attackPoint = dependecy.GetAttackPoint();
         statusProcPrefabs = dependecy.GetStatusPrefabs();
         tempHealth = dependecy.GetTempHealth();
@@ -360,13 +368,14 @@ public class monsterBase : MonoBehaviour
 
         if (isAttack)
         {
-            yield return new WaitForSeconds(0.2f);
-
-            while(gameMaster.holdItDeerCrossing)
-            {
-                yield return new WaitForEndOfFrame();
-            }
             destroyShields = false;
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        while (gameMaster.holdItDeerCrossing)
+        {
+            yield return new WaitForEndOfFrame();
         }
 
         if (consumeTurn == true)

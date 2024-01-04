@@ -21,6 +21,8 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     [SerializeField] GameObject monsterPrefab;
 
+    private bool fightingAI;
+
     [SerializeField] List<GameObject> monsterBasesToDeleteLater = new List<GameObject>();
 
     [Header("Targeting")]
@@ -43,11 +45,11 @@ public class GameMaster : MonoBehaviourPunCallbacks
     public bool bRegularDeath = true;
     public bool holdItDeerCrossing = false;
 
-    public void StartFight()
+    public void StartFight(bool againstAI)
     {
         bRegularDeath = true;
         movingToNewGame = false;
-        spawnTeams();
+        spawnTeams(againstAI);
         sortBySpeed();
         selectNew();
     }
@@ -83,26 +85,35 @@ public class GameMaster : MonoBehaviourPunCallbacks
         greenLine.updateReticleLocation(renderCamera.ScreenToWorldPoint(touchPos));
     }
 
-    public void spawnTeams()
+    public void spawnTeams(bool againstAI)
     {
-        createTeam(gameMenu.GetMyTeam(), playerSpawns, false);
-        createTeam(gameMenu.GetEnemyTeam(), enemySpawns, true);
+        fightingAI = againstAI;
+        createTeam(gameMenu.GetMyTeam(), playerSpawns, false, false);
+        createTeam(gameMenu.GetEnemyTeam(), enemySpawns, true, againstAI);
     }
 
-    private void createTeam(monster[] teamToCreate, Transform[] spawns, bool enemy)
+    private void createTeam(monster[] teamToCreate, Transform[] spawns, bool enemy, bool isAI)
     {
         for(int i = 0; i < teamToCreate.Length; i++)
         {
+            if (teamToCreate[i] == null)
+                continue;
+
             GameObject newMon = Instantiate(monsterPrefab, spawns[i]);
-            if(enemy)
-            {
-                monsterBase enemyScript = AddMonsterScript(teamToCreate[i].GetMonsterID(), newMon);
-                enemyScript.Init(teamToCreate[i], this, redLine, greenLine, renderCamera, damagePop, spawns[i]);
-            }
-            else
+            if(enemy == false)
             {
                 monsterAlly allyScript = AddMonsterScript(teamToCreate[i].GetMonsterID(), newMon);
                 allyScript.Init(teamToCreate[i], this, redLine, greenLine, renderCamera, damagePop, spawns[i]);
+            }
+            else if(isAI)
+            {
+                monsterEnemyAI enemyAI = AddEnemyScript(teamToCreate[i].GetMonsterID(), newMon);
+                enemyAI.Init(teamToCreate[i], this, redLine, greenLine, renderCamera, damagePop, spawns[i]);
+            }
+            else
+            {
+                monsterBase enemyScript = AddMonsterScript(teamToCreate[i].GetMonsterID(), newMon);
+                enemyScript.Init(teamToCreate[i], this, redLine, greenLine, renderCamera, damagePop, spawns[i]);
             }
             monsterBasesToDeleteLater.Add(newMon);
         }
@@ -129,6 +140,17 @@ public class GameMaster : MonoBehaviourPunCallbacks
         }
 
         return newMonster.AddComponent<lusseliaAlly>();
+    }
+
+    private monsterEnemyAI AddEnemyScript(int monsterID, GameObject newMonster)
+    {
+        switch (monsterID)
+        {
+            case 1:
+                return newMonster.AddComponent<minfurEnemy>();
+        }
+
+        return newMonster.AddComponent<minfurEnemy>();
     }
 
     [Header("Turn Order")]
@@ -170,10 +192,11 @@ public class GameMaster : MonoBehaviourPunCallbacks
         activeMonsters.Clear();
         StatComparer comparer = new StatComparer();
 
-        for (int i = 0; i < gameMenu.GetMyTeam().Length; ++i)
+        List<monster> bothTeams = gameMenu.GetBothTeams();
+
+        for (int i = 0; i < bothTeams.Count; ++i)
         {
-            activeMonsters.Add(gameMenu.GetMyTeam()[i]);
-            activeMonsters.Add(gameMenu.GetEnemyTeam()[i]);
+            activeMonsters.Add(bothTeams[i]);
         }
 
         activeMonsters.Sort(comparer);
@@ -199,10 +222,26 @@ public class GameMaster : MonoBehaviourPunCallbacks
         gameMenu.SetFilter(!activeMonsters[0].GetOwnership());
         activeMonsters[0].SetAct(true);
 
-        if(selectParticles != null)
+        if (activeMonsters[0].IsAI())
+            StartCoroutine(CheckAI());
+
+        if (selectParticles != null)
             Destroy(selectParticles);
 
         selectParticles = newSelect.gameObject;
+    }
+
+    private IEnumerator CheckAI()
+    {
+        yield return new WaitForSeconds(2f);
+        monsterEnemyAI[] enemyAIs = GameObject.FindObjectsOfType<monsterEnemyAI>();
+        foreach (monsterEnemyAI ai in enemyAIs)
+        {
+            if (ai.GetMonster() == activeMonsters[0])
+            {
+                ai.AITurn();
+            }
+        }
     }
 
     public void SetFilter(bool regular)
@@ -454,7 +493,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void NextTurn()
     {
-        this.photonView.RPC("NextTurnRPC", RpcTarget.AllBuffered);
+        if(fightingAI)
+        {
+            StartCoroutine(ExecuteNextTurn());
+        }
+        else
+        {
+            this.photonView.RPC("NextTurnRPC", RpcTarget.AllBuffered);
+        }
     }
 
     [PunRPC]
@@ -465,18 +511,58 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void UsedAction(monster mon, monster targetOfAction, bool isAttack)
     {
-        this.photonView.RPC("UsedActionRPC", RpcTarget.AllBuffered, mon.isPlayer1(), mon.GetIndex(), isAttack, targetOfAction.isPlayer1(), targetOfAction.GetIndex());
+        if (fightingAI)
+        {
+            holdItDeerCrossing = false;
+            mon.UsedAction(targetOfAction, isAttack);
+        }
+        else
+        {
+            this.photonView.RPC("UsedActionRPC", RpcTarget.AllBuffered, mon.isPlayer1(), mon.GetIndex(), isAttack, targetOfAction.isPlayer1(), targetOfAction.GetIndex());
+        }
     }
 
     [PunRPC]
     void UsedActionRPC(bool isPlayer1, int teamIndex, bool isAttack, bool isTargetOfAction, int targetTeamIndex)
     {
+        holdItDeerCrossing = false;
         GetMonster(isPlayer1, teamIndex).UsedAction(GetMonster(isTargetOfAction, targetTeamIndex), isAttack);
     }
 
     public void MoveMonster(monster monMoved, monster monLocation, int uniquePos)
     {
-        this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, monMoved.isPlayer1(), monMoved.GetIndex(), monLocation.isPlayer1(), monLocation.GetIndex(), uniquePos);
+        if (fightingAI)
+        {
+            bool doIOwnThis = DoIOwnThis(monMoved);
+            Vector3 pos = monLocation.spawnLocation.position;
+
+            switch (uniquePos)
+            {
+                case 1:
+                    pos = monMoved.spawnLocation.position;
+                    break;
+
+                case 2:
+                    pos = uniqueLocations[uniquePos].position;
+                    break;
+
+                case 3:
+                    pos = (doIOwnThis == true) ? uniqueLocations[uniquePos].position : uniqueLocations[uniquePos + 1].position;
+                    break;
+
+                case 5:
+                    pos = uniqueLocations[uniquePos].position;
+                    break;
+            }
+
+            pos.x += (doIOwnThis) ? -3 : 3;
+
+            monMoved.MovePosition(pos.x, pos.y);
+        }
+        else
+        {
+            this.photonView.RPC("MoveMonsterRPC", RpcTarget.AllBuffered, monMoved.isPlayer1(), monMoved.GetIndex(), monLocation.isPlayer1(), monLocation.GetIndex(), uniquePos);
+        }
     }
 
     [PunRPC]
@@ -511,7 +597,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void AnimateMonster(monster monToAnimate, string animName)
     {
-        this.photonView.RPC("AnimateMonsterRPC", RpcTarget.AllBuffered, monToAnimate.isPlayer1(), monToAnimate.GetIndex(), animName);
+        if (fightingAI)
+        {
+            monToAnimate.PlayAnimation(animName);
+        }
+        else
+        {
+            this.photonView.RPC("AnimateMonsterRPC", RpcTarget.AllBuffered, monToAnimate.isPlayer1(), monToAnimate.GetIndex(), animName);
+        }
     }
 
     [PunRPC]
@@ -522,7 +615,19 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void DamageMonster(monster usingMon, monster recivingMon, int damage, bool crit)
     {
-        this.photonView.RPC("DamageMonsterRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, crit);
+        if (fightingAI)
+        {
+            monster target = recivingMon;
+
+            if (target.isDead())
+                return;
+
+            target.TakeDamage(usingMon, damage, crit);
+        }
+        else
+        {
+            this.photonView.RPC("DamageMonsterRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, crit);
+        }
     }
 
     [PunRPC]
@@ -538,7 +643,19 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void HealMonster(monster usingMon, monster recivingMon, int heal)
     {
-        this.photonView.RPC("HealMonsterRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), heal);
+        if (fightingAI)
+        {
+            monster target = recivingMon;
+
+            if (target.isDead())
+                return;
+
+            target.HealHealth(usingMon, heal);
+        }
+        else
+        {
+            this.photonView.RPC("HealMonsterRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), heal);
+        }
     }
 
     [PunRPC]
@@ -554,7 +671,19 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void DeclaringDamage(monster usingMon, monster recivingMon, int damage, bool destroyShields, bool crit)
     {
-        this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, destroyShields, crit);
+        if (fightingAI)
+        {
+            monster target = recivingMon;
+
+            if (target.isDead())
+                return;
+
+            target.DelcaringDamage(usingMon, damage, destroyShields, crit);
+        }
+        else
+        {
+            this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, destroyShields, crit);
+        }
     }
 
     [PunRPC]
@@ -570,7 +699,19 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void ApplyStatus(monster usingMon, monster recivingMon, int statusIndex, int counter, int power)
     {
-        this.photonView.RPC("ApplyStatusRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), statusIndex, counter, power);
+        if (fightingAI)
+        {
+            monster target = recivingMon;
+
+            if (target.isDead())
+                return;
+
+            target.ApplyStatus(usingMon, statusIndex, statusPrefabs[statusIndex], counter, power);
+        }
+        else
+        {
+            this.photonView.RPC("ApplyStatusRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), statusIndex, counter, power);
+        }
     }
 
     [PunRPC]
@@ -586,7 +727,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void TryRemoveStatus(monster recivingMon, int statusIndex)
     {
-        this.photonView.RPC("TryRemoveStatusRPC", RpcTarget.AllBuffered, recivingMon.isPlayer1(), recivingMon.GetIndex(), statusIndex);
+        if (fightingAI)
+        {
+            recivingMon.TryRemoveStatus(statusIndex, true);
+        }
+        else
+        {
+            this.photonView.RPC("TryRemoveStatusRPC", RpcTarget.AllBuffered, recivingMon.isPlayer1(), recivingMon.GetIndex(), statusIndex);
+        }
     }
 
     [PunRPC]
@@ -597,7 +745,14 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void AttackAgain(monster recivingMon, monster targetMon, int extraDamage)
     {
-        this.photonView.RPC("AttackAgainRPC", RpcTarget.AllBuffered, recivingMon.isPlayer1(), recivingMon.GetIndex(), targetMon.isPlayer1(), targetMon.GetIndex(), extraDamage);
+        if (fightingAI)
+        {
+            recivingMon.AttackAgain(targetMon, extraDamage);
+        }
+        else
+        {
+            this.photonView.RPC("AttackAgainRPC", RpcTarget.AllBuffered, recivingMon.isPlayer1(), recivingMon.GetIndex(), targetMon.isPlayer1(), targetMon.GetIndex(), extraDamage);
+        }
     }
 
     [PunRPC]
@@ -611,7 +766,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void GiveKillExp(monster monWhoKilled)
     {
-        this.photonView.RPC("GiveKillExpRPC", RpcTarget.AllBuffered, monWhoKilled.isPlayer1(), monWhoKilled.GetIndex());
+        if (fightingAI)
+        {
+            onMonsterDied?.Invoke(monWhoKilled);
+            monWhoKilled.GetExpHold(1).GainExp();
+        }
+        else
+        {
+            this.photonView.RPC("GiveKillExpRPC", RpcTarget.AllBuffered, monWhoKilled.isPlayer1(), monWhoKilled.GetIndex());
+        }
     }
 
     [PunRPC]
@@ -623,7 +786,35 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void AdjustTurnOrder(monster gettingAdjusted, bool goFirst, bool goLast)
     {
-        this.photonView.RPC("AdjustTurnOrderRPC", RpcTarget.AllBuffered, gettingAdjusted.isPlayer1(), gettingAdjusted.GetIndex(), goFirst, goLast);
+        if (fightingAI)
+        {
+            monster target = gettingAdjusted;
+
+            for (int i = 0; i < activeMonsters.Count; i++)
+            {
+                if (activeMonsters[i] == target)
+                {
+                    activeMonsters.Remove(activeMonsters[i]);
+                    monsterTurnList[i].Discard();
+                    monsterTurnList.RemoveAt(i);
+                }
+            }
+
+            if (goFirst)
+            {
+                addToFront = true;
+                monsterToAdd = target;
+            }
+            else if (goLast)
+            {
+                activeMonsters.Add(target);
+                addTurn(target, false);
+            }
+        }
+        else
+        {
+            this.photonView.RPC("AdjustTurnOrderRPC", RpcTarget.AllBuffered, gettingAdjusted.isPlayer1(), gettingAdjusted.GetIndex(), goFirst, goLast);
+        }
     }
 
     [PunRPC]
@@ -655,7 +846,33 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void ShootProjectile(monster usingMon, monster recivingMon, int projectileIndex, int uniqueSpawn)
     {
-        this.photonView.RPC("ShootProjectileRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), projectileIndex, uniqueSpawn);
+        if (fightingAI)
+        {
+            Transform target = recivingMon.ownerTransform;
+            Transform spawn = usingMon.attackPoint;
+            bool doIOwnThis = DoIOwnThis(usingMon);
+
+            switch (uniqueSpawn)
+            {
+                case 2:
+                    spawn = uniqueLocations[uniqueSpawn];
+                    break;
+
+                case 3:
+                    spawn = (doIOwnThis) ? uniqueLocations[uniqueSpawn] : uniqueLocations[uniqueSpawn + 1];
+                    break;
+
+                case 5:
+                    spawn = uniqueLocations[uniqueSpawn];
+                    break;
+            }
+
+            usingMon.ShootProjectile(projectilePrefabs[projectileIndex], target, spawn);
+        }
+        else
+        {
+            this.photonView.RPC("ShootProjectileRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), projectileIndex, uniqueSpawn);
+        }
     }
 
     [PunRPC]

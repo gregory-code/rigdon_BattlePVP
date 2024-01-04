@@ -205,6 +205,8 @@ public class draticAlly : monsterAlly
 
         gameMaster.AttackAgain(GetTargetedMonster(), randomTarget, extraDamage);
 
+        gameMaster.targetedMonster = randomTarget.ownerTransform.GetComponent<monsterBase>();
+
         gameMaster.waitingForAction = true;
         while(gameMaster.waitingForAction == true)
         {

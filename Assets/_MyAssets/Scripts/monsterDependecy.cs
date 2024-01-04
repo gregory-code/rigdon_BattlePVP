@@ -9,6 +9,7 @@ public class monsterDependecy : MonoBehaviour
 {
     [SerializeField] Animator monsterAnimator;
     [SerializeField] SpriteRenderer monsterSprite;
+    [SerializeField] SpriteRenderer monsterShadow;
     [SerializeField] Image health;
     [SerializeField] Image tempHealth;
     [SerializeField] Transform effectSpawn;
@@ -21,6 +22,10 @@ public class monsterDependecy : MonoBehaviour
     [SerializeField] RuntimeAnimatorController[] babyMonsterControllers;
     [SerializeField] RuntimeAnimatorController[] midMonsterControllers;
     [SerializeField] RuntimeAnimatorController[] finalMonsterControllers;
+
+    [SerializeField] RuntimeAnimatorController[] babyEnemyControllers;
+    [SerializeField] RuntimeAnimatorController[] midEnemyControllers;
+    [SerializeField] RuntimeAnimatorController[] finalEnemyControllers;
 
     [SerializeField] GameObject[] statusProcPrefabs;
 
@@ -38,6 +43,26 @@ public class monsterDependecy : MonoBehaviour
 
             case 2:
                 monsterAnimator.runtimeAnimatorController = finalMonsterControllers[monsterID];
+                break;
+        }
+
+        return monsterAnimator;
+    }
+
+    public Animator GetEnemyAnimator(int monsterID, int whichStage)
+    {
+        switch (whichStage)
+        {
+            case 0:
+                monsterAnimator.runtimeAnimatorController = babyEnemyControllers[monsterID];
+                break;
+
+            case 1:
+                monsterAnimator.runtimeAnimatorController = midEnemyControllers[monsterID];
+                break;
+
+            case 2:
+                monsterAnimator.runtimeAnimatorController = finalEnemyControllers[monsterID];
                 break;
         }
 
@@ -97,5 +122,10 @@ public class monsterDependecy : MonoBehaviour
     public Transform GetEffectSpawn()
     {
         return effectSpawn;
+    }
+
+    public SpriteRenderer GetMonsterShadow()
+    {
+        return monsterShadow;
     }
 }

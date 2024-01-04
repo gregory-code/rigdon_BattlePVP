@@ -73,17 +73,26 @@ public class infoPageScript : canvasGroupRenderer
 
         moveContent[] contents = mon.GetMoveContents();
 
-        moveContent newAttack = Instantiate(contents[mon.GetAttackID() - 1], attackParent);
-        newAttack.transform.localPosition = Vector3.zero;
-        moveContentList.Add(newAttack);
+        if(mon.GetAttackID() != 0)
+        {
+            moveContent newAttack = Instantiate(contents[mon.GetAttackID() - 1], attackParent);
+            newAttack.transform.localPosition = Vector3.zero;
+            moveContentList.Add(newAttack);
+        }
 
-        moveContent newAbility = Instantiate(contents[mon.GetAbilityID() + 1], abilityParent);
-        newAbility.transform.localPosition = Vector3.zero;
-        moveContentList.Add(newAbility);
+        if (mon.GetAbilityID() != 0)
+        {
+            moveContent newAbility = Instantiate(contents[mon.GetAbilityID() + 1], abilityParent);
+            newAbility.transform.localPosition = Vector3.zero;
+            moveContentList.Add(newAbility);
+        }
 
-        moveContent newPassive = Instantiate(contents[mon.GetPassiveID() + 3], passiveParent);
-        newPassive.transform.localPosition = Vector3.zero;
-        moveContentList.Add(newPassive);
+        if (mon.GetPassiveID() != 0)
+        {
+            moveContent newPassive = Instantiate(contents[mon.GetPassiveID() + 3], passiveParent);
+            newPassive.transform.localPosition = Vector3.zero;
+            moveContentList.Add(newPassive);
+        }
 
         foreach (moveContent content in moveContentList)
         {

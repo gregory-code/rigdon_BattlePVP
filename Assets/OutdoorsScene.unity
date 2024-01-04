@@ -41271,7 +41271,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1487681938}
   m_HandleRect: {fileID: 1487681937}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -50023,6 +50023,19 @@ MonoBehaviour:
   - {fileID: 1233487182}
   - {fileID: 18040593}
   - {fileID: 2089577507}
+  chooseMonButtons:
+  - {fileID: 387665430}
+  - {fileID: 472875323}
+  - {fileID: 136965029}
+  monsterOptions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  enemyMonsters:
+  - {fileID: 11400000, guid: 6213790462a45884d971f5ed12f5524d, type: 2}
+  - {fileID: 11400000, guid: 03f900e67d42cf34faa9887ffb9ae617, type: 2}
+  enemyPrefs:
+  - {fileID: 11400000, guid: 95eb073ca4298c648af4445605e006a1, type: 2}
   allMenus: {fileID: 1144257508}
   menuChecks: {fileID: 556618547}
   expHolders:

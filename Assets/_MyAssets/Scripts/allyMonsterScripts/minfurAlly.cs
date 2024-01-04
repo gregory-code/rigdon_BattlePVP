@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
-using static monster;
-using static UnityEngine.GraphicsBuffer;
 
 public class minfurAlly : monsterAlly
 {

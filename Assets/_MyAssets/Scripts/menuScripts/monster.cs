@@ -16,6 +16,7 @@ public class monster : ScriptableObject
     [SerializeField] private string monsterName;
     private string monsterNickname;
     private bool canAct = false;
+    private bool isAI;
     private bool bPlayer1;
     private int teamIndex;
     private bool ownership;
@@ -90,6 +91,8 @@ public class monster : ScriptableObject
     public string GetMonsterNickname() { return monsterNickname; }
     public bool isPlayer1() { return bPlayer1; }
     public void SetAsPlayer1() { bPlayer1 = true; }
+    public bool IsAI() { return isAI; }
+    public void SetAsAI() { isAI = true; }
     public int GetIndex() { return teamIndex; }
     public void SetTeamIndex(int which) { teamIndex = which; }
     public bool isDead() { return dead; }

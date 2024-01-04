@@ -28,18 +28,17 @@ public class incanteerAlly : monsterAlly
 
     private void AllyAttacked(monster targetOfAction, bool isAttack)
     {
-        if (GetMonster().GetOwnership() == false)
-            return;
+        if(isAttack)
+        {
+            gameMaster.holdItDeerCrossing = true;
 
-        float attackMulti = GetMoveDamage(5, 0);
-        int attackID = GetMonster().GetAttackID();
-        int attackDamage = GetMonster().GetCurrentStrength() + GetMoveDamage((attackID - 1), 0);
-        float damageMultiplied = (attackDamage * 1f) * (attackMulti / 100);
-        int extraDamage = Mathf.RoundToInt(damageMultiplied);
+            if (GetMonster().GetOwnership())
+                return;
 
-        gameMaster.holdItDeerCrossing = true;
+            int bonusDamage = GetMonster().GetCurrentMagic() + GetMoveDamage(5, 0);
 
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetOfAction, false, extraDamage);
+            UseAttack(GetMonster().GetAttackID(), GetMonster(), targetOfAction, false, bonusDamage);
+        }
     }
 
     private void RemoveConnections()

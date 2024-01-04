@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
+using static Unity.Burst.Intrinsics.Arm;
 
 public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 {
@@ -33,8 +34,16 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] Transform[] attackTransforms;
     [SerializeField] Transform[] abilityTransforms;
 
+    [SerializeField] Button[] chooseMonButtons;
+
+    private bool choosing;
+
     private List<moveContent> moveContentList = new List<moveContent>();
-    private monster[] monsterOptions = new monster[3];
+    [SerializeField] monster[] monsterOptions = new monster[3];
+
+    [Header("Enemy Mons")]
+    [SerializeField] monster[] enemyMonsters;
+    [SerializeField] monsterPreferences[] enemyPrefs;
 
     [Header("HouseKeeping")]
 
@@ -105,6 +114,24 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     public monster[] GetMyTeam()
     {
         return (bIsPlayer1) ? player1Team : player2Team ;
+    }
+
+    public List<monster> GetBothTeams()
+    {
+        List<monster> teams = new List<monster>();
+        for(int i = 0; i < player1Team.Length; i++)
+        {
+            if (player1Team[i] == null)
+                continue;
+            teams.Add(player1Team[i]);
+        }
+        for (int i = 0; i < player2Team.Length; i++)
+        {
+            if (player2Team[i] == null)
+                continue;
+            teams.Add(player2Team[i]);
+        }
+        return teams;
     }
 
     public void PlayerWon(bool player1Won)
@@ -200,7 +227,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                     else if (usedIDs[1] == -1)
                         usedIDs[1] = ID;
 
-                    monsterOptions[i] = CreateMonster(draftMonsters[randomIndex], whichAllyIndex, true, false);
+                    monsterOptions[i] = CreateMonster(draftMonsters[randomIndex], whichAllyIndex, true, false, false);
                     this.photonView.RPC("RemoveMonsterFromPoolRPC", RpcTarget.OthersBuffered, randomIndex);
                     draftMonsters.RemoveAt(randomIndex);
                     foundOne = true;
@@ -217,6 +244,9 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         intermission.SetActive(false);
         decisionMonster.SetActive(true);
+
+        allMenus.SetActive(false);
+        menuChecks.SetActive(false);
 
         foreach (moveContent content in moveContentList)
         {
@@ -242,7 +272,26 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             {
                 content.SetTier(monsterOptions[i].GetSpriteIndexFromLevel(), monsterOptions[i].GetCurrentStatBlock());
             }
+
+            chooseMonButtons[i].onClick.RemoveAllListeners();
+            int index = i;
+            chooseMonButtons[i].onClick.AddListener(() => SelectAlly(monsterOptions[index]));
         }
+    }
+
+    private void SelectAlly(monster chosenAlly)
+    {
+        if (bIsPlayer1)
+        {
+            player1Team[chosenAlly.GetIndex()] = chosenAlly;
+        }
+        else
+        {
+            player2Team[chosenAlly.GetIndex()] = chosenAlly;
+        }
+
+        choosing = false;
+        SetCanvasGroup(false);
     }
 
     public IEnumerator SetUpGame(int format)
@@ -263,6 +312,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 SetIntermission(true);
                 myTeamPrefs = battleMenuScript.GetMonsterPrefsFromSelectedTeam();
                 myTeamName = battleMenuScript.GetSelectedTeamName();
+                StartCoroutine(StartRegularPVP());
                 break;
 
             case 1:
@@ -270,40 +320,54 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 int random = Random.Range(0, randoTeams.Length);
                 myTeamPrefs = randoTeams[random].GetTeam();
                 myTeamName = randoNames[random];
+                StartCoroutine(StartRegularPVP());
                 break;
 
             case 2:
                 waitingForEnemy = true;
-                yield return ChooseNewIDs(0);
+                choosing = true;
+                yield return ChooseNewIDs(1);
                 NewAllyChoice();
+
+                while(choosing)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+
+                CreateEnemyAITeam();
+
+                gameMaster.StartFight(true);
+
+                SetCanvasGroup(false);
+
                 break;
         }
+    }
 
-        if(format != 2)
-        {
-            yield return StartCoroutine(GetUsernames());
+    private IEnumerator StartRegularPVP()
+    {
+        yield return StartCoroutine(GetUsernames());
 
-            yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.5f);
 
-            yield return StartCoroutine(SendMyTeamPrefs(myTeamName));
+        yield return StartCoroutine(SendMyTeamPrefs(myTeamName));
 
-            yield return StartCoroutine(CreateTeams());
+        yield return StartCoroutine(CreateTeams());
 
-            yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.5f);
 
-            SetGameMenu();
+        SetGameMenu();
 
-            yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1f);
 
-            allMenus.SetActive(false);
-            menuChecks.SetActive(false);
+        allMenus.SetActive(false);
+        menuChecks.SetActive(false);
 
-            yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.5f);
 
-            gameMaster.StartFight();
+        gameMaster.StartFight(false);
 
-            SetCanvasGroup(false);
-        }
+        SetCanvasGroup(false);
     }
 
     private IEnumerator CreateTeams()
@@ -312,17 +376,20 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         for (int i = 0; i < 3; i++)
         {
-            CreateMonster(myTeamPrefs[i], i, true, true);
-            CreateMonster(enemyTeamPrefs[i], i, false, true);
+            CreateMonster(myTeamPrefs[i], i, true, true, false);
+            CreateMonster(enemyTeamPrefs[i], i, false, true, false);
         }
     }
 
-    private monster CreateMonster(monsterPreferences pref, int teamIndex, bool isMine, bool AddToTeam)
+    private monster CreateMonster(monsterPreferences pref, int teamIndex, bool isMine, bool AddToTeam, bool isAI)
     {
-        monster newMon = Instantiate(monsters[pref.monsterValues[0]]);
-        newMon.SetFromPref(pref);
+        monster newMon = (isAI) ? Instantiate(enemyMonsters[pref.monsterValues[0]]) : Instantiate(monsters[pref.monsterValues[0]]);
         newMon.SetInitialStats();
+        newMon.SetFromPref(pref);
         newMon.SetTeamIndex(teamIndex);
+
+        if (isAI)
+            newMon.SetAsAI();
 
         newMon.SetOwnership(isMine);
 
@@ -336,11 +403,13 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         if (bIsPlayer1)
         {
-            if(AddToTeam)
+            if(isMine)
+                newMon.SetAsPlayer1();
+
+            if (AddToTeam)
             {
                 if(isMine)
                 {
-                    newMon.SetAsPlayer1();
                     player1Team[teamIndex] = newMon;
                 }
                 else
@@ -351,7 +420,10 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
         else
         {
-            if(AddToTeam)
+            if (!isMine)
+                newMon.SetAsPlayer1();
+
+            if (AddToTeam)
             {
                 if(isMine)
                 {
@@ -366,6 +438,11 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
 
         return newMon;
+    }
+
+    private void CreateEnemyAITeam()
+    {
+        CreateMonster(enemyPrefs[0], 1, false, true, true);
     }
 
     private void SetGamesWonText()
@@ -497,7 +574,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return new WaitForSeconds(8f);
 
-        gameMaster.StartFight();
+        gameMaster.StartFight(false);
 
         SetCanvasGroup(false);
     }
@@ -617,7 +694,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [PunRPC]
     void RemoveMonsterFromPoolRPC(int which)
     {
-        Debug.Log("Removed at " + which + "   remaining Count: " + draftMonsters.Count);
         draftMonsters.RemoveAt(which);
     }
 

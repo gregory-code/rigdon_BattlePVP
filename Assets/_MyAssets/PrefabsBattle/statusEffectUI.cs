@@ -184,7 +184,7 @@ public class statusEffectUI : MonoBehaviour
             case status.LeadTheCharge:
                 if(isAttack)
                 {
-                    if(myMonster.GetOwnership())
+                    if(myMonster.GetOwnership() && targetOfAction.isDead() == false)
                     {
                         gameMaster.ApplyStatus(myMonster, targetOfAction, 2, secondaryPower, power);
                         gameMaster.ApplyStatus(myMonster, targetOfAction, 4, secondaryPower, 0);

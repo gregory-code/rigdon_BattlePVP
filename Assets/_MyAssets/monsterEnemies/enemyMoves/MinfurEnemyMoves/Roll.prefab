@@ -109,8 +109,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.3929977, y: -9.513}
-  m_SizeDelta: {x: -2.788, y: -19.027}
+  m_AnchoredPosition: {x: -20.4, y: 15.1}
+  m_SizeDelta: {x: -177.3095, y: -66.8634}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6014881688285071914
 CanvasRenderer:
@@ -175,8 +175,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Ramram
+  m_text: Roll
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -410,10 +410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'When an ally attacks an enemy,
-
-    Incanteer follows up afterwards with
-    its attack for          damage'
+  m_text: '           Deal      damage'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -494,7 +491,7 @@ GameObject:
   - component: {fileID: 2533241208719198176}
   - component: {fileID: 8812975950963853024}
   m_Layer: 5
-  m_Name: Ramram
+  m_Name: Roll
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -546,16 +543,16 @@ MonoBehaviour:
   - {fileID: 465393707680873253}
   - {fileID: 8962566636708827019}
   exists: 010000
-  statIndex: 020000000000000000000000
+  statIndex: 010000000000000000000000
   usesStatModifier: 010000
   isPerecentage: 000000
   isPlus: 000000
   percentageStatMultiplier: 0
-  scaleNums1: fcfffffffdfffffffeffffff
+  scaleNums1: 020000000400000004000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
-  statGrowthIndex: 3
+  statGrowthIndex: 0
 --- !u!1 &4617123071582503824
 GameObject:
   m_ObjectHideFlags: 0
@@ -621,7 +618,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: Single
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -860,8 +857,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 23.4, y: -28.9}
-  m_SizeDelta: {x: -124.8126, y: -72.8412}
+  m_AnchoredPosition: {x: -21.5, y: 14.9}
+  m_SizeDelta: {x: -109.2552, y: -61.7847}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410
 CanvasRenderer:
@@ -891,7 +888,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: =3
+  m_text: 2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -901,8 +898,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294942208
-  m_fontColor: {r: 0, g: 0.61960787, b: 1, a: 1}
+    rgba: 4278230271
+  m_fontColor: {r: 1, g: 0.6117647, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

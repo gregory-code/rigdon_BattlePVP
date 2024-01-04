@@ -106,7 +106,7 @@ public class lusseliaAlly : monsterAlly
 
         bool didCrit = false;
 
-        monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
+        monster[] enemyTeam = gameMaster.GetMonstersTeam(target);
         for (int i = 0; i < enemyTeam.Length; i++)
         {
             if (enemyTeam[i] == null)
