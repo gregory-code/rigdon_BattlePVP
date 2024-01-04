@@ -32,7 +32,6 @@ public class monsterBase : MonoBehaviour
     private Vector3 lerpLocation;
 
     public bool destroyShields = false;
-    public bool holdAttack = false;
 
     public delegate void OnOpenInfo();
     public event OnOpenInfo onOpenInfo;
@@ -81,7 +80,6 @@ public class monsterBase : MonoBehaviour
         myMonster.onMovePosition += movePosition;
         myMonster.onRemoveTaunt += RemoveTaunt;
         myMonster.onAttackBreaksShields += DestroyShields;
-        myMonster.onHoldAttack += HoldAttack;
         myMonster.onRemoveConnections += RemoveConnections;
 
         nameText.text = myMonster.GetMonsterNickname();
@@ -118,7 +116,6 @@ public class monsterBase : MonoBehaviour
         myMonster.onMovePosition -= movePosition;
         myMonster.onRemoveTaunt -= RemoveTaunt;
         myMonster.onAttackBreaksShields -= DestroyShields;
-        myMonster.onHoldAttack -= HoldAttack;
         myMonster.onRemoveConnections -= RemoveConnections;
     }
 
@@ -127,11 +124,6 @@ public class monsterBase : MonoBehaviour
         health.fillAmount = Mathf.Lerp(health.fillAmount, myMonster.getHealthPercentage(), 4 * Time.deltaTime);
         tempHealth.fillAmount = Mathf.Lerp(tempHealth.fillAmount, myMonster.GetBubblePercentage(), 4 * Time.deltaTime);
         transform.position = Vector3.Lerp(transform.position, lerpLocation, 5 * Time.deltaTime);
-    }
-
-    private void HoldAttack()
-    {
-        holdAttack = true;
     }
 
     public monster GetMonster()
@@ -362,16 +354,20 @@ public class monsterBase : MonoBehaviour
 
     private IEnumerator FinishAllyMove(bool consumeTurn, bool isAttack)
     {
+        gameMaster.waitingForAction = false;
+
+        gameMaster.UsedAction(myMonster, GetTargetedMonster(), isAttack);
+
         if (isAttack)
         {
             yield return new WaitForSeconds(0.2f);
 
+            while(gameMaster.holdItDeerCrossing)
+            {
+                yield return new WaitForEndOfFrame();
+            }
             destroyShields = false;
         }
-
-        gameMaster.waitingForAction = false;
-
-        gameMaster.UsedAction(myMonster, isAttack);
 
         if (consumeTurn == true)
         {

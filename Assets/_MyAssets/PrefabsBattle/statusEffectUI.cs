@@ -133,11 +133,12 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case status.LeadTheCharge:
+                this.power = power;
                 break;
         }
     }
 
-    private void UsedAction(bool isAttack)
+    private void UsedAction(monster targetOfAction, bool isAttack)
     {
         bool shouldProcStatus = true;
 
@@ -183,7 +184,12 @@ public class statusEffectUI : MonoBehaviour
             case status.LeadTheCharge:
                 if(isAttack)
                 {
-
+                    if(myMonster.GetOwnership())
+                    {
+                        gameMaster.ApplyStatus(myMonster, targetOfAction, 2, secondaryPower, power);
+                        gameMaster.ApplyStatus(myMonster, targetOfAction, 4, secondaryPower, 0);
+                    }
+                    myMonster.TryRemoveStatus(8, true);
                 }
                 break;
         }

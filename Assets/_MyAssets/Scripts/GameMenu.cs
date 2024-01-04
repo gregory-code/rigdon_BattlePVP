@@ -14,8 +14,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     [Header("Game Menu")]
     [SerializeField] CanvasGroup myGroup;
-    [SerializeField] Image rightCurtain;
-    [SerializeField] Image leftCurtain;
     [SerializeField] TextMeshProUGUI myTitle;
     [SerializeField] TextMeshProUGUI myTeamTitle;
     [SerializeField] TextMeshProUGUI myGamesWonText;
@@ -28,7 +26,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     [SerializeField] GameObject allMenus;
     [SerializeField] GameObject menuChecks;
-    bool showCurtain;
 
     [SerializeField] private expHolder[] expHolders;
 
@@ -77,6 +74,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] monster[] monsters;
     [SerializeField] private monster[] player1Team = new monster[3];
     [SerializeField] private monster[] player2Team = new monster[3];
+
+    private void Update()
+    {
+        int lerp = (myGroup.interactable) ? 1 : 0;
+        myGroup.alpha = Mathf.Lerp(myGroup.alpha, lerp, 4f * Time.deltaTime);
+    }
 
     public monster[] GetEnemyTeam()
     {
@@ -137,13 +140,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         }
     }
 
-    void Update()
-    {
-        int curtainLerp = (showCurtain) ? 1 : 0 ;
-        rightCurtain.fillAmount = Mathf.Lerp(rightCurtain.fillAmount, curtainLerp, 6 * Time.deltaTime);
-        leftCurtain.fillAmount = Mathf.Lerp(leftCurtain.fillAmount, curtainLerp, 6 * Time.deltaTime);
-    }
-
     private void SetCanvasGroup(bool state)
     {
         myGroup.interactable = state;
@@ -160,7 +156,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     public IEnumerator SetUpGame(int format)
     {
         SetCanvasGroup(true);
-        showCurtain = true;
 
         myGameWon = 0;
         enemyGamesWon = 0;
@@ -173,7 +168,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         switch(format)
         {
             case 0:
-            case 2:
                 myTeamPrefs = battleMenuScript.GetMonsterPrefsFromSelectedTeam();
                 myTeamName = battleMenuScript.GetSelectedTeamName();
                 break;
@@ -182,6 +176,10 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 int random = Random.Range(0, randoTeams.Length);
                 myTeamPrefs = randoTeams[random].GetTeam();
                 myTeamName = randoNames[random];
+                break;
+
+            case 2:
+
                 break;
         }
 
@@ -200,7 +198,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         yield return new WaitForSeconds(1f);
 
         allMenus.SetActive(false);
-        showCurtain = false;
         menuChecks.SetActive(false);
 
         yield return new WaitForSeconds(0.5f);
@@ -303,9 +300,11 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     {
         AddExpText(list, mon.GetExpHold(expIndex).GetExpText());
         float exp = mon.GetExpHold(expIndex).ExplenishExp();
+
+        yield return new WaitForEndOfFrame();
+
         while (exp > 0)
         {
-            yield return new WaitForEndOfFrame();
             bool levelUp = mon.TryLevelUp();
             levelBar.fillAmount = mon.GetLevelPercentage();
             exp--;
@@ -355,7 +354,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     private IEnumerator Intermission()
     {
         SetCanvasGroup(true);
-        showCurtain = true;
         waitingForEnemy = true;
 
         SetGamesWonText();
@@ -380,7 +378,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         gameMaster.StartFight();
 
         SetCanvasGroup(false);
-        showCurtain = false;
     }
 
     private void CleanUp()

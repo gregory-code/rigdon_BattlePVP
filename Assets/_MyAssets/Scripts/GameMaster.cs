@@ -41,6 +41,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     public GameObject regularDeath;
     public GameObject grimmetalDeath;
     public bool bRegularDeath = true;
+    public bool holdItDeerCrossing = false;
 
     public void StartFight()
     {
@@ -84,17 +85,26 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void spawnTeams()
     {
-        for (int i = 0; i < 3; ++i)
-        {
-            GameObject newAlly = Instantiate(monsterPrefab, playerSpawns[i]);
-            monsterAlly allyScript = AddMonsterScript(gameMenu.GetMyTeam()[i].GetMonsterID(), newAlly);
-            allyScript.Init(gameMenu.GetMyTeam()[i], this, redLine, greenLine, renderCamera, damagePop, playerSpawns[i]);
-            monsterBasesToDeleteLater.Add(newAlly);
+        createTeam(gameMenu.GetMyTeam(), playerSpawns, false);
+        createTeam(gameMenu.GetEnemyTeam(), enemySpawns, true);
+    }
 
-            GameObject newEnemy = Instantiate(monsterPrefab, enemySpawns[i]);
-            monsterBase enemyScript = AddMonsterScript(gameMenu.GetEnemyTeam()[i].GetMonsterID(), newEnemy);
-            enemyScript.Init(gameMenu.GetEnemyTeam()[i], this, redLine, greenLine, renderCamera, damagePop, enemySpawns[i]);
-            monsterBasesToDeleteLater.Add(newEnemy);
+    private void createTeam(monster[] teamToCreate, Transform[] spawns, bool enemy)
+    {
+        for(int i = 0; i < teamToCreate.Length; i++)
+        {
+            GameObject newMon = Instantiate(monsterPrefab, spawns[i]);
+            if(enemy)
+            {
+                monsterBase enemyScript = AddMonsterScript(teamToCreate[i].GetMonsterID(), newMon);
+                enemyScript.Init(teamToCreate[i], this, redLine, greenLine, renderCamera, damagePop, spawns[i]);
+            }
+            else
+            {
+                monsterAlly allyScript = AddMonsterScript(teamToCreate[i].GetMonsterID(), newMon);
+                allyScript.Init(teamToCreate[i], this, redLine, greenLine, renderCamera, damagePop, spawns[i]);
+            }
+            monsterBasesToDeleteLater.Add(newMon);
         }
     }
 
@@ -449,15 +459,15 @@ public class GameMaster : MonoBehaviourPunCallbacks
         StartCoroutine(ExecuteNextTurn());
     }
 
-    public void UsedAction(monster mon, bool isAttack)
+    public void UsedAction(monster mon, monster targetOfAction, bool isAttack)
     {
-        this.photonView.RPC("UsedActionRPC", RpcTarget.AllBuffered, mon.isPlayer1(), mon.GetIndex(), isAttack);
+        this.photonView.RPC("UsedActionRPC", RpcTarget.AllBuffered, mon.isPlayer1(), mon.GetIndex(), isAttack, targetOfAction.isPlayer1(), targetOfAction.GetIndex());
     }
 
     [PunRPC]
-    void UsedActionRPC(bool isPlayer1, int teamIndex, bool isAttack)
+    void UsedActionRPC(bool isPlayer1, int teamIndex, bool isAttack, bool isTargetOfAction, int targetTeamIndex)
     {
-        GetMonster(isPlayer1, teamIndex).UsedAction(isAttack);
+        GetMonster(isPlayer1, teamIndex).UsedAction(GetMonster(isTargetOfAction, targetTeamIndex), isAttack);
     }
 
     public void MoveMonster(monster monMoved, monster monLocation, int uniquePos)

@@ -111,12 +111,6 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator Cuddle(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack1");
         gameMaster.MoveMonster(user, target, 0);
 
@@ -174,12 +168,6 @@ public class minfurAlly : monsterAlly
 
     private IEnumerator FluffyRoll(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack2");
         gameMaster.ShootProjectile(user, target, 5, 0);
         gameMaster.MoveMonster(user, target, 0);

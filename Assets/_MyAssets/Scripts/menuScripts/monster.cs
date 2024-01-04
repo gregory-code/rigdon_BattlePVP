@@ -232,7 +232,7 @@ public class monster : ScriptableObject
     public delegate void OnAnimPlayed(string animName);
     public event OnAnimPlayed onAnimPlayed;
 
-    public delegate void OnUsedAction(bool isAttack);
+    public delegate void OnUsedAction(monster targetOfAction, bool isAttack);
     public event OnUsedAction onUsedAction;
 
     public delegate void OnMovePosition(float x, float y);
@@ -246,12 +246,6 @@ public class monster : ScriptableObject
 
     public delegate void OnNextTurn();
     public event OnNextTurn onNextTurn;
-
-    public delegate void OnAboutToAttack(monster attackingMon, monster gettingAttacked);
-    public event OnAboutToAttack onAboutToAttack;
-
-    public delegate void OnHoldAttack();
-    public event OnHoldAttack onHoldAttack;
 
     public delegate void OnAttackBreaksShields(bool state);
     public event OnAttackBreaksShields onAttackBreaksShields;
@@ -271,12 +265,12 @@ public class monster : ScriptableObject
         onMovePosition?.Invoke(x, y);
     }
 
-    public void UsedAction(bool isAttack)
+    public void UsedAction(monster targetOfAction, bool isAttack)
     {
         if (gameMaster.movingToNewGame == true || dead)
             return;
 
-        onUsedAction?.Invoke(isAttack);
+        onUsedAction?.Invoke(targetOfAction, isAttack);
     }
 
     public void PlayAnimation(string anim)
@@ -287,16 +281,6 @@ public class monster : ScriptableObject
     public void ApplyShieldBreak(bool state)
     {
         onAttackBreaksShields?.Invoke(state);
-    }
-
-    public void AboutToAttack(monster gettingAttacked)
-    {
-        onAboutToAttack?.Invoke(this, gettingAttacked);
-    }
-
-    public void HoldAttack()
-    {
-        onHoldAttack?.Invoke();
     }
 
     public void AdjustDamageReduction(int change)
@@ -433,9 +417,9 @@ public class monster : ScriptableObject
         }
 
         statusEffectUI weakness = GetStatus(2);
-        if(weakness != null)
+        if(burnDamage == false && weakness != null)
         {
-            damage += weakness.GetPower();
+            damage -= weakness.GetPower();
         }
 
         float Multiplier = damage * (1f * damagePercentage / 100f); // damage reduction

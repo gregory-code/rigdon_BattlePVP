@@ -87,12 +87,6 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator Cleave(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack1");
         gameMaster.MoveMonster(user, target, 0);
 
@@ -122,12 +116,6 @@ public class grimmetalAlly : monsterAlly
 
     private IEnumerator Duel(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack2");
 
         yield return new WaitForSeconds(0.5f);

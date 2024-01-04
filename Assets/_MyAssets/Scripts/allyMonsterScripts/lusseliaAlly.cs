@@ -67,12 +67,6 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator Starfall(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack1");
 
         yield return new WaitForSeconds(0.2f);
@@ -103,12 +97,6 @@ public class lusseliaAlly : monsterAlly
 
     private IEnumerator SolarWave(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack2");
 
         yield return new WaitForSeconds(0.3f);

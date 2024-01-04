@@ -51,7 +51,6 @@ public class monsterAlly : monsterBase
         if (redLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMonster() && GetMonster().CanAct() == true && gameMaster.movingToNewGame == false)
         {
             MadeChoice();
-            GetMonster().AboutToAttack(GetTargetedMonster());
             onAttack?.Invoke(GetMonster().GetAttackID(), GetMonster(), GetTargetedMonster(), true, 0);
         }
         if (greenLine.IsHoveringOverTarget() && gameMaster.activeMonsters[0] == GetMonster() && GetMonster().CanAct() == true && gameMaster.movingToNewGame == false)

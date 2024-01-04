@@ -17,7 +17,7 @@ public class incanteerAlly : monsterAlly
             {
                 if(ally != GetMonster())
                 {
-                    ally.onAboutToAttack += AllyAttacked;
+                    ally.onUsedAction += AllyAttacked;
                 }
             }
         }
@@ -26,12 +26,10 @@ public class incanteerAlly : monsterAlly
         GetMonster().onRemoveConnections += RemoveConnections;
     }
 
-    private void AllyAttacked(monster allyAttacking, monster enemyGettingAttacked)
+    private void AllyAttacked(monster targetOfAction, bool isAttack)
     {
         if (GetMonster().GetOwnership() == false)
             return;
-
-        allyAttacking.HoldAttack();
 
         float attackMulti = GetMoveDamage(5, 0);
         int attackID = GetMonster().GetAttackID();
@@ -39,7 +37,9 @@ public class incanteerAlly : monsterAlly
         float damageMultiplied = (attackDamage * 1f) * (attackMulti / 100);
         int extraDamage = Mathf.RoundToInt(damageMultiplied);
 
-        UseAttack(GetMonster().GetAttackID(), GetMonster(), enemyGettingAttacked, false, extraDamage);
+        gameMaster.holdItDeerCrossing = true;
+
+        UseAttack(GetMonster().GetAttackID(), GetMonster(), targetOfAction, false, extraDamage);
     }
 
     private void RemoveConnections()
@@ -53,7 +53,7 @@ public class incanteerAlly : monsterAlly
             {
                 if (ally != GetMonster())
                 {
-                    ally.onAboutToAttack -= AllyAttacked;
+                    ally.onUsedAction -= AllyAttacked;
                 }
             }
         }
@@ -108,12 +108,6 @@ public class incanteerAlly : monsterAlly
 
     private IEnumerator GoldenHorn(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack1");
         gameMaster.MoveMonster(user, target, 0);
 
@@ -139,17 +133,13 @@ public class incanteerAlly : monsterAlly
         gameMaster.ApplyStatus(user, user, 7, bonusDamage, 0);
         goldenHornDamage += bonusDamage;
 
+        gameMaster.holdItDeerCrossing = false;
+
         FinishMove(consumeTurn, true);
     }
 
     private IEnumerator FireRush(monster user, monster target, bool consumeTurn, int extraDamage)
     {
-        if (holdAttack)
-        {
-            holdAttack = false;
-            yield return new WaitForSeconds(1f);
-        }
-
         gameMaster.AnimateMonster(user, "attack1");
         gameMaster.MoveMonster(user, target, 0);
 
@@ -171,6 +161,8 @@ public class incanteerAlly : monsterAlly
         gameMaster.MoveMonster(user, target, 1);
 
         yield return new WaitForSeconds(1.6f);
+
+        gameMaster.holdItDeerCrossing = false;
 
         FinishMove(consumeTurn, true);
     }
