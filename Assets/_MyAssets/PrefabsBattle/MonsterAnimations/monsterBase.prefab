@@ -4135,12 +4135,13 @@ MonoBehaviour:
   statusProcPrefabs:
   - {fileID: 166006, guid: a2e78dba7d7f8f34e9be44acb8469dc2, type: 3}
   - {fileID: 1573430751113452, guid: 36b98a6665f226d47b28e409f4802f68, type: 3}
-  - {fileID: 0}
+  - {fileID: 1826959671400908, guid: 001ad710497f02c40b4817510097cbf4, type: 3}
   - {fileID: 177804, guid: 7568214281a1fb443bc81a02ed35c3a6, type: 3}
   - {fileID: 153256, guid: b056e3fe90727c54192ced1b360380d0, type: 3}
   - {fileID: 177804, guid: b3c9fb1f409adc043ade593d426cfa24, type: 3}
   - {fileID: 1126696128565986, guid: 58db12ef2cf9c7446aaf443bf85b83a4, type: 3}
   - {fileID: 147642, guid: d63d36b4b1bdab149b6edc844c897ca5, type: 3}
+  - {fileID: 1438902432858508, guid: 61f25c3ca45e7f546a581e24f3964571, type: 3}
 --- !u!1 &5297733555498542932
 GameObject:
   m_ObjectHideFlags: 0

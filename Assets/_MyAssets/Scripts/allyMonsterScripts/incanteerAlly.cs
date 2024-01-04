@@ -124,10 +124,11 @@ public class incanteerAlly : monsterAlly
         gameMaster.ShootProjectile(user, target, 6, 0);
         yield return new WaitForSeconds(0.6f);
         yield return new WaitForSeconds(0.4f);
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.3f);
         target = gameMaster.GetRedirectedMonster(target);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
 
         yield return new WaitForSeconds(0.55f);
@@ -158,10 +159,11 @@ public class incanteerAlly : monsterAlly
         gameMaster.ShootProjectile(user, target, 7, 0);
         yield return new WaitForSeconds(0.6f);
         yield return new WaitForSeconds(0.4f);
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(GetMonster().GetCurrentSpeed() * 2);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.3f);
         target = gameMaster.GetRedirectedMonster(target);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(GetMonster().GetCurrentSpeed() * 2));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         gameMaster.ApplyStatus(user, target, 1, 1, 0);
 
@@ -181,9 +183,9 @@ public class incanteerAlly : monsterAlly
 
         yield return new WaitForSeconds(0.5f);
 
-        int buff = GetMonster().GetCurrentMagic() + GetMoveDamage(2, 0);
+        int weakness = GetMonster().GetCurrentMagic() + GetMoveDamage(2, 0);
 
-        //gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 12, 1, buff);
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 8, 200, weakness);
 
         if (GetMonster().GetPassiveID() == 1 && GetTargetedMonster().GetIndex() != GetMonster().GetIndex())
             gameMaster.AdjustTurnOrder(GetTargetedMonster(), true, false);

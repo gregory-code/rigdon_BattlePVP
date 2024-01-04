@@ -9851,12 +9851,13 @@ MonoBehaviour:
   statusPrefabs:
   - {fileID: 145170, guid: 4f9f5c792c78b6e4bb91286ba103cf5b, type: 3}
   - {fileID: 8224381415989937120, guid: 640614f3416fa084d93e9b21aeb96470, type: 3}
-  - {fileID: 0}
+  - {fileID: 1163674692693586, guid: 23d43785a414b6d4e868c7fd4d8dea11, type: 3}
   - {fileID: 1135644536747142, guid: 9116a8c6e83d27543896c0ec8be7944e, type: 3}
   - {fileID: 111730, guid: 0ceabfcccc4ee1d41ba720801d2f378d, type: 3}
   - {fileID: 189378, guid: 351af065b7d39704bba8fa204705caaa, type: 3}
   - {fileID: 107530, guid: 95bfd79eba5666947b1299767fd54e5b, type: 3}
   - {fileID: 138498, guid: 17cddf5c81d3a984a90108279eac0291, type: 3}
+  - {fileID: 138498, guid: 75a495e525353bc4986ce70b5d30cd3a, type: 3}
   regularDeath: {fileID: 173590, guid: 9199f48996e301e408b14a54449d591a, type: 3}
   grimmetalDeath: {fileID: 1221293952758510, guid: cf2871a4bbfb7f64d8172bf9429514d1,
     type: 3}
@@ -21675,12 +21676,13 @@ MonoBehaviour:
   effectsPrefabs:
   - {fileID: 5447297565404100616, guid: 1784f9d044b54774981a27cd26c8bb7a, type: 3}
   - {fileID: 6070293028441550235, guid: 6fd93dd6b1cf36d4eb14df4fb2b98d90, type: 3}
-  - {fileID: 0}
+  - {fileID: 6070293028441550235, guid: 428f6d2945c3931459232a045d8609e6, type: 3}
   - {fileID: 6070293028441550235, guid: 8cbdf050f0fa62c48bafa20c6abbca8f, type: 3}
   - {fileID: 4328858284941032501, guid: bb74f3deae3792e488fa44084b7307e9, type: 3}
   - {fileID: 6070293028441550235, guid: 7817ce968f6a5434c889acb7fa9644a9, type: 3}
   - {fileID: 6070293028441550235, guid: 929aaf55fab981c4cbe6fd310e272a65, type: 3}
   - {fileID: 6070293028441550235, guid: 7f2ed86e0aad24043b8f5b7abe132b26, type: 3}
+  - {fileID: 4328858284941032501, guid: b4453af47b5504148930a2ff9bbd0d77, type: 3}
   moveContentList: []
 --- !u!114 &957664542
 MonoBehaviour:

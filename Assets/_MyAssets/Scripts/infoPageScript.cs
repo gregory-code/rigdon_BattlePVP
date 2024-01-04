@@ -112,10 +112,19 @@ public class infoPageScript : canvasGroupRenderer
                     effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetBurnDamage() + "";
                     break;
 
+                case 2:
+                    effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "";
+                    break;
+
                 case 6:
                     int tier = status.GetLevelIndex();
                     int reduction = 40 + (tier * 10);
                     effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = $"{reduction}%";
+                    break;
+
+                case 8:
+                    effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "";
+                    effect.transform.Find("secondaryPower").GetComponent<TextMeshProUGUI>().text = status.GetSecondaryPower() + "";
                     break;
             }
 

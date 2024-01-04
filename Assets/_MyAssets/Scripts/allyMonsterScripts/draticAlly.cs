@@ -96,12 +96,13 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.55f);
         gameMaster.ShootProjectile(user, target, 2, 0);
 
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.40f);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
             gameMaster.ApplyStatus(user, target, 0, 1, 0);
@@ -111,7 +112,9 @@ public class draticAlly : monsterAlly
         monster nextTarget = gameMaster.GetRandomEnemy(target.GetIndex(), -1, false);
         if(nextTarget != null)
         {
-            gameMaster.DeclaringDamage(user, nextTarget, -attack2, destroyShields);
+            didCrit = IsCrit(0);
+
+            gameMaster.DeclaringDamage(user, nextTarget, -attack2, destroyShields, didCrit);
             yield return new WaitForSeconds(0.2f);
             nextTarget = gameMaster.GetRedirectedMonster(nextTarget);
 
@@ -119,7 +122,7 @@ public class draticAlly : monsterAlly
 
             yield return new WaitForSeconds(0.1f);
 
-            gameMaster.DamageMonster(user, nextTarget, -attack2, IsCrit(0));
+            gameMaster.DamageMonster(user, nextTarget, -attack2, didCrit);
 
             if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
                 gameMaster.ApplyStatus(user, nextTarget, 0, 1, 0);
@@ -127,7 +130,9 @@ public class draticAlly : monsterAlly
             monster finalTarget = gameMaster.GetRandomEnemy(target.GetIndex(), nextTarget.GetIndex(), false);
             if (finalTarget != null)
             {
-                gameMaster.DeclaringDamage(user, finalTarget, -attack3, destroyShields);
+                didCrit = IsCrit(0);
+
+                gameMaster.DeclaringDamage(user, finalTarget, -attack3, destroyShields, didCrit);
                 yield return new WaitForSeconds(0.2f);
                 finalTarget = gameMaster.GetRedirectedMonster(finalTarget);
 
@@ -135,7 +140,7 @@ public class draticAlly : monsterAlly
 
                 yield return new WaitForSeconds(0.1f);
 
-                gameMaster.DamageMonster(user, finalTarget, -attack3, IsCrit(0));
+                gameMaster.DamageMonster(user, finalTarget, -attack3, didCrit);
 
                 if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)
                     gameMaster.ApplyStatus(user, finalTarget, 0, 1, 0);
@@ -166,11 +171,12 @@ public class draticAlly : monsterAlly
         yield return new WaitForSeconds(0.3f);
         gameMaster.ShootProjectile(user, target, 0, 0);
 
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
         yield return new WaitForSeconds(0.3f);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         yield return new WaitForSeconds(0.1f);
 
@@ -179,12 +185,13 @@ public class draticAlly : monsterAlly
 
         gameMaster.ShootProjectile(user, target, 1, 0);
 
-        gameMaster.DeclaringDamage(user, target, -attack2, destroyShields);
+        didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack2, destroyShields, didCrit);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.25f);
-        gameMaster.DamageMonster(user, target, -attack2, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack2, didCrit);
 
 
         if (GetMonster().GetPassiveID() == 1 && gameMaster.estimatedDamage < 0)

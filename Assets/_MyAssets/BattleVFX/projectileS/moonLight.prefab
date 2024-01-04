@@ -100,4 +100,6 @@ MonoBehaviour:
   hitEffect: {fileID: 8836016678098390642, guid: df56a5ae5e2a92143adc956af8cb98f3,
     type: 3}
   speed: 3
-  target: {fileID: 0}
+  followOwner: 0
+  lifeTime: 0
+  shouldDestroy: 0

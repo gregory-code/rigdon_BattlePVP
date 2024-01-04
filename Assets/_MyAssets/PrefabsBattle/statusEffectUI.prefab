@@ -94,12 +94,13 @@ MonoBehaviour:
   statusSprites:
   - {fileID: 21300000, guid: 5dcf1c65a8dc45547be8757e7184fc7c, type: 3}
   - {fileID: 21300000, guid: 2858fd571e491e241b67245e0763c1be, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 798763a7414f8004e911e4c5516a7b86, type: 3}
   - {fileID: 21300000, guid: 2e4547af8f9606b4abdf201247dc3e87, type: 3}
   - {fileID: 21300000, guid: d679638976bfcd24e911db6d58f68f78, type: 3}
   - {fileID: 21300000, guid: 89efc6666372fd14a9fd66afacf7e854, type: 3}
   - {fileID: 21300000, guid: 2c6ac867404771748baf00348735a786, type: 3}
   - {fileID: 21300000, guid: ba786fa94d6c82c41ae0672bd49a3036, type: 3}
+  - {fileID: 21300000, guid: f8edd0eaad84d7644ba25ab1029cbc17, type: 3}
   activeCounterText: {fileID: 7223047464945705902}
 --- !u!95 &3372933081414182728
 Animator:

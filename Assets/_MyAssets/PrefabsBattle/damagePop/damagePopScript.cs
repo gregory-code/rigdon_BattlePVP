@@ -32,9 +32,4 @@ public class damagePopScript : MonoBehaviour
         damageText.text = (change < 0) ? "" + change : "+" + change ;
         Destroy(this.gameObject, 1.5f);
     }
-
-    private void LateUpdate()
-    {
-        
-    }
 }

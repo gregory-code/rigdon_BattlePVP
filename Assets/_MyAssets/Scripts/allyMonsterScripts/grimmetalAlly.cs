@@ -104,13 +104,14 @@ public class grimmetalAlly : monsterAlly
 
 
         yield return new WaitForSeconds(1f);
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
 
         gameMaster.ShootProjectile(user, target, 10, 0);
         yield return new WaitForSeconds(0.1f);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         yield return new WaitForSeconds(0.4f);
         gameMaster.MoveMonster(user, target, 1);
@@ -166,12 +167,13 @@ public class grimmetalAlly : monsterAlly
 
         yield return new WaitForSeconds(0.3f);
 
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
 
         gameMaster.ShootProjectile(user, target, 10, 0);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         yield return new WaitForSeconds(0.6f);
         if(GetTargetedMonster().isDead())

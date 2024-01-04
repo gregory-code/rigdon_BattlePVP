@@ -187,12 +187,13 @@ public class minfurAlly : monsterAlly
         int attack = user.GetCurrentStrength() + GetMoveDamage(1, 0);
         attack += extraDamage;
 
-        gameMaster.DeclaringDamage(user, target, -attack, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack, destroyShields, didCrit);
         yield return new WaitForSeconds(0.1f);
         target = gameMaster.GetRedirectedMonster(target);
 
         yield return new WaitForSeconds(0.2f);
-        gameMaster.DamageMonster(user, target, -attack, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack, didCrit);
 
         if (GetMonster().GetPassiveID() == 1)
         {

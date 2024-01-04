@@ -226,7 +226,7 @@ public class monster : ScriptableObject
     public delegate void OnHealed(monster recivingMon, monster usingMon, int heal);
     public event OnHealed onHealed;
 
-    public delegate void OnDeclaredDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields);
+    public delegate void OnDeclaredDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields, bool crit);
     public event OnDeclaredDamage onDeclaredDamage;
 
     public delegate void OnAnimPlayed(string animName);
@@ -314,7 +314,7 @@ public class monster : ScriptableObject
         onNextTurn?.Invoke();
     }
 
-    public void DelcaringDamage(monster usingMon, int damage, bool destroyShields)
+    public void DelcaringDamage(monster usingMon, int damage, bool destroyShields, bool crit)
     {
         bool willDie = false;
 
@@ -327,11 +327,7 @@ public class monster : ScriptableObject
             }
         }
 
-        damage = CalculateConductive(damage, false);
-
-        damage = CalculateDamageReductionPercentage(damage);
-
-        damage = DamageCap(damage);
+        HandleDamageChanges(damage, crit, false, false);
 
         int bubbleHealth = 0;
         statusEffectUI bubbleStatus = GetStatus(3);
@@ -349,7 +345,7 @@ public class monster : ScriptableObject
 
         gameMaster.estimatedDamage = damage;
 
-        onDeclaredDamage?.Invoke(this, usingMon, theoreticalHealth, willDie, destroyShields);
+        onDeclaredDamage?.Invoke(this, usingMon, theoreticalHealth, willDie, destroyShields, crit);
     }
 
     private bool BurnDamage;
@@ -359,18 +355,7 @@ public class monster : ScriptableObject
         if (change >= 0 || dead == true || gameMaster.movingToNewGame == true)
             return;
 
-        if(crit)
-        {
-            float critDamage = change * 1.5f;
-            change = Mathf.RoundToInt(critDamage);
-        }
-
-        if(BurnDamage == false)
-            change = CalculateConductive(change, true);
-
-        change = DamageCap(change);
-
-        change = CalculateDamageReductionPercentage(change);
+        change = HandleDamageChanges(change, crit, BurnDamage, true);
 
         change = HandleBubble(change, usingMon, crit);
 
@@ -428,6 +413,40 @@ public class monster : ScriptableObject
         return change;
     }
 
+    private int HandleDamageChanges(int damage, bool crit, bool burnDamage, bool triggerConductive)
+    {
+        if (crit)
+        {
+            float critDamage = damage * 1.5f;
+            damage = Mathf.RoundToInt(critDamage);
+        }
+
+        if (burnDamage == false && GetStatus(0) != null) // Conductive
+        {
+            float conductiveDamage = (damage * 0.5f) + damage;
+            damage = Mathf.RoundToInt(conductiveDamage);
+
+            if (triggerConductive)
+            {
+                TryRemoveStatus(0, true);
+            }
+        }
+
+        statusEffectUI weakness = GetStatus(2);
+        if(weakness != null)
+        {
+            damage += weakness.GetPower();
+        }
+
+        float Multiplier = damage * (1f * damagePercentage / 100f); // damage reduction
+        damage = Mathf.RoundToInt(Multiplier);
+
+        if (damage <= hpDamageCap) // damage cap
+            damage = hpDamageCap;
+
+        return damage;
+    }
+
     public void HealHealth(monster usingMon, int heal)
     {
         if (heal <= 0 || dead == true || gameMaster.movingToNewGame == true)
@@ -440,37 +459,6 @@ public class monster : ScriptableObject
 
         onDamagePopup?.Invoke(heal, false, false);
         onHealed?.Invoke(this, usingMon, heal);
-    }
-
-    private int DamageCap(int incomingDamage)
-    {
-        if (incomingDamage <= hpDamageCap)
-            incomingDamage = hpDamageCap;
-
-        return incomingDamage;
-    }
-
-    private int CalculateConductive(int damage, bool triggerProc)
-    {
-        if (GetStatus(0) != null) // conductive
-        {
-            float conductiveDamage = (damage * 0.5f) + damage;
-            damage = Mathf.RoundToInt(conductiveDamage);
-
-            if(triggerProc)
-            {
-                onProcStatus?.Invoke(true, 0, true);
-                DestroyStatus(0);
-            }
-        }
-
-        return damage;
-    }
-
-    private int CalculateDamageReductionPercentage(int damage)
-    {
-        float Multiplier = damage * (1f * damagePercentage / 100f);
-        return Mathf.RoundToInt(Multiplier);
     }
 
     public int GetHalfStrength()

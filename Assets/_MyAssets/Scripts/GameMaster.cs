@@ -538,20 +538,20 @@ public class GameMaster : MonoBehaviourPunCallbacks
         target.HealHealth(GetMonster(isUsing, usingIndex), heal);
     }
 
-    public void DeclaringDamage(monster usingMon, monster recivingMon, int damage, bool destroyShields)
+    public void DeclaringDamage(monster usingMon, monster recivingMon, int damage, bool destroyShields, bool crit)
     {
-        this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, destroyShields);
+        this.photonView.RPC("DeclaringDamageRPC", RpcTarget.AllBuffered, usingMon.isPlayer1(), usingMon.GetIndex(), recivingMon.isPlayer1(), recivingMon.GetIndex(), damage, destroyShields, crit);
     }
 
     [PunRPC]
-    void DeclaringDamageRPC(bool isUsing, int usingIndex, bool isReciving, int recivingIndex, int damage, bool destroyShields)
+    void DeclaringDamageRPC(bool isUsing, int usingIndex, bool isReciving, int recivingIndex, int damage, bool destroyShields, bool crit)
     {
         monster target = (GetMonster(isReciving, recivingIndex));
 
         if (target.isDead())
             return;
 
-        target.DelcaringDamage(GetMonster(isUsing, usingIndex), damage, destroyShields);
+        target.DelcaringDamage(GetMonster(isUsing, usingIndex), damage, destroyShields, crit);
     }
 
     public void ApplyStatus(monster usingMon, monster recivingMon, int statusIndex, int counter, int power)

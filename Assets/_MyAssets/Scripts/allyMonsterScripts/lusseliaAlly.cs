@@ -82,11 +82,12 @@ public class lusseliaAlly : monsterAlly
 
         gameMaster.ShootProjectile(user, target, 3, 2);
 
-        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
         yield return new WaitForSeconds(0.2f);
         target = gameMaster.GetRedirectedMonster(target);
         yield return new WaitForSeconds(0.25f);
-        gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         int shouldAddBurnDamage = 0;
         if (GetMonster().GetPassiveID() == 2)
@@ -115,6 +116,8 @@ public class lusseliaAlly : monsterAlly
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0);
         attack1 += extraDamage;
 
+        bool didCrit = false;
+
         monster[] enemyTeam = gameMaster.GetMonstersTeam(GetTargetedMonster());
         for (int i = 0; i < 3; i++)
         {
@@ -124,10 +127,11 @@ public class lusseliaAlly : monsterAlly
             target = enemyTeam[i];
             gameMaster.ShootProjectile(user, target, 4, 3);
             yield return new WaitForSeconds(0.4f);
-            gameMaster.DeclaringDamage(user, target, -attack1, destroyShields);
+            didCrit = IsCrit(0);
+            gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
             yield return new WaitForSeconds(0.2f);
             target = gameMaster.GetRedirectedMonster(target);
-            gameMaster.DamageMonster(user, target, -attack1, IsCrit(0));
+            gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
             int shouldAddBurnDamage = 0;
             if (GetMonster().GetPassiveID() == 2)

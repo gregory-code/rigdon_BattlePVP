@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8788897441411023291}
   m_Layer: 0
   m_Name: fireChargeHit
-  m_TagString: Untagged
+  m_TagString: effect
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

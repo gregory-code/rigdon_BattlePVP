@@ -9651,7 +9651,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitEffect: {fileID: 160900, guid: b547be927aa7b7c4ebf13ab8ff83e628, type: 3}
   speed: 6
-  target: {fileID: 0}
+  followOwner: 0
+  lifeTime: 0
+  shouldDestroy: 0
 --- !u!1 &146008
 GameObject:
   m_ObjectHideFlags: 0
