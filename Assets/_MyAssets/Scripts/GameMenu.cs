@@ -6,7 +6,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
-using static Unity.Burst.Intrinsics.Arm;
 
 public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 {
@@ -37,6 +36,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] Button[] chooseMonButtons;
 
     private bool choosing;
+    private int round;
 
     private List<moveContent> moveContentList = new List<moveContent>();
     [SerializeField] monster[] monsterOptions = new monster[3];
@@ -48,6 +48,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] TextMeshProUGUI[] upgradeDescription;
 
     [SerializeField] Button[] chooseUpgardeButtons;
+    [SerializeField] GameObject[] rarietyGlows;
+    private List<GameObject> rarietyGlowList = new List<GameObject>();
+
+    private upgradeScript currentlyChosenUpgrade;
+
+    [SerializeField] List<upgradeScript> commonUpgrades = new List<upgradeScript>();
 
     [Header("Enemy Mons")]
     [SerializeField] monster[] enemyMonsters;
@@ -255,9 +261,6 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         decisionMonster.SetActive(true);
         choosingUpgrade.SetActive(false);
 
-        allMenus.SetActive(false);
-        menuChecks.SetActive(false);
-
         foreach (moveContent content in moveContentList)
         {
             Destroy(content.gameObject);
@@ -304,6 +307,82 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         SetCanvasGroup(false);
     }
 
+    private void NewUpgradeChoice(List<upgradeScript> upgrades, int glowIndex)
+    {
+        intermission.SetActive(false);
+        decisionMonster.SetActive(false);
+        choosingUpgrade.SetActive(true);
+
+        foreach(GameObject glow in rarietyGlowList)
+        {
+            Destroy(glow);
+        }
+        rarietyGlowList.Clear();
+
+        for(int i = 0; i < 3; i++)
+        {
+            int randodIndex = Random.Range(0, upgrades.Count);
+            GameObject glow = Instantiate(rarietyGlows[glowIndex], chooseUpgardeButtons[i].transform);
+            upgradeImage[i].sprite = upgrades[randodIndex].GetImage();
+            upgradeTitle[i].text = upgrades[randodIndex].GetTitle();
+            upgradeDescription[i].text = upgrades[randodIndex].GetDescription();
+            chooseMonButtons[i].onClick.RemoveAllListeners();
+            upgradeScript newUpgrade = upgrades[randodIndex];
+            int whichButton = i;
+            chooseUpgardeButtons[i].onClick.AddListener(() => SelectUpgrade(newUpgrade, whichButton));
+            upgrades.RemoveAt(randodIndex);
+        }
+    }
+
+    private void SelectUpgrade(upgradeScript chosenUpgrade, int whichButton)
+    {
+        currentlyChosenUpgrade = chosenUpgrade;
+    }
+
+    public void FinishedRound()
+    {
+        round++;
+        StartCoroutine(FinishRound());
+    }
+
+    private IEnumerator FinishRound()
+    {
+        waitingForEnemy = true;
+        choosing = true;
+        this.photonView.RPC("FinishedAICombatRPC", RpcTarget.OthersBuffered);
+        while (enemyInAICombat)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        bool fightingAI = true;
+        SetCanvasGroup(true);
+        switch (round)
+        {
+            case 1:
+                NewUpgradeChoice(commonUpgrades, 0);
+                while (choosing)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                break;
+
+            case 2:
+                yield return ChooseNewIDs(0);
+                NewAllyChoice();
+                while (choosing)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                CreateEnemyAITeam();
+                break;
+
+        }
+
+        SetCanvasGroup(false);
+        gameMaster.StartFight(fightingAI);
+    }
+
     public IEnumerator SetUpGame(int format)
     {
         SetCanvasGroup(true);
@@ -334,9 +413,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 break;
 
             case 2:
+                round = 0;
                 waitingForEnemy = true;
                 choosing = true;
                 yield return ChooseNewIDs(1);
+                allMenus.SetActive(false);
+                menuChecks.SetActive(false);
                 NewAllyChoice();
 
                 while(choosing)
@@ -559,6 +641,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
 
     bool waitingForEnemy;
+    public bool enemyInAICombat;
+
     private IEnumerator Intermission()
     {
         SetCanvasGroup(true);
@@ -699,6 +783,12 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     void ReadyToContinueRPC()
     {
         waitingForEnemy = false;
+    }
+
+    [PunRPC]
+    void FinishedAICombatRPC()
+    {
+        enemyInAICombat = false;
     }
 
     [PunRPC]

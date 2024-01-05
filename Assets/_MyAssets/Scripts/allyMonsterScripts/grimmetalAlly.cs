@@ -191,12 +191,13 @@ public class grimmetalAlly : monsterAlly
         gameMaster.AnimateMonster(GetMonster(), "ability2");
         yield return new WaitForSeconds(0.4f);
 
-        int strengthPower = GetMoveDamage(3, 0) + GetMonster().GetCurrentMagic();
-        //gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 11, 200, 0); // apply strength
 
         int turnDuration = GetMoveDamage(3, 1);
         if (GetMonster() == GetTargetedMonster())
             turnDuration++;
+
+        int strengthPower = GetMoveDamage(3, 0) + GetMonster().GetCurrentMagic();
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 9, turnDuration, strengthPower); // apply strength
 
         gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 5, turnDuration, 0);
 

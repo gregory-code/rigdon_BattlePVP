@@ -47,6 +47,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void StartFight(bool againstAI)
     {
+        gameMenu.enemyInAICombat = (againstAI);
         bRegularDeath = true;
         movingToNewGame = false;
         spawnTeams(againstAI);
@@ -356,6 +357,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
             if(fightingAI)
             {
+                gameMenu.FinishedRound();
             }
             else
             {

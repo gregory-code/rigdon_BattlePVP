@@ -9718,7 +9718,7 @@ GameObject:
   - component: {fileID: 8163839258548569623}
   - component: {fileID: 1114515934483340194}
   m_Layer: 0
-  m_Name: leadTheChargeProc
+  m_Name: strengthBuffProc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -18,7 +18,7 @@ public class statusEffectUI : MonoBehaviour
 
     private GameMaster gameMaster;
 
-    private enum status { Conductive, Burn, Weakness, Bubble, Taunt, SpellShield, BrambleCrown, GoldenHorn, LeadTheCharge  }
+    private enum status { Conductive, Burn, Weakness, Bubble, Taunt, SpellShield, BrambleCrown, GoldenHorn, LeadTheCharge, StrengthBuff  }
     private status myStatus;
 
     private int statusIndex;
@@ -135,6 +135,11 @@ public class statusEffectUI : MonoBehaviour
             case status.LeadTheCharge:
                 this.power = power;
                 break;
+
+            case status.StrengthBuff:
+                ReapplyPower(power);
+                UpdateStatusCounter(counter + newCounter);
+                break;
         }
     }
 
@@ -192,6 +197,10 @@ public class statusEffectUI : MonoBehaviour
                     myMonster.TryRemoveStatus(8, true);
                 }
                 break;
+
+            case status.StrengthBuff:
+                counter--;
+                break;
         }
 
         UpdateStatusCounter(counter);
@@ -232,6 +241,10 @@ public class statusEffectUI : MonoBehaviour
             case status.LeadTheCharge:
                 secondaryPower = myMonster.GetSpriteIndexFromLevel() + 2;
                 break;
+
+            case status.StrengthBuff:
+                StatChange(0, power);
+                break;
         }
     }
 
@@ -268,6 +281,9 @@ public class statusEffectUI : MonoBehaviour
             case status.GoldenHorn:
                 break;
             case status.LeadTheCharge:
+                break;
+            case status.StrengthBuff:
+                StatChange(0, -power);
                 break;
         }
     }

@@ -458,6 +458,14 @@ public class monster : ScriptableObject
         return strength;
     }
 
+    public delegate void OnApplyUpgrade(monster thatGotUpgrade, upgradeScript newUpgrade);
+    public event OnApplyUpgrade onApplyUpgrade;
+
+    public void ApplyUpgrade(upgradeScript newUpgrade)
+    {
+        onApplyUpgrade?.Invoke(this, newUpgrade);
+    }
+
     public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab);
     public event OnApplyStatus onApplyStatus;
 

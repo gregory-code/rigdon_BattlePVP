@@ -14,4 +14,24 @@ public class upgradeScript : ScriptableObject
     [SerializeField] Sprite upgradeIcon;
     [SerializeField] string upgradeTitle;
     [SerializeField] string upgradeDescription;
+
+    public Sprite GetImage()
+    {
+        return upgradeIcon;
+    }
+
+    public string GetTitle()
+    {
+        return upgradeTitle;
+    }
+
+    public string GetDescription()
+    {
+        return upgradeDescription;
+    }
+
+    public int GetID()
+    {
+        return upgradeID;
+    }
 }
