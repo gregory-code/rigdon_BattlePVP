@@ -20494,6 +20494,8 @@ MonoBehaviour:
   - {fileID: -6994415367948908567, guid: 688b8fdfea7aaae43b2ff051a46bdf0b, type: 3}
   - {fileID: 3059736901087236833, guid: 94425b8acae45db4fb3b779dd8545705, type: 3}
   - {fileID: -4437548302086879207, guid: 3e651d9f447e03d47915f1798c664638, type: 3}
+  - {fileID: 8091283170359546191, guid: cd90b3391dbed664a9b92b2d3dcdb920, type: 3}
+  - {fileID: 1441670118508295303, guid: a96a2115540cd844fa7e1c0b31746f9a, type: 3}
   statusPrefabs:
   - {fileID: 145170, guid: 4f9f5c792c78b6e4bb91286ba103cf5b, type: 3}
   - {fileID: 8224381415989937120, guid: 640614f3416fa084d93e9b21aeb96470, type: 3}
@@ -33229,6 +33231,7 @@ MonoBehaviour:
   - {fileID: 6070293028441550235, guid: 7f2ed86e0aad24043b8f5b7abe132b26, type: 3}
   - {fileID: 4328858284941032501, guid: b4453af47b5504148930a2ff9bbd0d77, type: 3}
   moveContentList: []
+  spellShieldInfinite: (lasts until used once)
 --- !u!114 &957664542
 MonoBehaviour:
   m_ObjectHideFlags: 0

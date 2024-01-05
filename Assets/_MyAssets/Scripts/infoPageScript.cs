@@ -31,6 +31,8 @@ public class infoPageScript : canvasGroupRenderer
 
     [SerializeField] List<moveContent> moveContentList = new List<moveContent>();
 
+    [SerializeField] string spellShieldInfinite;
+
     public void DisplayMonster(monster mon)
     {
         gameMaster.inInfoScreen = true;
@@ -123,6 +125,10 @@ public class infoPageScript : canvasGroupRenderer
 
                 case 2:
                     effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "";
+                    break;
+
+                case 5:
+                    effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() >= 160) ? spellShieldInfinite : "(" + status.GetCounter() + " turns)";
                     break;
 
                 case 6:

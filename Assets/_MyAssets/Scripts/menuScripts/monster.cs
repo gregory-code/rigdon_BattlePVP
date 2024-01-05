@@ -508,11 +508,14 @@ public class monster : ScriptableObject
     {
         statusEffectUI status = GetStatus(statusIndex);
 
-        if(GetStatus(5) != null) // spell shield
+        statusEffectUI spellShield = GetStatus(5);
+        if(spellShield != null)
         {
             if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2)
             {
-                TryRemoveStatus(5, true);
+                if(spellShield.GetCounter() >= 160)
+                    TryRemoveStatus(5, true);
+
                 return;
             }
         }

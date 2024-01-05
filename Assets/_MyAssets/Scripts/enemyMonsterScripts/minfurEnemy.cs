@@ -54,7 +54,7 @@ public class minfurEnemy : monsterEnemyAI
     private IEnumerator Roll(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         gameMaster.AnimateMonster(user, "attack2");
-        //gameMaster.ShootProjectile(user, target, 5, 0);
+        gameMaster.ShootProjectile(user, target, 9, 0);
         gameMaster.MoveMonster(user, target, 0);
 
         int attack = user.GetCurrentStrength() + GetMoveDamage(0, 0);

@@ -17,7 +17,7 @@ public class grimmetalAlly : monsterAlly
         GetMonster().onRemoveConnections += RemoveConnections;
 
         if (GetMonster().GetPassiveID() == 1)
-            GetMonster().SetDamageCap(GetMoveDamage(4, 0));
+            GetMonster().SetDamageCap(GetMoveDamage(4, 0) + GetMonster().GetCurrentMagic());
     }
 
     private void RemoveConnections()
@@ -80,7 +80,7 @@ public class grimmetalAlly : monsterAlly
                 break;
 
             case 2:
-                StartCoroutine(MirrorArmor());
+                StartCoroutine(MirrorSword());
                 break;
         }
     }
@@ -95,7 +95,6 @@ public class grimmetalAlly : monsterAlly
         float attackEffect = bonusDamage * (1f * user.GetCurrentHealth() / user.GetMaxHealth() * 1f);
         attack1 += Mathf.RoundToInt(attackEffect);
         attack1 += extraDamage;
-
 
         yield return new WaitForSeconds(1f);
         bool didCrit = IsCrit(0);
@@ -187,27 +186,20 @@ public class grimmetalAlly : monsterAlly
         FinishMove(true, false);
     }
 
-    private IEnumerator MirrorArmor()
+    private IEnumerator MirrorSword()
     {
         gameMaster.AnimateMonster(GetMonster(), "ability2");
         yield return new WaitForSeconds(0.4f);
 
-        int allyAmount = GetMoveDamage(3, 0);
-        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 11, 200, 0);
+        int strengthPower = GetMoveDamage(3, 0) + GetMonster().GetCurrentMagic();
+        //gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 11, 200, 0); // apply strength
 
-        if(allyAmount >= 2)
-        {
-            monster targetAlly = gameMaster.GetRandomEnemy(-1, GetTargetedMonster().GetIndex(), true);
-            if(targetAlly != null)
-                gameMaster.ApplyStatus(GetMonster(), targetAlly, 11, 200, 0);
+        int turnDuration = GetMoveDamage(3, 1);
+        if (GetMonster() == GetTargetedMonster())
+            turnDuration++;
 
-            if (allyAmount >= 3)
-            {
-                monster finalAlly = gameMaster.GetRandomEnemy(targetAlly.GetIndex(), GetTargetedMonster().GetIndex(), true);
-                if (finalAlly != null)
-                    gameMaster.ApplyStatus(GetMonster(), finalAlly, 11, 200, 0);
-            }
-        }
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 5, turnDuration, 0);
+
 
         yield return new WaitForSeconds(0.4f);
 

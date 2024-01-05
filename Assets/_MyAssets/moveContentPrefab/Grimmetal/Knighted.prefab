@@ -543,12 +543,12 @@ MonoBehaviour:
   - {fileID: 465393707680873253}
   - {fileID: 8962566636708827019}
   exists: 010000
-  statIndex: 000000000000000000000000
-  usesStatModifier: 000000
+  statIndex: 020000000000000000000000
+  usesStatModifier: 010000
   isPerecentage: 000000
   isPlus: 000000
   percentageStatMultiplier: 0
-  scaleNums1: f9fffffff1ffffffe7ffffff
+  scaleNums1: f6ffffffecffffffe2ffffff
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
@@ -898,8 +898,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294942208
+  m_fontColor: {r: 0, g: 0.61960787, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
