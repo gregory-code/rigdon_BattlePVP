@@ -29,6 +29,8 @@ public class monsterDependecy : MonoBehaviour
 
     [SerializeField] GameObject[] statusProcPrefabs;
 
+    [SerializeField] GameObject dirtSpray;
+
     public Animator GetAnimator(int monsterID, int whichStage)
     {
         switch(whichStage)
@@ -127,5 +129,13 @@ public class monsterDependecy : MonoBehaviour
     public SpriteRenderer GetMonsterShadow()
     {
         return monsterShadow;
+    }
+
+    public void SprayDirt()
+    {
+        GameObject dirt = Instantiate(dirtSpray);
+        Vector3 spawn = monsterSprite.transform.position;
+        spawn.y -= 3.5f;
+        dirt.transform.position = spawn;
     }
 }

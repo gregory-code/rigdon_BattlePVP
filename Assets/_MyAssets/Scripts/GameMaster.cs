@@ -138,6 +138,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
             case 9:
                 return newMonster.AddComponent<minfurAlly>();
+
+            case 14:
+                return newMonster.AddComponent<sirethAlly>();
         }
 
         return newMonster.AddComponent<lusseliaAlly>();
@@ -223,13 +226,23 @@ public class GameMaster : MonoBehaviourPunCallbacks
         gameMenu.SetFilter(!activeMonsters[0].GetOwnership());
         activeMonsters[0].SetAct(true);
 
-        if (activeMonsters[0].IsAI())
-            StartCoroutine(CheckAI());
-
         if (selectParticles != null)
             Destroy(selectParticles);
-
+        
         selectParticles = newSelect.gameObject;
+
+        if (activeMonsters[0].GetStatus(10) != null)
+        {
+            activeMonsters[0].TryRemoveStatus(10, true);
+            if (activeMonsters[0].GetOwnership())
+            {
+                UsedAction(activeMonsters[0], activeMonsters[0], false);
+                NextTurn();
+            }
+        }
+
+        if (activeMonsters[0].IsAI())
+            StartCoroutine(CheckAI());
     }
 
     private IEnumerator CheckAI()
@@ -340,11 +353,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
         {
             mon.NextTurn();
         }
-
-        selectNew();
         waitingQueue = false;
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
 
         if (IsGameOver() == true && movingToNewGame == false)
         {
@@ -363,6 +374,10 @@ public class GameMaster : MonoBehaviourPunCallbacks
             {
                 gameMenu.StartIntermission();
             }
+        }
+        else
+        {
+            selectNew();
         }
     }
 

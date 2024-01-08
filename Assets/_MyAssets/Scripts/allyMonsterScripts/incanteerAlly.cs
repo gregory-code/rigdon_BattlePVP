@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static UnityEngine.GraphicsBuffer;
 
 public class incanteerAlly : monsterAlly
@@ -37,7 +38,7 @@ public class incanteerAlly : monsterAlly
 
             int bonusDamage = GetMonster().GetCurrentMagic() + GetMoveDamage(5, 0);
 
-            UseAttack(GetMonster().GetAttackID(), GetMonster(), targetOfAction, false, bonusDamage);
+            gameMaster.AttackAgain(GetMonster(), targetOfAction, bonusDamage);
         }
     }
 
@@ -113,6 +114,8 @@ public class incanteerAlly : monsterAlly
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(0, 0);
         attack1 += goldenHornDamage;
         attack1 += extraDamage;
+
+        Debug.Log("Final damage: " + attack1);
 
         gameMaster.ShootProjectile(user, target, 6, 0);
         yield return new WaitForSeconds(0.6f);

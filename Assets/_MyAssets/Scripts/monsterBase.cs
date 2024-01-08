@@ -240,8 +240,7 @@ public class monsterBase : MonoBehaviour
         for (int i = 0; i < enemyTeam.Length; i++)
         {
             statusEffectUI taunt = enemyTeam[i].GetStatus(4);
-            statusEffectUI duel = enemyTeam[i].GetStatus(12);
-            if (taunt != null || duel != null)
+            if (taunt != null)
             {
                 ApplyTargetable(enemyTeam);
                 return;
@@ -256,8 +255,7 @@ public class monsterBase : MonoBehaviour
         for (int i = 0; i < enemyTeam.Length; i++)
         {
             statusEffectUI taunt = enemyTeam[i].GetStatus(4);
-            statusEffectUI duel = enemyTeam[i].GetStatus(12);
-            if (taunt == null && duel == null)
+            if (taunt == null)
             {
                 enemyTeam[i].isTargetable = false;
             }

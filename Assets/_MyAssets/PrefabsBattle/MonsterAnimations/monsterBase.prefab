@@ -4104,6 +4104,7 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 17059834d7bd5b94a8a079d6864bbd51, type: 2}
   midMonsterControllers:
   - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
   - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
@@ -4119,6 +4120,7 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
   - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
   - {fileID: 9100000, guid: 8af7e673166da684683f087ae758baac, type: 2}
+  - {fileID: 9100000, guid: 17059834d7bd5b94a8a079d6864bbd51, type: 2}
   finalMonsterControllers:
   - {fileID: 9100000, guid: e570a0f7d44679142b9047fce9b6f431, type: 2}
   - {fileID: 9100000, guid: e570a0f7d44679142b9047fce9b6f431, type: 2}
@@ -4134,6 +4136,7 @@ MonoBehaviour:
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
   - {fileID: 9100000, guid: 58510e518a94b7f4194028872554b1c4, type: 2}
+  - {fileID: 9100000, guid: 17059834d7bd5b94a8a079d6864bbd51, type: 2}
   babyEnemyControllers:
   - {fileID: 9100000, guid: c3092009389cbe34e9b54c8eb76ef1e4, type: 2}
   - {fileID: 9100000, guid: c3092009389cbe34e9b54c8eb76ef1e4, type: 2}
@@ -4154,6 +4157,10 @@ MonoBehaviour:
   - {fileID: 147642, guid: d63d36b4b1bdab149b6edc844c897ca5, type: 3}
   - {fileID: 1438902432858508, guid: 61f25c3ca45e7f546a581e24f3964571, type: 3}
   - {fileID: 6579453261124972213, guid: b2296ec7f399df547a9d9b8f8727c1c6, type: 3}
+  - {fileID: 123268, guid: f8f64bf88a0ef6541a589f5a418ad391, type: 3}
+  - {fileID: 195360, guid: d0a365d6fff796a4d847b18785685c7d, type: 3}
+  - {fileID: 177804, guid: b3c9fb1f409adc043ade593d426cfa24, type: 3}
+  dirtSpray: {fileID: 1477782971762948, guid: 8e2edb2a8a19e674f80d0fb19fe5c051, type: 3}
 --- !u!1 &5297733555498542932
 GameObject:
   m_ObjectHideFlags: 0

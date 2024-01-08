@@ -410,7 +410,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Enemies that deal      or more damage are marked for 5 turns,
+  m_text: 'Enemies that deal      or more damage are marked for    turn(s),
 
     Sireth''s
     attacks         marked foes'
@@ -545,14 +545,14 @@ MonoBehaviour:
   - {fileID: 8205547447539754975}
   - {fileID: 465393707680873253}
   - {fileID: 8962566636708827019}
-  exists: 010000
+  exists: 010100
   statIndex: 000000000000000000000000
   usesStatModifier: 000000
   isPerecentage: 000000
   isPlus: 000000
   percentageStatMultiplier: 0
-  scaleNums1: 060000000f0000001e000000
-  scaleNums2: 000000000000000000000000
+  scaleNums1: 080000001400000014000000
+  scaleNums2: 010000000200000002000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
   statGrowthIndex: 0
@@ -1130,8 +1130,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.3929977, y: -9.513}
-  m_SizeDelta: {x: -2.788, y: -19.027}
+  m_AnchoredPosition: {x: 47.2, y: -7.1}
+  m_SizeDelta: {x: -152.8167, y: -55.045}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9157608670724634358
 CanvasRenderer:
@@ -1161,7 +1161,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 
+  m_text: 1
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -1196,8 +1196,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0

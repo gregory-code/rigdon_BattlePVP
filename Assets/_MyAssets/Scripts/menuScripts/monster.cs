@@ -519,13 +519,18 @@ public class monster : ScriptableObject
         statusEffectUI spellShield = GetStatus(5);
         if(spellShield != null)
         {
-            if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2)
+            if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 10|| statusIndex == 11)
             {
                 if(spellShield.GetCounter() >= 160)
                     TryRemoveStatus(5, true);
 
                 return;
             }
+        }
+
+        if(statusIndex != 0 && statusIndex != 1 && statusIndex != 2 && statusIndex != 10 && statusIndex != 11)
+        {
+            onAnimPlayed?.Invoke("idle");
         }
 
         if (status == null)
@@ -589,6 +594,28 @@ public class monster : ScriptableObject
         growthSpeed = build.monsterValues[7];
 
         monsterNickname = build.monsterNickname;
+    }
+
+    public string CreateSeralizedPref()
+    {
+        string preferences = "";
+        preferences += monsterID;
+        preferences += "_";
+        preferences += AttackID;
+        preferences += "_";
+        preferences += AbilityID;
+        preferences += "_";
+        preferences += PassiveID;
+        preferences += "_";
+        preferences += growthHP;
+        preferences += "_";
+        preferences += growthStrength;
+        preferences += "_";
+        preferences += growthMagic;
+        preferences += "_";
+        preferences += growthSpeed;
+
+        return preferences;
     }
 
     public void SetInitialStats()

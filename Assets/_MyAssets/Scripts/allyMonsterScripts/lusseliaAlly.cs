@@ -190,7 +190,7 @@ public class lusseliaAlly : monsterAlly
         {
             foreach (int index in listOfIndexes)
             {
-                if(index == 0 || index == 1 || index == 2)
+                if(index == 0 || index == 1 || index == 2 || index == 10 || index == 11)
                 {
                     gameMaster.TryRemoveStatus(GetTargetedMonster(), index);
                 }

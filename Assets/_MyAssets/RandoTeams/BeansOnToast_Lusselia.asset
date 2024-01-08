@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4eb969ddac0b3d947b217b6f111da710, type: 3}
-  m_Name: BeansOnToast_Lusselia
+  m_Name: beansOnToast_Lusselia
   m_EditorClassIdentifier: 
-  monsterValues: 0800000001000000010000000100000001000000010000000400000000000000
-  monsterNickname: 
+  monsterValues: 0800000002000000020000000200000001000000020000000000000001000000
+  monsterNickname: Sun

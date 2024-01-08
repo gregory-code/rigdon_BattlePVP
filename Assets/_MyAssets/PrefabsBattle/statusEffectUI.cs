@@ -18,7 +18,8 @@ public class statusEffectUI : MonoBehaviour
 
     private GameMaster gameMaster;
 
-    private enum status { Conductive, Burn, Weakness, Bubble, Taunt, SpellShield, BrambleCrown, GoldenHorn, LeadTheCharge, StrengthBuff  }
+    private enum status { Conductive, Burn, Weakness, Bubble, Taunt, SpellShield, BrambleCrown, GoldenHorn, 
+        LeadTheCharge, StrengthBuff, Stun, WasteLandHunter, SpikeyCarapace  }
     private status myStatus;
 
     private int statusIndex;
@@ -140,6 +141,17 @@ public class statusEffectUI : MonoBehaviour
                 ReapplyPower(power);
                 UpdateStatusCounter(counter + newCounter);
                 break;
+
+            case status.Stun:
+                break;
+
+            case status.WasteLandHunter:
+                UpdateStatusCounter(counter + newCounter);
+                break;
+
+            case status.SpikeyCarapace:
+                UpdateStatusCounter(counter + newCounter);
+                break;
         }
     }
 
@@ -201,6 +213,18 @@ public class statusEffectUI : MonoBehaviour
             case status.StrengthBuff:
                 counter--;
                 break;
+
+            case status.Stun:
+                break;
+
+            case status.WasteLandHunter:
+                shouldProcStatus = false;
+                counter--;
+                break;
+
+            case status.SpikeyCarapace:
+                counter--;
+                break;
         }
 
         UpdateStatusCounter(counter);
@@ -245,6 +269,16 @@ public class statusEffectUI : MonoBehaviour
             case status.StrengthBuff:
                 StatChange(0, power);
                 break;
+
+            case status.Stun:
+                break;
+
+            case status.WasteLandHunter:
+                break;
+
+            case status.SpikeyCarapace:
+                myMonster.onTakeDamage += SpikeDamage;
+                break;
         }
     }
 
@@ -285,6 +319,16 @@ public class statusEffectUI : MonoBehaviour
             case status.StrengthBuff:
                 StatChange(0, -power);
                 break;
+
+            case status.Stun:
+                break;
+
+            case status.WasteLandHunter:
+                break;
+
+            case status.SpikeyCarapace:
+                myMonster.onTakeDamage -= SpikeDamage;
+                break;
         }
     }
 
@@ -294,6 +338,18 @@ public class statusEffectUI : MonoBehaviour
         float roundedPower = (power + this.power) / 2;
         this.power = Mathf.RoundToInt(roundedPower);
         GettingApplied();
+    }
+
+    private void SpikeDamage(monster recivingMon, monster usingMon, int damage, bool died, bool crit, bool burnDamage)
+    {
+        if(burnDamage == false)
+        {
+            float spikeMultiplier = damage * (1f * power / 100f); // damage reduction
+            int spikeDamage = Mathf.RoundToInt(spikeMultiplier);
+
+            usingMon.SetBurnDamage();
+            usingMon.TakeDamage(myMonster, spikeDamage, false);
+        }
     }
 
     private void StatChange(int which, int change)

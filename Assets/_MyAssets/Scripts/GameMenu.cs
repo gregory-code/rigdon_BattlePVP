@@ -51,6 +51,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     [SerializeField] GameObject[] rarietyGlows;
     private List<GameObject> rarietyGlowList = new List<GameObject>();
 
+    [SerializeField] Animator chooseUpgradeAnimator;
+    [SerializeField] Image[] monsterUpgradeImages;
     private upgradeScript currentlyChosenUpgrade;
 
     [SerializeField] List<upgradeScript> commonUpgrades = new List<upgradeScript>();
@@ -313,16 +315,11 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         decisionMonster.SetActive(false);
         choosingUpgrade.SetActive(true);
 
-        foreach(GameObject glow in rarietyGlowList)
-        {
-            Destroy(glow);
-        }
-        rarietyGlowList.Clear();
-
         for(int i = 0; i < 3; i++)
         {
             int randodIndex = Random.Range(0, upgrades.Count);
             GameObject glow = Instantiate(rarietyGlows[glowIndex], chooseUpgardeButtons[i].transform);
+            rarietyGlowList.Add(glow);
             upgradeImage[i].sprite = upgrades[randodIndex].GetImage();
             upgradeTitle[i].text = upgrades[randodIndex].GetTitle();
             upgradeDescription[i].text = upgrades[randodIndex].GetDescription();
@@ -336,7 +333,39 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     private void SelectUpgrade(upgradeScript chosenUpgrade, int whichButton)
     {
+        chooseUpgradeAnimator.SetBool("teamPopup", true);
+
+        monster[] myteam = GetMyTeam();
+        for(int i = 0; i < myteam.Length; i++)
+        {
+            if (myteam[i] == null)
+                continue;
+
+            monsterUpgradeImages[i].sprite = myteam[i].stages[myteam[i].GetSpriteIndexFromLevel()];
+        }
+
+        for(int i = 0; i < chooseUpgardeButtons.Length; i++)
+        {
+            chooseUpgardeButtons[i].transform.localScale = Vector3.one;
+        }
+
+        chooseUpgardeButtons[whichButton].transform.localScale = Vector3.one * 1.1f;
+
         currentlyChosenUpgrade = chosenUpgrade;
+
+    }
+
+    public void FinalizeUpgrade(int monsterIndex)
+    {
+        foreach (GameObject glow in rarietyGlowList)
+        {
+            Destroy(glow);
+        }
+        rarietyGlowList.Clear();
+
+        chooseUpgradeAnimator.SetBool("teamPopup", false);
+        GetMyTeam()[monsterIndex].ApplyUpgrade(currentlyChosenUpgrade);
+        choosing = false;
     }
 
     public void FinishedRound()
@@ -365,22 +394,36 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 {
                     yield return new WaitForEndOfFrame();
                 }
+                CreateEnemyAITeam();
                 break;
 
             case 2:
                 yield return ChooseNewIDs(0);
                 NewAllyChoice();
+                enemyInAICombat = true;
+                fightingAI = false;
                 while (choosing)
                 {
                     yield return new WaitForEndOfFrame();
                 }
-                CreateEnemyAITeam();
+                this.photonView.RPC("FinishedAICombatRPC", RpcTarget.OthersBuffered);
+                while (enemyInAICombat)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+                StartCoroutine(StartDraftPVP());
+                break;
+
+            case 3:
                 break;
 
         }
 
-        SetCanvasGroup(false);
-        gameMaster.StartFight(fightingAI);
+        if(fightingAI == true)
+        {
+            SetCanvasGroup(false);
+            gameMaster.StartFight(fightingAI);
+        }
     }
 
     public IEnumerator SetUpGame(int format)
@@ -420,20 +463,40 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 allMenus.SetActive(false);
                 menuChecks.SetActive(false);
                 NewAllyChoice();
-
                 while(choosing)
                 {
                     yield return new WaitForEndOfFrame();
                 }
-
                 CreateEnemyAITeam();
-
                 gameMaster.StartFight(true);
-
                 SetCanvasGroup(false);
-
                 break;
         }
+    }
+
+    private IEnumerator StartDraftPVP()
+    {
+        SetIntermission(true);
+
+        gotEnemyTeam = false;
+
+        yield return StartCoroutine(GetUsernames());
+
+        yield return new WaitForSeconds(0.5f);
+
+        yield return StartCoroutine(SerilizeDraftTeam());
+
+        yield return StartCoroutine(CreatePVPTeams());
+
+        yield return new WaitForSeconds(0.5f);
+
+        SetGameMenu();
+
+        yield return new WaitForSeconds(1.5f);
+
+        gameMaster.StartFight(false);
+
+        SetCanvasGroup(false);
     }
 
     private IEnumerator StartRegularPVP()
@@ -444,7 +507,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return StartCoroutine(SendMyTeamPrefs(myTeamName));
 
-        yield return StartCoroutine(CreateTeams());
+        yield return StartCoroutine(CreatePVPTeams());
 
         yield return new WaitForSeconds(0.5f);
 
@@ -462,13 +525,23 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         SetCanvasGroup(false);
     }
 
-    private IEnumerator CreateTeams()
+    private IEnumerator CreatePVPTeams()
     {
         yield return new WaitForEndOfFrame();
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < myTeamPrefs.Length; i++)
         {
+            if (myTeamPrefs[i].monsterValues[0] == 0)
+                continue;
+
             CreateMonster(myTeamPrefs[i], i, true, true, false);
+        }
+
+        for (int i = 0; i < enemyTeamPrefs.Length; i++)
+        {
+            if (enemyTeamPrefs[i].monsterValues[0] == 0)
+                continue;
+
             CreateMonster(enemyTeamPrefs[i], i, false, true, false);
         }
     }
@@ -548,13 +621,25 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         myTeamTitle.text = myTeamName;
         enemyTeamTitle.text = enemyTeamName;
 
-        for (int i = 0; i < 3; i++)
+        monster[] myTeam = GetMyTeam();
+        monster[] enemyTeam = GetEnemyTeam();
+
+        for (int i = 0; i < myTeam.Length; i++)
         {
-            monster myNewMon = GetMyTeam()[i];
+            if (myTeam[i] == null)
+                continue;
+
+            monster myNewMon = myTeam[i];
             myImages[i].sprite = myNewMon.stages[myNewMon.GetSpriteIndexFromLevel()];
             myLevels[i].text = "Lvl " + myNewMon.GetLevel();
+        }
 
-            monster enemyNewMon = GetEnemyTeam()[i];
+        for(int i = 0; i < enemyTeam.Length; i++)
+        {
+            if (enemyTeam[i] == null)
+                continue;
+
+            monster enemyNewMon = enemyTeam[i];
             enemyImages[i].sprite = enemyNewMon.stages[enemyNewMon.GetSpriteIndexFromLevel()];
             enemyLevels[i].text = "Lvl " + enemyNewMon.GetLevel();
         }
@@ -710,10 +795,13 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
     private IEnumerator SendMyTeamPrefs(string teamNickName)
     {
-        string[] myPref = new string[3];
-        string[] nickname = new string[3];
+        string[] myPref = new string[3] { "", "", ""};
+        string[] nickname = new string[3] { "", "", ""};
         for (int i = 0; i < myTeamPrefs.Length; i++)
         {
+            if (myTeamPrefs[i].monsterValues[0] == 0)
+                continue;
+
             myPref[i] = myTeamPrefs[i].SeralizedPref();
             nickname[i] = myTeamPrefs[i].monsterNickname;
         }
@@ -724,6 +812,22 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         {
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    private IEnumerator SerilizeDraftTeam()
+    {
+        yield return new WaitForEndOfFrame();
+
+        monster[] myteam = GetMyTeam();
+        for (int i = 0; i < myteam.Length; i++)
+        {
+            if (myteam[i] == null)
+                continue;
+
+            myTeamPrefs[i].DeseralizePref(myteam[i].CreateSeralizedPref());
+        }
+
+        yield return StartCoroutine(SendMyTeamPrefs(""));
     }
 
     public void GetBattlePlayList(List<string> battlPlayList)
@@ -772,6 +876,9 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         for(int i = 0; i < enemys.Length; i++)
         {
+            if (enemys[i] == "")
+                continue;
+
             enemyTeamPrefs[i].DeseralizePref(enemys[i]);
             enemyTeamPrefs[i].monsterNickname = nicknames[i];
         }
