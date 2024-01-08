@@ -115,8 +115,6 @@ public class incanteerAlly : monsterAlly
         attack1 += goldenHornDamage;
         attack1 += extraDamage;
 
-        Debug.Log("Final damage: " + attack1);
-
         gameMaster.ShootProjectile(user, target, 6, 0);
         yield return new WaitForSeconds(0.6f);
         yield return new WaitForSeconds(0.4f);

@@ -85,6 +85,12 @@ public class monsterBase : MonoBehaviour
         nameText.text = myMonster.GetMonsterNickname();
         healthText.text = myMonster.GetCurrentHealth() + "";
         healthText.color = (myMonster.getHealthPercentage() >= 0.7f) ? new Vector4(0, 255, 0, 255) : new Vector4(255, 180, 180, 255);
+
+        List<int> statuses = myMonster.GetStatusList();
+        foreach(int index in statuses)
+        {
+            myMonster.TryRemoveStatus(index, false);
+        }
     }
 
     private void SetImage(SpriteRenderer target, Sprite image, int stage)

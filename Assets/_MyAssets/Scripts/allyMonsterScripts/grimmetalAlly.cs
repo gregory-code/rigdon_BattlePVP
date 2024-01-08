@@ -76,7 +76,13 @@ public class grimmetalAlly : monsterAlly
                 break;
 
             case 1:
-                StartCoroutine(SteelYourself());
+                StartCoroutine(Vow());
+                if(GetTargetedMonster() == GetMonster())
+                {
+                    GetMonster().SetAct(true);
+                    gameMaster.SetFilter(false);
+                    return;
+                }
                 break;
 
             case 2:
@@ -172,14 +178,18 @@ public class grimmetalAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator SteelYourself()
+    private IEnumerator Vow()
     {
         gameMaster.AnimateMonster(GetMonster(), "ability1");
 
         yield return new WaitForSeconds(0.5f);
 
-        int attackMultiplier = (GetMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
-        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 9, 200, attackMultiplier);
+        int damageReduction = (GetMonster().GetCurrentMagic() * GetCurrentMove(2).GetPercentageMultiplier()) + GetMoveDamage(2, 0);
+        int turns = GetMoveDamage(2, 1);
+        if (GetTargetedMonster() == GetMonster())
+            turns++;
+
+        gameMaster.ApplyStatus(GetMonster(), GetTargetedMonster(), 13, turns, damageReduction);
 
         yield return new WaitForSeconds(0.5f);
 

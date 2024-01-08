@@ -10907,6 +10907,7 @@ MonoBehaviour:
   - {fileID: 109542, guid: 01f5d539ee014214495973fee6629267, type: 3}
   - {fileID: 1250201152801508, guid: d01e138628f3b304c8346370de7274f5, type: 3}
   - {fileID: 1180339156143574174, guid: 690e624d9d9710f438dd5df9c6686da8, type: 3}
+  - {fileID: 7417451007581110352, guid: 1d197ddf834fb784eaeff0159a31c2c9, type: 3}
   regularDeath: {fileID: 173590, guid: 9199f48996e301e408b14a54449d591a, type: 3}
   grimmetalDeath: {fileID: 1221293952758510, guid: cf2871a4bbfb7f64d8172bf9429514d1,
     type: 3}
@@ -23897,6 +23898,7 @@ MonoBehaviour:
   - {fileID: 5447297565404100616, guid: 128c8481a4d60d64bb8a299b18187eb3, type: 3}
   - {fileID: 5447297565404100616, guid: b7d075f8b5a7773428cb8bc06f1b619f, type: 3}
   - {fileID: 5447297565404100616, guid: cd6e535d88335b04b87a9db94d7eb1e2, type: 3}
+  - {fileID: 5447297565404100616, guid: fb5170cc108b00446883b292798b4330, type: 3}
   moveContentList: []
   spellShieldInfinite: (lasts until used once)
 --- !u!114 &957664542

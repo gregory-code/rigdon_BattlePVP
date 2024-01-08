@@ -4160,6 +4160,7 @@ MonoBehaviour:
   - {fileID: 123268, guid: f8f64bf88a0ef6541a589f5a418ad391, type: 3}
   - {fileID: 195360, guid: d0a365d6fff796a4d847b18785685c7d, type: 3}
   - {fileID: 177804, guid: b3c9fb1f409adc043ade593d426cfa24, type: 3}
+  - {fileID: 1826959671400908, guid: 3a99081d1004ba146bb10501991f2f15, type: 3}
   dirtSpray: {fileID: 1477782971762948, guid: 8e2edb2a8a19e674f80d0fb19fe5c051, type: 3}
 --- !u!1 &5297733555498542932
 GameObject:

@@ -149,6 +149,10 @@ public class infoPageScript : canvasGroupRenderer
                 case 12:
                     effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "%";
                     break;
+
+                case 13:
+                    effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "%";
+                    break;
             }
 
             listOfEffects.Add(effect);

@@ -19,7 +19,7 @@ public class statusEffectUI : MonoBehaviour
     private GameMaster gameMaster;
 
     private enum status { Conductive, Burn, Weakness, Bubble, Taunt, SpellShield, BrambleCrown, GoldenHorn, 
-        LeadTheCharge, StrengthBuff, Stun, WasteLandHunter, SpikeyCarapace  }
+        LeadTheCharge, StrengthBuff, Stun, WasteLandHunter, SpikeyCarapace, Vow  }
     private status myStatus;
 
     private int statusIndex;
@@ -152,6 +152,10 @@ public class statusEffectUI : MonoBehaviour
             case status.SpikeyCarapace:
                 UpdateStatusCounter(counter + newCounter);
                 break;
+
+            case status.Vow:
+                UpdateStatusCounter(counter + newCounter);
+                break;
         }
     }
 
@@ -225,6 +229,10 @@ public class statusEffectUI : MonoBehaviour
             case status.SpikeyCarapace:
                 counter--;
                 break;
+
+            case status.Vow:
+                counter--;
+                break;
         }
 
         UpdateStatusCounter(counter);
@@ -279,6 +287,12 @@ public class statusEffectUI : MonoBehaviour
             case status.SpikeyCarapace:
                 myMonster.onTakeDamage += SpikeDamage;
                 break;
+
+            case status.Vow:
+                usingMonster.AdjustDamageReduction(-power);
+                myMonster.onDeclaredDamage += allyGettingDeclaredDamage;
+                usingMonster.onRemoveConnections += RemoveConnection;
+                break;
         }
     }
 
@@ -329,6 +343,39 @@ public class statusEffectUI : MonoBehaviour
             case status.SpikeyCarapace:
                 myMonster.onTakeDamage -= SpikeDamage;
                 break;
+
+            case status.Vow:
+                usingMonster.AdjustDamageReduction(power);
+                myMonster.onDeclaredDamage -= allyGettingDeclaredDamage;
+                usingMonster.onRemoveConnections -= RemoveConnection;
+                break;
+        }
+    }
+
+    private void RemoveConnection()
+    {
+        if(myStatus == status.Vow && usingMonster.GetOwnership())
+        {
+            gameMaster.TryRemoveStatus(myMonster, 13);
+        }
+    }
+
+    private void allyGettingDeclaredDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields, bool crit)
+    {
+        if(recivingMon == myMonster && myStatus == status.Vow)
+        {
+            gameMaster.redirectedMon = usingMonster;
+            StartCoroutine(MoveToProtect());
+        }
+    }
+
+    private IEnumerator MoveToProtect()
+    {
+        if(usingMonster.GetOwnership())
+        {
+            gameMaster.MoveMonster(usingMonster, myMonster, 0);
+            yield return new WaitForSeconds(1f);
+            gameMaster.MoveMonster(usingMonster, myMonster, 1);
         }
     }
 
