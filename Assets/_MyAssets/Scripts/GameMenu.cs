@@ -364,7 +364,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         rarietyGlowList.Clear();
 
         chooseUpgradeAnimator.SetBool("teamPopup", false);
-        GetMyTeam()[monsterIndex].ApplyUpgrade(currentlyChosenUpgrade);
+        GetMyTeam()[monsterIndex].ApplyUpgrade(currentlyChosenUpgrade.GetID());
         choosing = false;
     }
 
@@ -415,6 +415,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 break;
 
             case 3:
+
                 break;
 
         }
@@ -422,7 +423,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         if(fightingAI == true)
         {
             SetCanvasGroup(false);
-            gameMaster.StartFight(fightingAI);
+            gameMaster.StartFight(fightingAI, true);
         }
     }
 
@@ -468,7 +469,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                     yield return new WaitForEndOfFrame();
                 }
                 CreateEnemyAITeam();
-                gameMaster.StartFight(true);
+                gameMaster.StartFight(true, true);
                 SetCanvasGroup(false);
                 break;
         }
@@ -494,7 +495,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return new WaitForSeconds(1.5f);
 
-        gameMaster.StartFight(false);
+        gameMaster.StartFight(false, true);
 
         SetCanvasGroup(false);
     }
@@ -520,7 +521,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return new WaitForSeconds(0.5f);
 
-        gameMaster.StartFight(false);
+        gameMaster.StartFight(false, false);
 
         SetCanvasGroup(false);
     }
@@ -650,22 +651,28 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         monster[] myTeam = GetMyTeam();
         monster[] enemyTeam = GetEnemyTeam();
 
-        int expLength = myTeam[0].GetExpHolders().Count;
+        int expLength = myTeam[1].GetExpHolders().Count; // this might not work if you don't have a guy in the first slot
 
         for (int i = 0; i < expLength; i++)
         {
-            if(ShouldPostIt(i))
+            if(ShouldPostIt(i, myTeam, enemyTeam))
             {
-                AddExpText(expTitleList, myTeam[0].GetExpHold(i).GetTitle());
+                AddExpText(expTitleList, myTeam[1].GetExpHold(i).GetTitle());
 
                 for(int x = 0; x < 3; x++)
                 {
-                    yield return AddExp(myExpLists[x], myTeam[x], i, myLevels[x], myLevelBars[x], myImages[x]);
+                    if (myTeam[x] != null)
+                    {
+                        yield return AddExp(myExpLists[x], myTeam[x], i, myLevels[x], myLevelBars[x], myImages[x]);
+                    }
                 }
 
                 for (int x = 0; x < 3; x++)
                 {
-                    yield return AddExp(enemyExpLists[x], enemyTeam[x], i, enemyLevels[x], enemyLevelBars[x], enemyImages[x]);
+                    if (enemyTeam[i] != null)
+                    {
+                        yield return AddExp(enemyExpLists[x], enemyTeam[x], i, enemyLevels[x], enemyLevelBars[x], enemyImages[x]);
+                    }
                 }
             }
         }
@@ -701,18 +708,24 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
         allText.Add(newTitle);
     }
 
-    private bool ShouldPostIt(int whichHold)
+    private bool ShouldPostIt(int whichHold, monster[] myTeam, monster[] enemyTeam)
     {
         for (int i = 0; i < 3; i++)
         {
-            if (GetMyTeam()[i].GetExpHold(whichHold).GetExp() > 0)
+            if (myTeam[i] != null)
             {
-                return true;
+                if (myTeam[i].GetExpHold(whichHold).GetExp() > 0)
+                {
+                    return true;
+                }
             }
 
-            if (GetEnemyTeam()[i].GetExpHold(whichHold).GetExp() > 0)
+            if (enemyTeam[i] != null)
             {
-                return true;
+                if (enemyTeam[i].GetExpHold(whichHold).GetExp() > 0)
+                {
+                    return true;
+                }
             }
         }
 
@@ -753,7 +766,7 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
 
         yield return new WaitForSeconds(8f);
 
-        gameMaster.StartFight(false);
+        gameMaster.StartFight(false, false);
 
         SetCanvasGroup(false);
     }
@@ -806,12 +819,27 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             nickname[i] = myTeamPrefs[i].monsterNickname;
         }
 
-        this.photonView.RPC("GetEnemyMonsterRPC", RpcTarget.OthersBuffered, myPref, nickname, teamNickName); // First person to search is player 2
+        int[] upgrades0 = GetUpgradeArray(myTeamPrefs[0].GetUpgradeList());
+        int[] upgrades1 = GetUpgradeArray(myTeamPrefs[1].GetUpgradeList());
+        int[] upgrades2 = GetUpgradeArray(myTeamPrefs[2].GetUpgradeList());
+
+        this.photonView.RPC("GetEnemyMonsterRPC", RpcTarget.OthersBuffered, myPref, nickname, teamNickName, upgrades0, upgrades1, upgrades2,
+            myTeamPrefs[0].GetLostHealth(), myTeamPrefs[1].GetLostHealth(), myTeamPrefs[2].GetLostHealth()); // First person to search is player 2
 
         while(gotEnemyTeam == false)
         {
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    private int[] GetUpgradeArray(List<int> upgradeRef)
+    {
+        int[] upgrades = new int[upgradeRef.Count];
+        for (int i = 0; i < upgradeRef.Count; i++) 
+        { 
+            upgrades[i] = upgradeRef[i]; 
+        }
+        return upgrades;
     }
 
     private IEnumerator SerilizeDraftTeam()
@@ -825,6 +853,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
                 continue;
 
             myTeamPrefs[i].DeseralizePref(myteam[i].CreateSeralizedPref());
+            myTeamPrefs[i].SetUpradeList(myteam[i].GetUpgradeListIDs());
+            myTeamPrefs[i].SetLostHealth(myteam[i].GetMissingHealth());
         }
 
         yield return StartCoroutine(SendMyTeamPrefs(""));
@@ -870,7 +900,8 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
     }
 
     [PunRPC]
-    void GetEnemyMonsterRPC(string[] enemys, string[] nicknames, string teamName)
+    void GetEnemyMonsterRPC(string[] enemys, string[] nicknames, string teamName, 
+        int[] upgrades0, int[] upgrades1, int[] upgrades2, int lostHP0, int lostHP1, int lostHP2)
     {
         enemyTeamName = teamName;
 
@@ -882,8 +913,23 @@ public class GameMenu : MonoBehaviourPunCallbacks, IDataPersistence
             enemyTeamPrefs[i].DeseralizePref(enemys[i]);
             enemyTeamPrefs[i].monsterNickname = nicknames[i];
         }
+        enemyTeamPrefs[0].SetLostHealth(lostHP0);
+        enemyTeamPrefs[1].SetLostHealth(lostHP1);
+        enemyTeamPrefs[2].SetLostHealth(lostHP2);
+
+        DeseralizeEnemyUpgrades(0, upgrades0);
+        DeseralizeEnemyUpgrades(1, upgrades1);
+        DeseralizeEnemyUpgrades(2, upgrades2);
 
         gotEnemyTeam = true;
+    }
+
+    private void DeseralizeEnemyUpgrades(int whichTeamPref, int[] upgradeArray)
+    {
+        foreach(int upgrade in upgradeArray)
+        {
+            enemyTeamPrefs[whichTeamPref].AddUpgrade(upgrade);
+        }
     }
 
     [PunRPC]

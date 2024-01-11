@@ -22,6 +22,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     [SerializeField] GameObject monsterPrefab;
 
     private bool fightingAI;
+    private bool inDraft;
 
     [SerializeField] List<GameObject> monsterBasesToDeleteLater = new List<GameObject>();
 
@@ -45,9 +46,10 @@ public class GameMaster : MonoBehaviourPunCallbacks
     public bool bRegularDeath = true;
     public bool holdItDeerCrossing = false;
 
-    public void StartFight(bool againstAI)
+    public void StartFight(bool againstAI, bool inDraft)
     {
         gameMenu.enemyInAICombat = (againstAI);
+        this.inDraft = inDraft;
         bRegularDeath = true;
         movingToNewGame = false;
         spawnTeams(againstAI);
@@ -247,7 +249,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     private IEnumerator CheckAI()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
         monsterEnemyAI[] enemyAIs = GameObject.FindObjectsOfType<monsterEnemyAI>();
         foreach (monsterEnemyAI ai in enemyAIs)
         {
@@ -366,7 +368,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
             waitingQueue = false;
             ClearField();
 
-            if(fightingAI)
+            if(fightingAI || inDraft)
             {
                 gameMenu.FinishedRound();
             }
@@ -517,6 +519,8 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void NextTurn()
     {
+        redirectedMon = null;
+
         if(fightingAI)
         {
             StartCoroutine(ExecuteNextTurn());
@@ -535,6 +539,8 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
     public void UsedAction(monster mon, monster targetOfAction, bool isAttack)
     {
+        redirectedMon = null;
+
         if (fightingAI)
         {
             holdItDeerCrossing = false;

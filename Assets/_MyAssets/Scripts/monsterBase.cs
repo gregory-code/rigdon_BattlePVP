@@ -52,7 +52,6 @@ public class monsterBase : MonoBehaviour
         myMonster.gameMaster = gameMaster;
         myMonster.ownerTransform = transform;
         myMonster.GetExpHold(0).GainExp();
-        myMonster.GetExpHold(0).GainExp();
 
         monsterDependecy dependecies = GetComponent<monsterDependecy>();
         GrabDependecies(dependecies);
@@ -90,6 +89,13 @@ public class monsterBase : MonoBehaviour
         foreach(int index in statuses)
         {
             myMonster.TryRemoveStatus(index, false);
+        }
+
+        if (myMonster.HasUpgrade(4)) // heal 33% of max health from Forest Charm
+        {
+            float percentageHealth = myMonster.GetMaxHealth() / 3f;
+            int heal = Mathf.RoundToInt(percentageHealth);
+            myMonster.HealHealth(myMonster, heal);
         }
     }
 

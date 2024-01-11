@@ -8,6 +8,34 @@ public class monsterPreferences : ScriptableObject
 {
     public int[] monsterValues = new int[8];
 
+    private List<int> upgradeList = new List<int>();
+    private int lostHealth = 0;
+
+    public void AddUpgrade(int index)
+    {
+        upgradeList.Add(index);
+    }
+
+    public void SetUpradeList(List<int> list)
+    {
+        upgradeList = list;
+    }
+
+    public List<int> GetUpgradeList()
+    {
+        return upgradeList;
+    }
+
+    public void SetLostHealth(int health)
+    {
+        lostHealth = health;
+    }
+
+    public int GetLostHealth()
+    {
+        return lostHealth;
+    }
+
     // 0  is ID
     // 1 is attack ID
     // 2 is ability ID

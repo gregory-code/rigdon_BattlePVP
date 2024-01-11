@@ -286,11 +286,14 @@ public class statusEffectUI : MonoBehaviour
 
             case status.SpikeyCarapace:
                 myMonster.onTakeDamage += SpikeDamage;
+                myMonster.onRemoveConnections += RemoveConnection;
+                usingMonster.onRemoveConnections += RemoveConnection;
                 break;
 
             case status.Vow:
                 usingMonster.AdjustDamageReduction(-power);
                 myMonster.onDeclaredDamage += allyGettingDeclaredDamage;
+                myMonster.onRemoveConnections += RemoveConnection;
                 usingMonster.onRemoveConnections += RemoveConnection;
                 break;
         }
@@ -341,28 +344,30 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case status.SpikeyCarapace:
-                myMonster.onTakeDamage -= SpikeDamage;
+                RemoveConnection();
                 break;
 
             case status.Vow:
                 usingMonster.AdjustDamageReduction(power);
-                myMonster.onDeclaredDamage -= allyGettingDeclaredDamage;
-                usingMonster.onRemoveConnections -= RemoveConnection;
+                RemoveConnection();
                 break;
         }
     }
 
     private void RemoveConnection()
     {
-        if(myStatus == status.Vow && usingMonster.GetOwnership())
-        {
-            gameMaster.TryRemoveStatus(myMonster, 13);
-        }
+        myMonster.onDeclaredDamage -= allyGettingDeclaredDamage;
+        myMonster.onTakeDamage -= SpikeDamage;
+        myMonster.onRemoveConnections -= RemoveConnection;
+        usingMonster.onRemoveConnections -= RemoveConnection;
+
+        if (alreadyRemoved == false)
+            myMonster.TryRemoveStatus(statusIndex, true);
     }
 
     private void allyGettingDeclaredDamage(monster recivingMon, monster usingMon, int damage, bool willDie, bool destroyShields, bool crit)
     {
-        if(recivingMon == myMonster && myStatus == status.Vow)
+        if(recivingMon == myMonster && myStatus == status.Vow && usingMonster.isDead() == false && alreadyRemoved == false)
         {
             gameMaster.redirectedMon = usingMonster;
             StartCoroutine(MoveToProtect());
@@ -389,7 +394,7 @@ public class statusEffectUI : MonoBehaviour
 
     private void SpikeDamage(monster recivingMon, monster usingMon, int damage, bool died, bool crit, bool burnDamage)
     {
-        if(burnDamage == false)
+        if(burnDamage == false && alreadyRemoved == false)
         {
             float spikeMultiplier = damage * (1f * power / 100f); // damage reduction
             int spikeDamage = Mathf.RoundToInt(spikeMultiplier);

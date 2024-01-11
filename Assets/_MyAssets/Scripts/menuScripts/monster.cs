@@ -458,12 +458,51 @@ public class monster : ScriptableObject
         return strength;
     }
 
-    public delegate void OnApplyUpgrade(monster thatGotUpgrade, upgradeScript newUpgrade);
+    public delegate void OnApplyUpgrade(monster thatGotUpgrade, int ID);
     public event OnApplyUpgrade onApplyUpgrade;
 
-    public void ApplyUpgrade(upgradeScript newUpgrade)
+    private List<int> upgradesList = new List<int>();
+
+    public void ApplyUpgrade(int ID)
     {
-        onApplyUpgrade?.Invoke(this, newUpgrade);
+        onApplyUpgrade?.Invoke(this, ID);
+
+        upgradesList.Add(ID);
+
+        switch(ID)
+        {
+            case 0:
+                maxHP += 6;
+                currentHP += 6;
+                break;
+
+            case 1:
+                baseStrength += 2;
+                currentStrength += 2;
+                break;
+
+            case 2:
+                baseMagic += 3;
+                currentMagic += 3;
+                break;
+
+            case 3:
+                baseSpeed += 3;
+                currentSpeed += 3;
+                break;
+        }
+    }
+
+    public bool HasUpgrade(int ID)
+    {
+        if(upgradesList.Count > 0)
+        {
+            if(upgradesList.Contains(ID))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public delegate void OnApplyStatus(int statusIndex, GameObject statusPrefab);
@@ -558,8 +597,12 @@ public class monster : ScriptableObject
 
     public void DestroyStatus(int statusIndex)
     {
-        Destroy(GetStatus(statusIndex).gameObject);
-        statusEffects.Remove(GetStatus(statusIndex));
+        if(GetStatus(statusIndex).gameObject != null)
+        {
+            Destroy(GetStatus(statusIndex).gameObject);
+
+            statusEffects.Remove(GetStatus(statusIndex));
+        }
 
         if (statusIndex == 4)
         {
@@ -593,6 +636,16 @@ public class monster : ScriptableObject
         growthMagic = build.monsterValues[6];
         growthSpeed = build.monsterValues[7];
 
+        if(build.GetUpgradeList().Count > 0)
+        {
+            foreach(int upgradeID in build.GetUpgradeList())
+            {
+                ApplyUpgrade(upgradeID);
+            }
+        }
+
+        currentHP += build.GetLostHealth();
+
         monsterNickname = build.monsterNickname;
     }
 
@@ -616,6 +669,26 @@ public class monster : ScriptableObject
         preferences += growthSpeed;
 
         return preferences;
+    }
+
+    public List<int> GetUpgradeListIDs()
+    {
+        List<int> upgradeIndexes = new List<int>();
+
+        if (upgradesList.Count > 0)
+        {
+            foreach (int upgrade in upgradesList)
+            {
+                upgradeIndexes.Add(upgrade);
+            }
+        }
+
+        return upgradeIndexes;
+    }
+
+    public int GetMissingHealth()
+    {
+        return currentHP - maxHP;
     }
 
     public void SetInitialStats()
