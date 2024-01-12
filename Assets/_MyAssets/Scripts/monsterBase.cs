@@ -251,6 +251,9 @@ public class monsterBase : MonoBehaviour
         monster[] enemyTeam = gameMaster.GetMonstersTeam(myMonster);
         for (int i = 0; i < enemyTeam.Length; i++)
         {
+            if (enemyTeam[i] == null)
+                continue;
+
             statusEffectUI taunt = enemyTeam[i].GetStatus(4);
             if (taunt != null)
             {
@@ -266,6 +269,9 @@ public class monsterBase : MonoBehaviour
     {
         for (int i = 0; i < enemyTeam.Length; i++)
         {
+            if (enemyTeam[i] == null)
+                continue;
+
             statusEffectUI taunt = enemyTeam[i].GetStatus(4);
             if (taunt == null)
             {

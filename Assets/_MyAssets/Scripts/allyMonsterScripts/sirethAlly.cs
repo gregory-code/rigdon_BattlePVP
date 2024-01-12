@@ -69,7 +69,7 @@ public class sirethAlly : monsterAlly
                 break;
 
             case 2:
-                StartCoroutine(NotYet(user, target, consumeTurn, extraDamage));
+                StartCoroutine(Crush(user, target, consumeTurn, extraDamage));
                 break;
         }
     }
@@ -125,12 +125,46 @@ public class sirethAlly : monsterAlly
         FinishMove(consumeTurn, true);
     }
 
-    private IEnumerator NotYet(monster user, monster target, bool consumeTurn, int extraDamage)
+    private IEnumerator Crush(monster user, monster target, bool consumeTurn, int extraDamage)
     {
         gameMaster.AnimateMonster(user, "attack2");
+        gameMaster.MoveMonster(user, target, 0);
 
-        yield return new WaitForSeconds(0.5f);
+        int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0); // need damage boost
+        attack1 += extraDamage;
 
+        float crushDamage = (GetCurrentMove(1).GetPercentageMultiplier() * user.GetCurrentMagic()) + GetMoveDamage(1, 1);
+        float crushMultiplier = 100;
+        if(target.GetStatusList().Count > 0)
+        {
+            foreach(int status in target.GetStatusList())
+            {
+                if (status == 0 || status == 1 || status == 2 || status == 10 || status == 11)
+                {
+                    crushMultiplier += crushDamage;
+                }
+            }
+        }
+        attack1 = Mathf.RoundToInt(attack1 * (crushMultiplier / 100));
+
+        yield return new WaitForSeconds(0.3f);
+        bool didCrit = IsCrit(0);
+        gameMaster.DeclaringDamage(user, target, -attack1, destroyShields, didCrit);
+        yield return new WaitForSeconds(0.2f);
+        target = gameMaster.GetRedirectedMonster(target);
+
+        yield return new WaitForSeconds(0.3f);
+        gameMaster.ShootProjectile(user, target, 12, 0);
+        gameMaster.DamageMonster(user, target, -attack1, didCrit);
+
+        if (target.GetStatus(11) != null)
+        {
+            gameMaster.ApplyStatus(user, target, 10, 200, 0);
+            gameMaster.TryRemoveStatus(target, 11);
+        }
+
+        yield return new WaitForSeconds(0.4f);
+        gameMaster.MoveMonster(user, target, 1);
         yield return new WaitForSeconds(0.4f);
 
         FinishMove(consumeTurn, true);

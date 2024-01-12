@@ -36,9 +36,10 @@ MonoBehaviour:
   initial_Speed: 5
   moveContents:
   - {fileID: 8812975950963853024, guid: 46b17abfba8f1e4478697b804826b81b, type: 3}
-  - {fileID: 8812975950963853024, guid: 46b17abfba8f1e4478697b804826b81b, type: 3}
+  - {fileID: 8812975950963853024, guid: a5c74b5c01190364c80319764ccce8c5, type: 3}
   - {fileID: 8812975950963853024, guid: 3ab42fe7c3c8b824895b1e3055563e7e, type: 3}
   - {fileID: 8812975950963853024, guid: 3ab42fe7c3c8b824895b1e3055563e7e, type: 3}
   - {fileID: 8812975950963853024, guid: 612e516febe48874bac2c086985a2771, type: 3}
-  - {fileID: 8812975950963853024, guid: 612e516febe48874bac2c086985a2771, type: 3}
+  - {fileID: 8812975950963853024, guid: 83bde5fbadf492c4db12ced21b06988a, type: 3}
   statusEffects: []
+  statusReduction: 0

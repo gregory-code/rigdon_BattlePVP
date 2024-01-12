@@ -279,7 +279,7 @@ public class teamBuilder : canvasGroupRenderer
     [SerializeField] statNotif statNotification;
     [SerializeField] TextMeshProUGUI levelText;
     bool dontPopup;
-    int growthPoints = 5;
+    int growthPoints = 4;
     int level = 1;
     int statIndex;
     bool bStatGrowthMenu;
@@ -297,7 +297,7 @@ public class teamBuilder : canvasGroupRenderer
 
     private void SetGrowthBars()
     {
-        growthPoints = 5;
+        growthPoints = 4;
         for (int i = 0; i < statSliders.Length; i++)
         {
             int growthValue = currentTeam.GetMonsterPref(currentMonster).monsterValues[i + 4];

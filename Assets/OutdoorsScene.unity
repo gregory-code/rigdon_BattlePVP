@@ -3744,7 +3744,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1937873894}
   m_Direction: 2
   m_MinValue: 0
-  m_MaxValue: 3
+  m_MaxValue: 2
   m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
@@ -10573,7 +10573,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 535492783}
   m_Direction: 2
   m_MinValue: 0
-  m_MaxValue: 3
+  m_MaxValue: 2
   m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
@@ -10932,6 +10932,7 @@ MonoBehaviour:
   - {fileID: 8091283170359546191, guid: cd90b3391dbed664a9b92b2d3dcdb920, type: 3}
   - {fileID: 1441670118508295303, guid: a96a2115540cd844fa7e1c0b31746f9a, type: 3}
   - {fileID: -7643279072134091728, guid: 764a16f1f0c504e46b10a2edbbcdc50a, type: 3}
+  - {fileID: 1881012478243177871, guid: 49098e15b29b57f4d97b2ed52b899b75, type: 3}
   statusPrefabs:
   - {fileID: 145170, guid: 4f9f5c792c78b6e4bb91286ba103cf5b, type: 3}
   - {fileID: 8224381415989937120, guid: 640614f3416fa084d93e9b21aeb96470, type: 3}
@@ -44666,7 +44667,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 750707045}
   m_Direction: 2
   m_MinValue: 0
-  m_MaxValue: 3
+  m_MaxValue: 2
   m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
@@ -52735,6 +52736,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 923679d92b5bbcf48b32045bf31010f5, type: 2}
   - {fileID: 11400000, guid: 8dd9b18aa3ddc3b41ba7be473ab63f45, type: 2}
   - {fileID: 11400000, guid: 3ade075515a7dc94e94ba0d30148330b, type: 2}
+  - {fileID: 11400000, guid: c6cf1d0e73ba3f843a1556aa71b22019, type: 2}
   randoNames:
   - Beans on Toast
   - Hard Carry
@@ -53229,7 +53231,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1588105438}
   m_Direction: 2
   m_MinValue: 0
-  m_MaxValue: 3
+  m_MaxValue: 2
   m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
@@ -53343,9 +53345,9 @@ MonoBehaviour:
   m_HandleRect: {fileID: 63164486}
   m_Direction: 3
   m_MinValue: 0
-  m_MaxValue: 5
+  m_MaxValue: 4
   m_WholeNumbers: 1
-  m_Value: 5
+  m_Value: 4
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
