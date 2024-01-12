@@ -10,8 +10,11 @@ public class grimmetalAlly : monsterAlly
         onAbility += UseAbility;
         gameMaster.onMonsterDied += MonsterDied;
 
+        //if (GetMonster().GetPassiveID() == 2)
+        //gameMaster.bRegularDeath = false;
+
         if (GetMonster().GetPassiveID() == 2)
-            gameMaster.bRegularDeath = false;
+            GetMonster().statusReduction = 1;
 
         GetMonster().onAttackAgain += AttackAgain;
         GetMonster().onRemoveConnections += RemoveConnections;
@@ -39,7 +42,7 @@ public class grimmetalAlly : monsterAlly
 
     private void MonsterDied(monster whoDied)
     {
-        if(GetMonster().GetPassiveID() == 2)
+        /*if(GetMonster().GetPassiveID() == 2)
         {
             if(GetMonster().GetCurrentHealth() <= 0)
             {
@@ -48,7 +51,7 @@ public class grimmetalAlly : monsterAlly
 
             GetMonster().PlayAnimation("idle");
             GetMonster().GetExpHold(2).GainExp();
-        }
+        }*/
     }
 
     private void UseAttack(int attackID, monster user, monster target, bool consumeTurn, int extraDamage)
@@ -128,32 +131,12 @@ public class grimmetalAlly : monsterAlly
         monster[] enemyTeam = gameMaster.GetMonstersTeam(target);
         monster[] myTeam = gameMaster.GetMonstersTeam(user);
 
-        gameMaster.MoveMonster(user, myTeam[1], 0);
-        gameMaster.MoveMonster(target, enemyTeam[1], 0);
+        gameMaster.MoveMonster(user, user, 6);
+        gameMaster.MoveMonster(target, target, 6);
 
-        gameMaster.ApplyStatus(user, user, 10, 2, 0);
-        gameMaster.ApplyStatus(user, target, 10, 2, 0);
+        gameMaster.ApplyStatus(target, user, 4, 200, 0);
 
         gameMaster.AdjustTurnOrder(target, true, false);
-
-        for (int i = 0; i < 3; i++)
-        {
-            if (enemyTeam[i].GetCurrentHealth() > 0)
-            {
-                if (enemyTeam[i] != target)
-                {
-                    gameMaster.MoveMonster(enemyTeam[i], enemyTeam[i], 3);
-                }
-            }
-
-            if (myTeam[i].GetCurrentHealth() > 0)
-            {
-                if (myTeam[i] != user)
-                {
-                    gameMaster.MoveMonster(myTeam[i], myTeam[i], 3);
-                }
-            }
-        }
 
         int attack1 = user.GetCurrentStrength() + GetMoveDamage(1, 0);
         attack1 += extraDamage;
@@ -169,10 +152,8 @@ public class grimmetalAlly : monsterAlly
         gameMaster.DamageMonster(user, target, -attack1, didCrit);
 
         yield return new WaitForSeconds(0.6f);
-        if(GetTargetedMonster().isDead())
-        {
-            gameMaster.TryRemoveStatus(user, 10);
-        }
+        gameMaster.MoveMonster(user, target, 1);
+        gameMaster.MoveMonster(target, user, 1);
         yield return new WaitForSeconds(0.4f);
 
         FinishMove(consumeTurn, true);

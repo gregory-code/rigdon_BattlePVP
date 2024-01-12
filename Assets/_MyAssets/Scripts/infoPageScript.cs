@@ -127,6 +127,10 @@ public class infoPageScript : canvasGroupRenderer
                     effect.transform.Find("power").GetComponent<TextMeshProUGUI>().text = status.GetPower() + "";
                     break;
 
+                case 4:
+                    effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() >= 160) ? "(Next enemies action)" : "(" + status.GetCounter() + " turns)";
+                    break;
+
                 case 5:
                     effect.transform.Find("statusCounter").GetComponent<TextMeshProUGUI>().text = (status.GetCounter() >= 160) ? spellShieldInfinite : "(" + status.GetCounter() + " turns)";
                     break;

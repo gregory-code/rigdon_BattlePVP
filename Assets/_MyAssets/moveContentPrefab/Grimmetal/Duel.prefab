@@ -410,10 +410,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '          Deal     damage and isolate
-
-    the target away from their
-    team for 1 turn, they move next'
+  m_text: "           Deal     damage\n enemy moves next in turn order\n  gain taunt
+    during their turn"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f4a03a5b42ac0b64688bf89d29bc8dbb, type: 2}
   m_sharedMaterial: {fileID: 7462457322177501377, guid: f4a03a5b42ac0b64688bf89d29bc8dbb,
@@ -551,7 +549,7 @@ MonoBehaviour:
   isPerecentage: 000000
   isPlus: 000000
   percentageStatMultiplier: 0
-  scaleNums1: 010000000300000005000000
+  scaleNums1: 010000000400000007000000
   scaleNums2: 000000000000000000000000
   scaleNums3: 000000000000000000000000
   givesStatGrowth: 0
@@ -860,7 +858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -27.2, y: 14.89}
+  m_AnchoredPosition: {x: -24.6, y: 14.89}
   m_SizeDelta: {x: -180.8903, y: -68.8126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7320207862807922410

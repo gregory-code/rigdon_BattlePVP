@@ -518,6 +518,8 @@ public class monster : ScriptableObject
     private Transform effectsList;
     private statusEffectUI statusEffectPrefab;
 
+    public int statusReduction = 0;
+
     public statusEffectUI GetStatus(int which)
     {
         if (statusEffects.Count <= 0)
@@ -555,12 +557,16 @@ public class monster : ScriptableObject
     {
         statusEffectUI status = GetStatus(statusIndex);
 
-        statusEffectUI spellShield = GetStatus(5);
-        if(spellShield != null)
+        if (statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 10 || statusIndex == 11)
         {
-            if(statusIndex == 0 || statusIndex == 1 || statusIndex == 2 || statusIndex == 10|| statusIndex == 11)
+            counter -= statusReduction;
+            if (counter <= 0)
+                return;
+
+            statusEffectUI spellShield = GetStatus(5);
+            if (spellShield != null)
             {
-                if(spellShield.GetCounter() >= 160)
+                if (spellShield.GetCounter() >= 160)
                     TryRemoveStatus(5, true);
 
                 return;

@@ -497,6 +497,9 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
         for (int i = 0; i < enemyTeam.Length; i++)
         {
+            if (enemyTeam[i] == null)
+                continue;
+
             statusEffectUI conductive = enemyTeam[i].GetStatus(0);
 
             if (conductive != null && enemyTeam[i].isDead() == false)
@@ -563,7 +566,7 @@ public class GameMaster : MonoBehaviourPunCallbacks
     {
         if (fightingAI)
         {
-            bool doIOwnThis = DoIOwnThis(monMoved);
+            bool doIOwnThis = DoIOwnThis(monMoved.isPlayer1());
             Vector3 pos = monLocation.spawnLocation.position;
 
             switch (uniquePos)
@@ -582,6 +585,10 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
                 case 5:
                     pos = uniqueLocations[uniquePos].position;
+                    break;
+
+                case 6:
+                    pos = (doIOwnThis == true) ? uniqueLocations[uniquePos].position : uniqueLocations[uniquePos + 1].position;
                     break;
             }
 
@@ -617,6 +624,10 @@ public class GameMaster : MonoBehaviourPunCallbacks
 
             case 5:
                 pos = uniqueLocations[uniquePos].position;
+                break;
+
+            case 6:
+                pos = (doIOwnThis == true) ? uniqueLocations[uniquePos].position : uniqueLocations[uniquePos + 1].position;
                 break;
         }
 

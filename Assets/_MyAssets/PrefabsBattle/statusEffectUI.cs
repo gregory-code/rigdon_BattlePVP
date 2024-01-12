@@ -117,10 +117,25 @@ public class statusEffectUI : MonoBehaviour
                 break;
 
             case status.Taunt:
-                UpdateStatusCounter(counter + newCounter);
+                if (counter >= 160)
+                {
+                    UpdateStatusCounter(newCounter);
+                }
+                else if(newCounter <= 160)
+                {
+                    UpdateStatusCounter(counter + newCounter);
+                }
                 break;
 
             case status.SpellShield:
+                if(counter >= 160)
+                {
+                    UpdateStatusCounter(newCounter);
+                }
+                else if(newCounter <= 160)
+                {
+                    UpdateStatusCounter(counter + newCounter);
+                }
                 break;
 
             case status.BrambleCrown:
@@ -256,6 +271,13 @@ public class statusEffectUI : MonoBehaviour
             case status.Bubble:
                 break;
             case status.Taunt:
+                foreach(monster enemy in gameMaster.GetMonstersTeam(usingMonster))
+                {
+                    if (enemy == null)
+                        continue;
+
+                    enemy.onUsedAction += EnemyDidAnAction;
+                }
                 break;
             case status.SpellShield:
                 break;
@@ -319,6 +341,13 @@ public class statusEffectUI : MonoBehaviour
             case status.Bubble:
                 break;
             case status.Taunt:
+                foreach (monster enemy in gameMaster.GetMonstersTeam(usingMonster))
+                {
+                    if (enemy == null)
+                        continue;
+
+                    enemy.onUsedAction -= EnemyDidAnAction;
+                }
                 break;
             case status.SpellShield:
                 break;
@@ -371,6 +400,15 @@ public class statusEffectUI : MonoBehaviour
         {
             gameMaster.redirectedMon = usingMonster;
             StartCoroutine(MoveToProtect());
+        }
+    }
+
+    private void EnemyDidAnAction(monster targetOfAction, bool isAttack)
+    {
+        if(myStatus == status.Taunt && counter >= 160)
+        {
+            if (alreadyRemoved == false)
+                myMonster.TryRemoveStatus(statusIndex, true);
         }
     }
 

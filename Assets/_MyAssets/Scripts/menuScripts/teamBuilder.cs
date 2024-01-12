@@ -219,6 +219,12 @@ public class teamBuilder : canvasGroupRenderer
 
     public void CreateNewMonster(int ID)
     {
+        if(ID != 2 && ID != 4  && ID != 6 && ID != 8 && ID != 14)
+        {
+            GameObject.FindObjectOfType<notifScript>().createNotif("Not yet implimented :(", Color.red);
+            return;
+        }
+
         monsterListCanvasGroup.SetCanvasStatus(false);
         monsterExists[currentMonster] = true;
 
